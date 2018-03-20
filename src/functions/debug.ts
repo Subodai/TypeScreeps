@@ -1,26 +1,26 @@
 export class Debug {
-
-    private static c_grey: string = '#CCCCCC';
-    private static c_red: string = '#FF0000';
-    private static c_green: string = '#00FF00';
-    private static c_blue: string = '#0000FF';
-    private static c_yellow: string = '#FFFF00';
-
+    private static cGrey: string = "#CCCCCC";
+    private static cRed: string = "#FF0000";
+    private static cGreen: string = "#00FF00";
+    private static cBlue: string = "#0000FF";
+    private static cYellow: string = "#FFFF00";
+    private static debugEnabled: boolean = Memory.debugEnabled;
     /**
      * Debug messages for creeps, will spit out room details and creep details
      *
      * @param message {string}
      * @param creep {Creep}
      */
-    public static CreepMsg(message: string, creep: Creep) {
-        let msg: string = '';
-        msg += '<span style="color:' + this.c_grey + ';">[' + Game.time + ']</span> ';
-        let room: Room = creep.room;
+    public static creep(message: string, creep: Creep): void {
+        if (!this.debugEnabled) { return; }
+        let msg: string = "";
+        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
+        const room: Room = creep.room;
         if (room) {
-            msg += '<span style="color:' + this.c_yellow + ';">[' + room.name + ']</span> ';
+            msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "]</span> ";
         }
         if (creep) {
-            msg += '<span style="color:' + this.c_green + ';">[' + creep.name + ']</span> ';
+            msg += "<span style='color:" + this.cGreen + ";'>[" + creep.name + "]</span> ";
         }
         msg += message;
         console.log(msg);
@@ -32,11 +32,14 @@ export class Debug {
      * @param message {string}
      * @param room {Room}
      */
-    public static RoomMsg(message: string, room: Room) {
-        let msg: string = '';
-        msg += '<span style="color:' + this.c_grey + ';">[' + Game.time + ']</span> ';
+    public static room(message: string, room: Room): void {
+        if (!this.debugEnabled) { return; }
+        let msg: string = "";
+        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
         if (room) {
-            msg += '<a href="/a/#!/room/shard1/' + room.name + '"><span style="color:' + this.c_yellow + ';">[' + room.name + ']</span></a> ';
+            msg += "<a href='/a/#!/room/shard1/" + room.name + "'>";
+            msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "]</span>";
+            msg += "</a> ";
         }
         msg += message;
         console.log(msg);
@@ -47,11 +50,24 @@ export class Debug {
      *
      * @param message {string}
      */
-    public static DebugMsg(message: string) {
-        let msg: string = '';
-        msg += '<span style="color:' + this.c_grey + ';">[' + Game.time + ']</span> ';
+    public static Log(message: string): void {
+        if (!this.debugEnabled) { return; }
+        let msg: string = "";
+        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
+        msg += message;
+        console.log(msg);
+    }
+
+    /**
+     * Debug Messages for Memory with niceness
+     *
+     * @param message {string}
+     */
+    public static Memory(message: string): void {
+        if (!this.debugEnabled) { return; }
+        let msg: string = "";
+        msg += "<span style='color:" + this.cRed + ";'>[Memory]</span> ";
         msg += message;
         console.log(msg);
     }
 }
-
