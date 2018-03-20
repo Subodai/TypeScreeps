@@ -5,7 +5,7 @@ const DBG = false;
  * Is a Creep Spawning or fatigued?
  * In other words can it do anything this tick?
  */
-Creep.prototype.isTired = function () {
+Creep.prototype.isTired = function ():boolean {
     return this.spawning || this.fatigue > 0;
 }
 

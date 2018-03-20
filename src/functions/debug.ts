@@ -1,10 +1,10 @@
-export class Functions {
+export class Debug {
 
-    private static c_grey:string   = '#CCCCCC';
-    private static c_red:string    = '#FF0000';
-    private static c_green:string  = '#00FF00';
-    private static c_blue:string   = '#0000FF';
-    private static c_yellow:string = '#FFFF00';
+    private static c_grey: string = '#CCCCCC';
+    private static c_red: string = '#FF0000';
+    private static c_green: string = '#00FF00';
+    private static c_blue: string = '#0000FF';
+    private static c_yellow: string = '#FFFF00';
 
     /**
      * Debug messages for creeps, will spit out room details and creep details
