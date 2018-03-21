@@ -451,4 +451,71 @@ export function loadCreepPrototypes(): void {
         }
         return ERR_BUSY;
     };
+
+    /**
+     * Get Nearby minerals to pickup
+     */
+    Creep.prototype.getNearbyMinerals = function(storage: boolean = false): number {
+        // First are we full?
+        if (this.full()) {
+            this.log("Creep full cannot get nearby minerals");
+            // Clear the pickup target
+            this.invalidateMineralTarget(true);
+        }
+        if (!this.memory.mineralPickup && storage) { this.findStorageMinerals(); }
+        // Start with ground minerals
+        if (!this.memory.mineralPickup) { this.findGroundMinerals(); }
+        // Next Container Minerals
+        if (!this.memory.mineralPickup) { this.findContainerMinerals(); }
+        // Do we have a target?
+        if (this.memory.mineralPickup) { return this.moveToAndPickupMinerals(); }
+        // No target return not found
+        return ERR_NOT_FOUND;
+    };
+
+    Creep.prototype.invalidateMineralTarget = function(full: boolean = false): number {
+        delete this.memory.mineralPickup;
+        if (full) { return ERR_FULL; }
+        return ERR_INVALID_TARGET;
+    };
+
+    Creep.prototype.findStorageMinerals = function(): void {
+        // Have an override, call it storeMinerals for now (it'l do)
+        if (this.room.memory.storeMinerals) { return; }
+        const storage = this.room.storage;
+        // Does this room have a storage? (no harm in checking)
+        if (storage) {
+            // Is there something other than energy in the storage?
+            if (_.sum(storage.store) - storage.store[RESOURCE_ENERGY] > 0) {
+                // Set the target to be the storage
+                this.memory.mineralPickup = storage.id;
+            }
+        }
+    };
+
+    Creep.prototype.findGroundMinerals = function(): void {
+        let resource: boolean | Resource = false;
+        const thisCreep = this;
+        this.log("Creep has no mineral memory, finding stuff to pickup");
+        // First check for nearby dropped resources
+        const resources = this.room.find(FIND_DROPPED_RESOURCES, {
+            filter: (i) => i.resourceType !== RESOURCE_ENERGY &&
+            i.amount > (this.pos.getRangeTo(i) / this.moveEfficiency())
+        });
+        // Did we find resources?
+        if (resources.length > 0) {
+            this.log("Found some minerals picking the clostest");
+            // get the closest resource
+            resource = _.min(resources, (r) => thisCreep.pos.getRangeTo(r));
+            // Did we find some resources?
+            if (resource) {
+                // We did, let's store their id
+                this.memory.mineralPickup = resource.id;
+            }
+        }
+    };
+
+    Creep.prototype.moveEfficiency = function(): number {
+        return 1;
+    };
 }

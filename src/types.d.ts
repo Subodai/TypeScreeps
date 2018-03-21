@@ -10,20 +10,27 @@ interface Creep {
     isTired(): boolean;
     clearTargets(): void;
     getNearbyEnergy(): number;
+    getNearbyMinerals(storage: boolean): number;
     canWork(): boolean;
     canDo(bodyPart: BodyPartConstant): boolean;
     log(msg: string): void;
     travelTo(destination: HasPos | RoomPosition, options?: TravelToOptions): number;
+    invalidateMineralTarget(full: boolean): number;
+    findStorageMinerals(): void;
+    findGroundMinerals(): void;
+    moveEfficiency(): number;
+    findContainerMinerals(): void;
 }
 
 interface CreepMemory {
-    role?:string;
-    level:number;
-    sType?:string;
-    roomName?:string;
-    energyPickup?:string;
-    canWork?:string;
-    repair?:boolean;
+    role?: string;
+    level: number;
+    sType?: string;
+    roomName?: string;
+    energyPickup?: string;
+    mineralPickup?: string;
+    canWork?: string;
+    repair?: boolean;
     _trav?: TravelData;
 }
 
@@ -32,6 +39,7 @@ interface RoomMemory {
     prioritise?: string;
     avoid?: number;
     sources?: any;
+    storeMinerals?: boolean;
 }
 
 interface Room {

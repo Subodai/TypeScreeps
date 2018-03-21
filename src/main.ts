@@ -1,7 +1,7 @@
-/* load functions */
+/* Function Imports */
 import { Debug } from "./functions/debug";
 
-/* load prototypes */
+/* Prototype imports */
 import { loadCreepPrototypes } from "./prototypes/creep";
 import { loadRoomPrototypes } from "./prototypes/room";
 import { loadSourcePrototypes } from "./prototypes/sources";
@@ -10,6 +10,7 @@ import { loadStructurePrototypes } from "./prototypes/structure";
 /* load error mapper */
 import { ErrorMapper } from "./utils/ErrorMapper";
 
+/* Prototype loader */
 loadStructurePrototypes();
 loadSourcePrototypes();
 loadRoomPrototypes();
