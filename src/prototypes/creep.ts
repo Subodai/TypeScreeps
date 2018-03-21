@@ -7,6 +7,14 @@ import { Traveler } from "utils/Traveler";
 export function loadCreepPrototypes(): void {
     // Some debug
     Debug.Log("Loading Creep Prototype");
+
+    /**
+     * Log Handler to make it tidier
+     */
+    Creep.prototype.log = function(msg: string): void {
+        Debug.creep(msg, this);
+    };
+
     /**
      * Is Creep Tired
      * @return boolean
@@ -27,10 +35,13 @@ export function loadCreepPrototypes(): void {
             sType: this.memory.sType
         };
         this.memory = mem;
-        Debug.creep("Target Reset", this);
+        this.log("Target Reset");
     };
 
-    Creep.prototype.canWork = function() {
+    /**
+     * Can this creep do work tasks?
+     */
+    Creep.prototype.canWork = function(): boolean {
         // Has this creep already been flagged as a worker? and at full health
         // (if it's been hit we should check it's parts again)
         if (!this.memory.canWork && this.hits === this.hitsMax) {
@@ -53,9 +64,9 @@ export function loadCreepPrototypes(): void {
     };
 
     /*
- * Does a creep have any active BodyParts of type sent?
- * @param BodyPart Creep.body.part
- */
+    * Does a creep have any active BodyParts of type sent?
+    * @param BodyPart Creep.body.part
+    */
     Creep.prototype.canDo = function(bodyPart: BodyPartConstant): boolean {
         // If this creep needs a bodypart it doesn't have to function properly,
         // it needs to go home to repair or self repair
@@ -86,6 +97,90 @@ export function loadCreepPrototypes(): void {
         return true;
     };
 
+    Creep.prototype.findSpaceAtSource = function(source: Source): boolean {
+        if (source.id === "5982fecbb097071b4adc1835") {
+            // this.DBG = true;
+        }
+        if (this.pos.getRangeTo(source) === 1) {
+            this.log("Already at the source");
+            return true;
+        }
+        this.log("Checking for space at source " + source.id);
+        // return true;
+        // Make sure to initialise the source's last check memory
+        if (!source.memory.lastSpaceCheck) {
+            source.memory.lastSpaceCheck = 0;
+        }
+        // If we checked the space this tick and there's no space left,
+        // we don't need to check again we just need to decrement the spaces
+        if (source.memory.lastSpaceCheck === Game.time) {
+            this.log("Last Check was this tick");
+            if (source.memory.spaces === 0) {
+                this.log("No more spaces");
+                return false;
+            } else {
+                // Decrement the spaces left
+                source.memory.spaces = source.memory.spaces - 1;
+                this.log("Found a space " + source.memory.spaces + "remaining");
+                return true;
+            }
+        }
+        this.log("First check for space at source");
+        let spaces = 1;
+        const n: RoomPosition = new RoomPosition(source.pos.x, source.pos.y - 1, source.pos.roomName);
+        if (this.checkEmptyAtPos(n)) { spaces++; }
+        const ne: RoomPosition = new RoomPosition(source.pos.x + 1, source.pos.y - 1, source.pos.roomName);
+        if (this.checkEmptyAtPos(ne)) { spaces++; }
+        const e: RoomPosition = new RoomPosition(source.pos.x + 1, source.pos.y, source.pos.roomName);
+        if (this.checkEmptyAtPos(e)) { spaces++; }
+        const se: RoomPosition = new RoomPosition(source.pos.x + 1, source.pos.y + 1, source.pos.roomName);
+        if (this.checkEmptyAtPos(se)) { spaces++; }
+        const s: RoomPosition = new RoomPosition(source.pos.x, source.pos.y + 1, source.pos.roomName);
+        if (this.checkEmptyAtPos(s)) { spaces++; }
+        const sw: RoomPosition = new RoomPosition(source.pos.x - 1, source.pos.y + 1, source.pos.roomName);
+        if (this.checkEmptyAtPos(sw)) { spaces++; }
+        const w: RoomPosition = new RoomPosition(source.pos.x - 1, source.pos.y, source.pos.roomName);
+        if (this.checkEmptyAtPos(w)) { spaces++; }
+        const nw: RoomPosition = new RoomPosition(source.pos.x - 1, source.pos.y - 1, source.pos.roomName);
+        if (this.checkEmptyAtPos(nw)) { spaces++; }
+        this.log("We found " + spaces + " spaces at source" + source.id);
+        // Set our memory
+        source.memory.lastSpaceCheck = Game.time;
+        source.memory.spaces = spaces;
+        // If it's 0 there's no space
+        if (source.memory.spaces === 0) {
+            return false;
+        } else {
+            // If it's not 0, there is a space, lets take one off our count and return true
+            // Decrement the spaces left
+            source.memory.spaces = source.memory.spaces - 1;
+            return true;
+        }
+    };
+
+    Creep.prototype.checkEmptyAtPos = function(pos: RoomPosition): boolean {
+        const terrain: Terrain = Game.map.getTerrainAt(pos);
+        if (terrain === "wall") {
+            this.log("Wall found at " + JSON.stringify(pos));
+            return false;
+        } else {
+            const creeps: Creep[] = pos.lookFor(LOOK_CREEPS);
+            if (creeps.length === 0) {
+                this.log("Space found at " + JSON.stringify(pos));
+                return true;
+            } else {
+                // is this, the creep we're trying to find a space for
+                if (creeps[0] === this) {
+                    this.log("We are at " + JSON.stringify(pos));
+                    return true;
+                } else {
+                    this.log("Other creep [" + creeps[0].name + "] found at " + JSON.stringify(pos));
+                    return false;
+                }
+            }
+        }
+    };
+
     /**
      * Find and collect nearby energy
      *
@@ -95,7 +190,7 @@ export function loadCreepPrototypes(): void {
     Creep.prototype.getNearbyEnergy = function(useStorage: boolean = false, emergency: boolean = false): number {
         // First, are we full?
         if (_.sum(this.carry) === this.carryCapacity) {
-            Debug.creep("Creep Full Cannot Get Nearby Energy", this);
+            this.log("Creep Full Cannot Get Nearby Energy");
             // Clear our pickup target
             delete this.memory.energyPickup;
             return ERR_FULL;
@@ -103,10 +198,10 @@ export function loadCreepPrototypes(): void {
         /* Are we near a link with memory of receiver limit to only upgraders or supergraders,
         otherwise refillers become.. interesting*/
         if (!this.memory.energyPickup && (this.memory.role === "upgrader" || this.memory.role === "supergrader")) {
-            Debug.creep("Checking for links", this);
+            this.log("Checking for links");
             // If we're in our own room, with our own controller, above level 5 (should have links)
             if (this.room.controller && this.room.controller.my && this.room.controller.level >= 5) {
-                Debug.creep("Links available", this);
+                this.log("Links available");
                 // Lets find the nearest link with energy that has the right flag
                 const links: Structure[] = this.room.find(FIND_STRUCTURES, {
                     filter: (i) => i.structureType === STRUCTURE_LINK &&
@@ -147,7 +242,7 @@ export function loadCreepPrototypes(): void {
             }
         }
         if (!this.memory.energyPickup) {
-            Debug.creep("Creep has no memory, finding stuff to pickup", this);
+            this.log("Creep has no memory, finding stuff to pickup");
             // If this is an emergency we should be going for the terminal, then storage
             if (emergency) {
                 // TODO EMPTY TERMINAL AND STORAGE HERE PLEASE
@@ -168,12 +263,12 @@ export function loadCreepPrototypes(): void {
             const thisCreep: Creep = this;
             // If we have resources
             if (resources.length > 0) {
-                Debug.creep("Found " + resources.length + " resource piles", this);
+                this.log("Found " + resources.length + " resource piles");
                 resource = _.max(resources, (r) => r.amount / thisCreep.pos.getRangeTo(r));
             }
             // if we have containers
             if (containers.length > 0) {
-                Debug.creep(" Found " + containers.length + " containers", this);
+                this.log(" Found " + containers.length + " containers");
                 container = _.max(containers, (c: StructureContainer) =>
                             c.store[RESOURCE_ENERGY] / thisCreep.pos.getRangeTo(c));
             }
@@ -181,27 +276,27 @@ export function loadCreepPrototypes(): void {
             if (resource && container) {
                 // If the resource is closer
                 if (this.pos.getRangeTo(resource) < this.pos.getRangeTo(container)) {
-                    Debug.creep("Stored resource pile " + resource.id + " in memory", this);
+                    this.log("Stored resource pile " + resource.id + " in memory");
                     this.memory.energyPickup = resource.id;
                 } else {
-                    Debug.creep("Stored container " + container.id + " in memory", this);
+                    this.log("Stored container " + container.id + " in memory");
                     this.memory.energyPickup = container.id;
                 }
             } else if (resource) {
-                Debug.creep("Stored resource pile " + resource.id + " in memory", this);
+                this.log("Stored resource pile " + resource.id + " in memory");
                 this.memory.energyPickup = resource.id;
             } else if (container) {
-                Debug.creep("Stored container " + container.id + " in memory", this);
+                this.log("Stored container " + container.id + " in memory");
                 this.memory.energyPickup = container.id;
             }
             if (this.memory.role === "builder" || this.memory.level <= 2) {
                 // Nothing found? lets try finding available sources
                 if (!this.memory.energyPickup) {
                     // Can this creep work?
-                    if (this.canWork() && this.memory.role != 'refiller') {
-                        DBG && console.log('[' + this.name + '] Can work finding sources');
+                    if (this.canWork() && this.memory.role !== "refiller") {
+                        this.log("Can work, finding sources");
                         const source = this.pos.findClosestByRange(FIND_SOURCES_ACTIVE, {
-                            filter: function (i) {
+                            filter: (i) => {
                                 if (i.energy > 0 || i.ticksToRegeneration < 10) {
                                     const space = thisCreep.findSpaceAtSource(i);
                                     return space;
@@ -211,7 +306,7 @@ export function loadCreepPrototypes(): void {
                             }
                         });
                         if (source) {
-                            DBG && console.log('[' + this.name + '] Stored Source ' + container.id + ' in creep memory');
+                            this.log("Stored Source " + source.id + " in memory");
                             this.memory.energyPickup = source.id;
                         }
                     }
@@ -220,81 +315,83 @@ export function loadCreepPrototypes(): void {
         }
         // Do we have a target?
         if (this.memory.energyPickup) {
-            DBG && console.log('[' + this.name + '] Found Energy source in creeps memory ' + this.memory.energyPickup);
+            this.log("Found energy source in memory " + this.memory.energyPickup);
             // We do! let's grab it
             const target = Game.getObjectById(this.memory.energyPickup);
             if (!target) {
                 delete this.memory.energyPickup;
                 return ERR_INVALID_TARGET;
             }
-            var pickupSuccess = true;
+            let pickupSuccess: boolean = true;
             // Alright what is it?
             if (target instanceof Resource) { // Resource
-                DBG && console.log('[' + this.name + '] Target is a Resource');
+                this.log("Target is a resource");
                 // Is there still enough of it?
                 if (target.amount <= 0 /* (this.carryCapacity - _.sum(this.carry))/4*/) {
-                    DBG && console.log('[' + this.name + '] Resource no longer viable clearing memory');
+                    this.log("Resource no longer viable, clearing memory");
                     // Target has gone, clear memory
                     delete this.memory.energyPickup;
                     return ERR_INVALID_TARGET;
                 }
                 // Only bother trying to pick up if we're within 1 range
                 if (this.pos.inRangeTo(target, 1)) {
-                    DBG && console.log('[' + this.name + '] Target should be in range, attempting pickup');
+                    this.log("Target should be in range, attempting pickup");
                     // First attempt to pickitup
                     if (this.pickup(target) === ERR_NOT_IN_RANGE) {
-                        DBG && console.log('[' + this.name + '] Pickup failed');
-                        var pickupSuccess = false;
+                        this.log("Pickup failed");
+                        pickupSuccess = false;
                     }
                 } else {
-                    DBG && console.log('[' + this.name + '] Target not in range');
-                    var pickupSuccess = false;
+                    this.log("Target not in range");
+                    pickupSuccess = false;
                 }
-            } else if (target instanceof StructureContainer || target instanceof StructureStorage || target instanceof StructureTerminal) { // Container, Storage, Terminal
-                DBG && console.log('[' + this.name + '] Target is a Container, Storage, or Terminal');
+            } else if (target instanceof StructureContainer ||
+                       target instanceof StructureStorage ||
+                       target instanceof StructureTerminal) { // Container, Storage, Terminal
+                this.log("Target is Container, Storage or Terminal");
                 // Check the container still has the energy
                 if (target.store[RESOURCE_ENERGY] <= 0 /* (this.carryCapacity - _.sum(this.carry))/4*/) {
-                    DBG && console.log('[' + this.name + '] Target no longer has enough energy clearing memory');
+                    this.log("Target no longer has enough energy, clearing memory");
                     // Clear memory and return invalid target
                     delete this.memory.energyPickup;
                     return ERR_INVALID_TARGET;
                 }
                 // Only bother trying to pick up if we're within 1 range
                 if (this.pos.inRangeTo(target, 1)) {
-                    DBG && console.log('[' + this.name + '] Target should be in range, attempting withdraw');
+                    this.log("Target should be in range, attempting withdraw");
                     // Lets attempt to withdraw
                     if (this.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                        DBG && console.log('[' + this.name + '] Withdraw failed');
-                        var pickupSuccess = false;
+                        this.log("Withdraw failed");
+                        pickupSuccess = false;
                     }
                 } else {
-                    DBG && console.log('[' + this.name + '] Target not in range');
-                    var pickupSuccess = false;
+                    this.log("Target not in range");
+                    pickupSuccess = false;
                 }
             } else if (target instanceof StructureLink) { // Link
-                DBG && console.log('[' + this.name + '] Target is a Link');
+                this.log("Target is a link");
                 // Check the container still has the energy
-                if (target.energy == 0) {
-                    DBG && console.log('[' + this.name + '] Target no longer has enough energy clearing memory');
+                if (target.energy === 0) {
+                    this.log("Target no longer has enough energy, clearing memory");
                     // Clear memory and return invalid target
                     delete this.memory.energyPickup;
                     return ERR_INVALID_TARGET;
                 }
                 // Only bother trying to pick up if we're within 1 range
                 if (this.pos.inRangeTo(target, 1)) {
-                    DBG && console.log('[' + this.name + '] Target should be in range, attempting withdraw');
+                    this.log("Target should be in range, attempting withdraw");
                     // Lets attempt to withdraw
                     if (this.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                        DBG && console.log('[' + this.name + '] Withdraw failed');
-                        var pickupSuccess = false;
+                        this.log("Withdraw failed");
+                        pickupSuccess = false;
                     }
                 } else {
-                    DBG && console.log('[' + this.name + '] Target not in range');
-                    var pickupSuccess = false;
+                    this.log("Target not in range");
+                    pickupSuccess = false;
                 }
 
             } else if (target instanceof Source) { // Source
-                if (this.memory.role != 'builder' && this.memory.level >= 2) {
+                if (this.memory.role !== "builder" && this.memory.level >= 2) {
                     delete this.memory.energyPickup;
                 }
                 if (!this.canWork()) {
@@ -303,30 +400,30 @@ export function loadCreepPrototypes(): void {
                     return ERR_INVALID_TARGET;
                 }
                 // Does it still have energy ?
-                if (target.energy == 0) {
-                    DBG && console.log('[' + this.name + '] Source no longer has energy, clearing memory');
+                if (target.energy === 0) {
+                    this.log("Source no longer has energy, clearing memory");
                     // no clear the memory
                     delete this.memory.energyPickup;
                     return ERR_INVALID_TARGET;
                 }
                 // Check for space
                 if (!this.findSpaceAtSource(target)) {
-                    DBG && console.log('[' + this.name + '] Source no longer has space, clearing memory');
+                    this.log("Source no longer has space, clearing memory");
                     // no clear the memory
                     delete this.memory.energyPickup;
                     return ERR_INVALID_TARGET;
                 }
                 // Only bother trying to pick up if we're within 1 range
                 if (this.pos.inRangeTo(target, 1)) {
-                    DBG && console.log('[' + this.name + '] Target should be in range, attempting harvest');
+                    this.log("Target should be in range, attempting harvest");
                     // Alright lets try harvesting it
                     if (this.harvest(target) === ERR_NOT_IN_RANGE) {
-                        DBG && console.log('[' + this.name + '] Harvest failed');
-                        var pickupSuccess = false;
+                        this.log("Harvest failed");
+                        pickupSuccess = false;
                     }
                 } else {
-                    DBG && console.log('[' + this.name + '] Target not in range');
-                    var pickupSuccess = false;
+                    this.log("Target not in range");
+                    pickupSuccess = false;
                 }
             } else {
                 // Something went wrong, or what we wanted to pickup has disapeared...
@@ -335,11 +432,10 @@ export function loadCreepPrototypes(): void {
             }
             // Did we successfully pick up the thing
             if (pickupSuccess) {
-                DBG && console.log('[' + this.name + '] Successfully gathered resources');
-                this.say(global.sayWithdraw);
+                this.log("Successfully gathered resources");
                 // Are we now full?
                 if (this.carry.energy === this.carryCapacity) {
-                    DBG && console.log('[' + this.name + '] Creep is now full clearing pickup memory');
+                    this.log("Creep is now full clearing pickup memory");
                     // Alright we're full clear memory and return full
                     delete this.memory.energyPickup;
                     return ERR_FULL;
@@ -347,14 +443,12 @@ export function loadCreepPrototypes(): void {
                 // Just return OK, we're not full yet
                 return OK;
             } else {
-                DBG && console.log('[' + this.name + '] Moving closer to target');
+                this.log("Moving closer to target");
                 // We probably need to move
                 this.travelTo(target);
-                // Say!
-                this.say(global.sayMove);
                 return OK;
             }
         }
-
+        return ERR_BUSY;
     };
 }

@@ -13,15 +13,14 @@ export function loadStructurePrototypes(): void {
     Object.defineProperty(OwnedStructure.prototype, "memory", {
         configurable: true,
         enumerable: false,
-        get: function() {
+        get(): any {
             if (!Memory.structures[this.id]) {
                 Memory.structures[this.id] = {};
             }
             return Memory.structures[this.id];
         },
-        set: function (v) {
+        set(v: any): any {
             return _.set(Memory, "structures." + this.id, v);
         }
-
     });
 }

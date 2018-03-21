@@ -2,14 +2,18 @@
 // for stricter node.js typings, remove this and install `@types/node`
 declare const require: (module: string) => any;
 
+declare let global: any;
 // add your custom typings here
 interface Creep {
+    checkEmptyAtPos(pos: RoomPosition): boolean;
+    findSpaceAtSource(source: Source): boolean;
     isTired(): boolean;
     clearTargets(): void;
     getNearbyEnergy(): number;
     canWork(): boolean;
     canDo(bodyPart: BodyPartConstant): boolean;
-    travelTo(destination: HasPos | RoomPosition, options: TravelToOptions): number;
+    log(msg: string): void;
+    travelTo(destination: HasPos | RoomPosition, options?: TravelToOptions): number;
 }
 
 interface CreepMemory {
@@ -24,9 +28,10 @@ interface CreepMemory {
 }
 
 interface RoomMemory {
-    links?:boolean;
-    prioritise?:string;
+    links?: boolean;
+    prioritise?: string;
     avoid?: number;
+    sources?: any;
 }
 
 interface Room {
@@ -34,7 +39,11 @@ interface Room {
 }
 
 interface OwnedStructure {
-    memory:any;
+    memory?: any;
+}
+
+interface Source {
+    memory?: any;
 }
 
 

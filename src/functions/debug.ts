@@ -5,6 +5,8 @@ export class Debug {
     private static cBlue: string = "#0000FF";
     private static cYellow: string = "#FFFF00";
     private static debugEnabled: boolean = Memory.debugEnabled;
+    private static creepDebugEnabled: boolean = Memory.creepDebug;
+    private static roomDebugEnabled: boolean = Memory.roomDebug;
     /**
      * Debug messages for creeps, will spit out room details and creep details
      *
@@ -12,7 +14,7 @@ export class Debug {
      * @param creep {Creep}
      */
     public static creep(message: string, creep: Creep): void {
-        if (!this.debugEnabled) { return; }
+        if (!this.creepDebugEnabled || !this.debugEnabled) { return; }
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
         const room: Room = creep.room;
@@ -33,7 +35,7 @@ export class Debug {
      * @param room {Room}
      */
     public static room(message: string, room: Room): void {
-        if (!this.debugEnabled) { return; }
+        if (!this.roomDebugEnabled || !this.debugEnabled) { return; }
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
         if (room) {
