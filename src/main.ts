@@ -2,19 +2,14 @@
 import { Debug } from "./functions/debug";
 
 /* Prototype imports */
-import { loadCreepPrototypes } from "./prototypes/creep";
-import { loadRoomPrototypes } from "./prototypes/room";
-import { loadSourcePrototypes } from "./prototypes/sources";
-import { loadStructurePrototypes } from "./prototypes/structure";
+import { loadPrototypes } from "prototypes/all";
 
 /* load error mapper */
 import { ErrorMapper } from "./utils/ErrorMapper";
 
 /* Prototype loader */
-loadStructurePrototypes();
-loadSourcePrototypes();
-loadRoomPrototypes();
-loadCreepPrototypes();
+loadPrototypes();
+
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {

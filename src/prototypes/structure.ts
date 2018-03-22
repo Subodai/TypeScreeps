@@ -1,7 +1,8 @@
 import { Debug } from "functions/debug";
 
 export function loadStructurePrototypes(): void {
-    Debug.Log("Loading Structure Prototype");
+    // Debug
+    Debug.Log("Structure Prototype Init");
 
     if (!Memory.structures) {
         Debug.Memory("Initialising Structure Memory");
