@@ -15,11 +15,18 @@ interface Creep {
     canDo(bodyPart: BodyPartConstant): boolean;
     log(msg: string): void;
     travelTo(destination: HasPos | RoomPosition, options?: TravelToOptions): number;
-    invalidateMineralTarget(full: boolean): number;
+    invalidateMineralTarget(full?: boolean): number;
     findStorageMinerals(): void;
     findGroundMinerals(): void;
     moveEfficiency(): number;
     findContainerMinerals(): void;
+    moveToAndPickupMinerals(): number;
+    canPickup(target: RoomObject, range?: number): boolean;
+    full(): boolean;
+    roadCheck(work?: boolean): void;
+    containerCheck(): void | boolean;
+    repairStructures(roads?: boolean, defences?: boolean, structures?: boolean): number;
+    findDamagedStructures(): void;
 }
 
 interface CreepMemory {
@@ -32,6 +39,8 @@ interface CreepMemory {
     canWork?: string;
     repair?: boolean;
     _trav?: TravelData;
+    repairTarget?: string;
+    targetMaxHP?: number;
 }
 
 interface RoomMemory {
@@ -44,6 +53,10 @@ interface RoomMemory {
 
 interface Room {
     clearSites(): number;
+}
+
+interface RoomPosition {
+    isRoomEdge(): boolean;
 }
 
 interface OwnedStructure {

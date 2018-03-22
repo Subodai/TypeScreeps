@@ -17,7 +17,7 @@ export function loadCreepPrototypes(): void {
 
     /**
      * Is Creep Tired
-     * @return boolean
+     * @returns {boolean}
      */
     Creep.prototype.isTired = function(): boolean {
         return this.spawning || this.fatigue > 0;
@@ -25,7 +25,7 @@ export function loadCreepPrototypes(): void {
 
     /**
      * Clear creep memory
-     * @return void
+     * @returns {void}
      */
     Creep.prototype.clearTargets = function(): void {
         const mem: CreepMemory = {
@@ -63,10 +63,10 @@ export function loadCreepPrototypes(): void {
         return this.memory.canWork === "yes";
     };
 
-    /*
-    * Does a creep have any active BodyParts of type sent?
-    * @param BodyPart Creep.body.part
-    */
+    /**
+     * Does a creep have any active BodyParts of type sent?
+     * @param BodyPart Creep.body.part
+     */
     Creep.prototype.canDo = function(bodyPart: BodyPartConstant): boolean {
         // If this creep needs a bodypart it doesn't have to function properly,
         // it needs to go home to repair or self repair
@@ -473,12 +473,18 @@ export function loadCreepPrototypes(): void {
         return ERR_NOT_FOUND;
     };
 
+    /**
+     * Invalidate mineral storage in creep memory
+     */
     Creep.prototype.invalidateMineralTarget = function(full: boolean = false): number {
         delete this.memory.mineralPickup;
         if (full) { return ERR_FULL; }
         return ERR_INVALID_TARGET;
     };
 
+    /**
+     * Find minerals in storage
+     */
     Creep.prototype.findStorageMinerals = function(): void {
         // Have an override, call it storeMinerals for now (it'l do)
         if (this.room.memory.storeMinerals) { return; }
@@ -493,6 +499,9 @@ export function loadCreepPrototypes(): void {
         }
     };
 
+    /**
+     * Find ground based minerals
+     */
     Creep.prototype.findGroundMinerals = function(): void {
         let resource: boolean | Resource = false;
         const thisCreep = this;
@@ -500,7 +509,7 @@ export function loadCreepPrototypes(): void {
         // First check for nearby dropped resources
         const resources = this.room.find(FIND_DROPPED_RESOURCES, {
             filter: (i) => i.resourceType !== RESOURCE_ENERGY &&
-            i.amount > (this.pos.getRangeTo(i) / this.moveEfficiency())
+                           i.amount > (this.pos.getRangeTo(i) / this.moveEfficiency())
         });
         // Did we find resources?
         if (resources.length > 0) {
@@ -515,7 +524,369 @@ export function loadCreepPrototypes(): void {
         }
     };
 
-    Creep.prototype.moveEfficiency = function(): number {
-        return 1;
+    /**
+     * Find minerals on containers
+     */
+    Creep.prototype.findContainerMinerals = function(): void {
+        let container: boolean | Structure = false;
+        const thisCreep = this;
+        this.log("Creep searching for mineral containers");
+        // Check for containers with anything other than energy in them
+        const containers = this.room.find(FIND_STRUCTURES, {
+            filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
+                           (_.sum(i.store) - i.store[RESOURCE_ENERGY]) > 0
+        });
+        // Any containers?
+        if (containers.length > 0) {
+            this.log("Found some mineral containers, picking the most cost effective");
+            container = _.max(containers, (c: StructureContainer) =>
+                        (_.sum(c.store) - c.store[RESOURCE_ENERGY]) / thisCreep.pos.getRangeTo(c));
+            // Did we find a container
+            if (container) {
+                // We did it, store the id
+                this.memory.mineralPickup = container.id;
+            }
+        }
+    };
+
+    /**
+     * Move to and pickup minerals
+     */
+    Creep.prototype.moveToAndPickupMinerals = function(): number {
+        this.log("Found minerals in memory");
+        const target: Resource | StructureContainer | StructureStorage | null =
+        Game.getObjectById(this.memory.mineralPickup);
+        // if the target is invalid, or cannot be found let's clear it
+        if (!target) { return this.invalidateMineralTarget(); }
+        // Quick validation pass on the target
+        if (target instanceof Resource) {
+            // If it's going to disapwn before we get there, then there's no point in carrying on
+            if (target.amount < (this.pos.getRangeTo(target) / this.moveEfficiency())) {
+                return this.invalidateMineralTarget();
+            }
+            // Can we pick it up yet?
+            if (!this.canPickup(target)) {
+                this.say(global.sayMove);
+                // We can't pick it up yet, let's move to it
+                this.travelTo(target);
+            }
+            // Can we pick it up after our move?
+            if (this.canPickup(target)) {
+                // Attempt to pick it up
+                const pickupResult = this.pickup(target);
+                // Check the result
+                if (pickupResult === ERR_NOT_IN_RANGE) {
+                    // something went wrong
+                } else if (pickupResult === OK) {
+                    this.say(global.sayPickup);
+                    // Invalidate and return full
+                    return this.invalidateMineralTarget(true);
+                }
+            }
+        } else if (target instanceof StructureContainer || target instanceof StructureStorage) {
+            // Check there is still res in the container
+            if (_.sum(target.store) - target.store[RESOURCE_ENERGY] === 0) {
+                return this.invalidateMineralTarget();
+            }
+            // Can we pick it up yet?
+            if (!this.canPickup(target)) {
+                this.say(global.sayMove);
+                // Can't pick it up yet, so lets move towards it
+                this.travelTo(target);
+            }
+            // Can we pick it up now?
+            if (this.canPickup(target)) {
+                // Loop through all the resources in the container
+                for (const r in target.store) {
+                    // If there is more than 0 of this mineral, let's pick it up
+                    if (target.store.hasOwnProperty(r) && r !== RESOURCE_ENERGY) {
+                        // Attempt to pick it up
+                        const pickupResult = this.withdraw(target, r as ResourceConstant);
+                        // check the result
+                        if (pickupResult === ERR_NOT_IN_RANGE) {
+                            // something probbaly went wrong
+                        } else if (pickupResult === OK) {
+                            this.say(global.sayWithdraw);
+                            // Invalidate and return full
+                            return this.invalidateMineralTarget(this.full());
+                        }
+                    }
+                }
+            }
+        }
+        // We've probably moved return ok
+        return OK;
+    };
+
+    /**
+     * Is creep in range of target to pick it up?
+     */
+    Creep.prototype.canPickup = function(target: RoomObject, range: number = 1): boolean {
+        if (!target) { return false; }
+        // Are we within 1 range?
+        return this.pos.inRangeTo(target, range);
+    };
+
+    /**
+     * Is Creep Full?
+     */
+    Creep.prototype.full = function() {
+        return _.sum(this.carry) >= this.carryCapacity;
+    };
+
+    /**
+     * Road check
+     */
+    Creep.prototype.roadCheck = function(work: boolean = false): void {
+        let road: Structure | boolean = false;
+        let site: ConstructionSite | boolean = false;
+        let flag: Flag | boolean = false;
+        // Don't lay roads no room edges
+        if (this.pos.isRoomEdge()) { return; }
+        const obj = this.room.lookForAt(LOOK_STRUCTURES, this.pos);
+        if (obj.length > 0) {
+            for (const i in obj) {
+                if (obj[i].structureType === STRUCTURE_ROAD) {
+                    this.log("Already road here");
+                    road = obj[i];
+                    break;
+                }
+            }
+        }
+        if (road && work && this.carry.energy > 0) {
+            if (road.hits < road.hitsMax) {
+                this.log("Repairing existing road");
+                this.repair(road);
+            } else {
+                this.log("Road good to go");
+            }
+            return;
+        }
+        if (road) {
+            this.log("Already road, no action to perform");
+            return;
+        }
+        // No road?
+        if (!road) {
+            // Are we in one of our OWN rooms
+            if (this.room.controller) {
+                if (this.room.controller.my) {
+                    // DO nothing don't want millions of roads!
+                    return;
+                }
+            }
+            this.log("No road, looking for construction site");
+            // Check for construction sites
+            const sites = this.room.lookForAt(LOOK_CONSTRUCTION_SITES, this.pos);
+            if (sites.length > 0) {
+                this.log("Found construction site");
+                if (sites[0].structureType === STRUCTURE_ROAD) {
+                    site = sites[0];
+                }
+            }
+        }
+        if (site && work && this.carry.energy > 0) {
+            this.log("Building construction site");
+            this.build(site);
+            return;
+        }
+        // No site?
+        if (!site) {
+            this.log("No construction site, looking for flags");
+            // Check for flag
+            const flags = _.filter(Game.flags, (f) => f.pos === this.pos);
+            // let flags = this.room.lookForAt(LOOK_FLAGS, this.pos);
+            if (flags.length > 0) {
+                this.log("Found a flag");
+                flag = flags[0];
+            }
+        }
+        this.log(" No road, site, or flag.. attempting to place one");
+        this.log(JSON.stringify(this.pos));
+        // No site, no flag, and we're seeding remote roads
+        if (!site && !flag && global.seedRemoteRoads === true) {
+            // How many construction flags do we have?
+            const roadFlags = _.filter(Game.flags, (f) =>
+            f.color === global.flagColor.buildsite && f.secondaryColor === COLOR_WHITE);
+            // If we have 100 or more road flags, don't make any more!
+            if (roadFlags.length >= 100) {
+                this.log("Enough flags not dropping any more");
+                return;
+            }
+            this.log("Dropping a flag");
+            this.pos.createFlag();
+            return;
+        }
+    };
+
+    /**
+     * Check and repair container if sat on one
+     */
+    Creep.prototype.containerCheck = function(): void | boolean {
+        // If we're in our own room, stop right there! no container check here please
+        if (this.room.controller && this.room.controller.my) { return; }
+        // Check we have energy (and it's higher than 0.. because 0 probably means we got smacked and lost our carry)
+        if (this.carry.energy >= this.carryCapacity && this.carry.energy > 0) {
+            let container: StructureContainer | boolean = false;
+            // Check for structures at our pos
+            const objects = this.pos.lookFor(LOOK_STRUCTURES);
+            if (objects.length > 0) {
+                for (const i in objects) {
+                    if (objects[i].structureType === STRUCTURE_CONTAINER) {
+                        container = objects[i] as StructureContainer;
+                        break;
+                    }
+                }
+            }
+            // Is there a container?
+            if (container) {
+                if (container.hits < container.hitsMax) {
+                    this.repair(container);
+                    return;
+                }
+            } else {
+                let constructionSite: ConstructionSite | boolean = false;
+                // Get sites
+                const sites = this.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+                // If there are some
+                if (sites.length > 0) {
+                    // loop
+                    for (const i in sites) {
+                        // is this site a container?
+                        if (sites[i].structureType === STRUCTURE_CONTAINER) {
+                            constructionSite = sites[i];
+                            break;
+                        }
+                    }
+                }
+                // Did we find one?
+                if (constructionSite) {
+                    this.build(constructionSite);
+                    this.say(global.sayBuild);
+                    return true;
+                } else {
+                    this.pos.createConstructionSite(STRUCTURE_CONTAINER);
+                    return;
+                }
+            }
+        }
+    };
+
+    Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = false, s: boolean = false): number {
+        // First are we empty?
+        if (this.carry.energy === 0) {
+            this.log("Empty cannot repair anything");
+            // Clear repair target
+            delete this.memory.repairTarget;
+            delete this.memory.targetMaxHP;
+            return ERR_NOT_ENOUGH_ENERGY;
+        }
+        // Is their an item in memory, with full health already?
+        if (this.memory.repairTarget) {
+            const target: Structure | null = Game.getObjectById(this.memory.repairTarget);
+            if (target) {
+                let targetHits = 0;
+                if (this.memory.targetMaxHP) {
+                    targetHits = this.memory.targetMaxHP;
+                }
+                // Have we already filled the items health to what we want?
+                if (target.hits >= targetHits) {
+                    // Clear the target, time for a new one
+                    delete this.memory.repairTarget;
+                    delete this.memory.targetMaxHP;
+                }
+            } else {
+                delete this.memory.repairTarget;
+                delete this.memory.targetMaxHP;
+            }
+        }
+        // Do we have a repairTarget in memory?
+        if (!this.memory.repairTarget && d) {
+            this.log("Has no repair target, looking for 1 hp ramparts and walls");
+            // Check for walls or ramparts with 1 hit first
+            const targets = this.room.find(FIND_STRUCTURES, {
+                filter: (i) => (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL) &&
+                i.hits === 1 && i.room === this.room
+            });
+
+            if (targets.length > 0) {
+                this.log("Found a 1 hp item, setting target");
+                this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
+                this.memory.targetMaxHP = 10;
+            }
+        }
+
+        // Next juice up walls and ramparts to 600
+        if (!this.memory.repairTarget && d) {
+            this.log("Has no repair target, looking for < 600hp ramparts and walls");
+            const targets = this.room.find(FIND_STRUCTURES, {
+                filter: (i) => (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL)
+                                && i.hits <= 600 && i.room === this.room
+            });
+            if (targets.length > 0) {
+                this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
+                this.memory.targetMaxHP = 600;
+            }
+        }
+
+        // Next find damaged structures that aren't walls, ramparts or roads
+        if (!this.memory.repairTarget && s) {
+            this.log("Has no repair target, looking for damaged structures");
+            this.findDamagedStructures();
+        }
+
+        // Next find Damaged Roads
+        if (!this.memory.repairTarget && r) {
+            this.log("Has no repair target, looking for damaged roads");
+            // this.findDamagedRoads();
+        }
+
+        // Next find Damaged defence items (wall, rampart)
+        if (!this.memory.repairTarget && d) {
+            this.log("Has no repair target, looking for damaged defences");
+            // this.findDamagedDefences();
+        }
+        // Do we have something to repair?
+        if (this.memory.repairTarget) {
+            this.log("Has a repair target, checking close enough to repair");
+            const target: Structure | null = Game.getObjectById(this.memory.repairTarget);
+            // Make sure target is still valid
+            let targetHits = 0;
+            if (this.memory.targetMaxHP) {
+                targetHits = this.memory.targetMaxHP;
+            }
+            if (target) {
+                if (target.hits >= targetHits) {
+                    this.log("Repair target at target XP deleting target from memory");
+                    delete this.memory.repairTarget;
+                    delete this.memory.targetMaxHP;
+                    return ERR_FULL;
+                }
+                if (this.pos.inRangeTo(target, 3)) {
+                    this.log("Target in range, attempting repair");
+                    // attempt repair
+                    if (this.repair(target) === ERR_NOT_IN_RANGE) {
+                        this.log("Repair Failed");
+                    }
+                } else {
+                    this.log("Travelling to target");
+                    this.travelTo(target);
+                    return OK;
+                }
+            }
+        } else {
+            // Nothing to repair?
+            // No targets.. head back to the room spawn
+            const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
+                filter: (i) => i.structureType === STRUCTURE_SPAWN
+            }) as StructureSpawn;
+            if (spawn) {
+                if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
+                    this.travelTo(spawn);
+                }
+            }
+            return ERR_INVALID_TARGET;
+        }
+        return OK;
     };
 }
