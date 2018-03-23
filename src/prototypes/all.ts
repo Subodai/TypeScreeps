@@ -6,11 +6,11 @@ import { loadSourcePrototypes } from "./sources";
 import { loadStructurePrototypes } from "./structure";
 
 export function loadPrototypes(): void {
-    Debug.Log("Prototype Load Start");
+    Debug.Load("Prototype: Start[" + Game.cpu.getUsed() + "]");
     loadCreepPrototypes();
     loadRoomPrototypes();
     loadRoomPositionPrototypes();
     loadStructurePrototypes();
     loadSourcePrototypes();
-    Debug.Log("Prototype Load Complete");
+    Debug.Load("Prototype: Complete[" + Game.cpu.getUsed() + "]");
 }

@@ -6,7 +6,7 @@ import { Traveler } from "utils/Traveler";
  */
 export function loadCreepPrototypes(): void {
     // Some debug
-    Debug.Log("Creep Prototype Init");
+    Debug.Load("Prototype: Creep");
 
     /**
      * Log Handler to make it tidier

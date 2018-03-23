@@ -34,7 +34,7 @@ export class Debug {
      * @param message {string}
      * @param room {Room}
      */
-    public static room(message: string, room: Room): void {
+    public static Room(message: string, room: Room): void {
         if (!this.roomDebugEnabled || !this.debugEnabled) { return; }
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
@@ -69,6 +69,18 @@ export class Debug {
         if (!this.debugEnabled) { return; }
         let msg: string = "";
         msg += "<span style='color:" + this.cRed + ";'>[Memory]</span> ";
+        msg += message;
+        console.log(msg);
+    }
+
+    /**
+     * Debug Messages for Module Loads
+     * @param message {string}
+     */
+    public static Load(message: string): void {
+        // always debug loads
+        let msg: string = "";
+        msg += "<span style='color:" + this.cYellow + ";'>[Load]</span> ";
         msg += message;
         console.log(msg);
     }

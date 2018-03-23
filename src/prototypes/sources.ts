@@ -2,7 +2,7 @@ import { Debug } from "functions/debug";
 
 export function loadSourcePrototypes(): void {
     // Debug
-    Debug.Log("Source Prototype Init");
+    Debug.Load("Prototype: Source");
 
     if (!Memory.sources) {
         Debug.Memory("Initialising Source Memory");

@@ -2,7 +2,7 @@ import { Debug } from "functions/debug";
 
 export function loadRoomPositionPrototypes(): void {
     // Debug
-    Debug.Log("RoomPosition Prototype Init");
+    Debug.Load("Prototype: RoomPosition");
     /**
      * Is this roomposition at at room edge?
      * @returns {boolean}

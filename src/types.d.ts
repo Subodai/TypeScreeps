@@ -43,16 +43,26 @@ interface CreepMemory {
     targetMaxHP?: number;
 }
 
+interface Room {
+    clearSites(): number;
+    collectableEnergy(): number;
+    hostiles(): number;
+    drain(): void;
+    stopDrain(): void;
+}
+
 interface RoomMemory {
     links?: boolean;
     prioritise?: string;
     avoid?: number;
     sources?: any;
     storeMinerals?: boolean;
-}
-
-interface Room {
-    clearSites(): number;
+    war?: boolean;
+    lastEnergyCheck?: number;
+    energy?: number;
+    lastHostileCheck?: number;
+    hostiles?: number;
+    charging?: boolean;
 }
 
 interface RoomPosition {

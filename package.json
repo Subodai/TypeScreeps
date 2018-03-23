@@ -37,6 +37,7 @@
     "typescript": "^2.7.1"
   },
   "dependencies": {
+    "npm": "^5.7.1",
     "source-map": "~0.6.1",
     "traveler": "^0.1.0"
   }
