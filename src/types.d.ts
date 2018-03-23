@@ -41,6 +41,7 @@ interface CreepMemory {
     _trav?: TravelData;
     repairTarget?: string;
     targetMaxHP?: number;
+    dying?: boolean;
 }
 
 interface Room {
@@ -63,6 +64,7 @@ interface RoomMemory {
     lastHostileCheck?: number;
     hostiles?: number;
     charging?: boolean;
+    keep?: boolean;
 }
 
 interface RoomPosition {

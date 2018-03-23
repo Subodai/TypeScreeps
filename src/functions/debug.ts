@@ -7,6 +7,7 @@ export class Debug {
     private static debugEnabled: boolean = Memory.debugEnabled;
     private static creepDebugEnabled: boolean = Memory.creepDebug;
     private static roomDebugEnabled: boolean = Memory.roomDebug;
+    private static memoryDebugEnabled: boolean = Memory.memoryDebug;
     /**
      * Debug messages for creeps, will spit out room details and creep details
      *
@@ -66,7 +67,7 @@ export class Debug {
      * @param message {string}
      */
     public static Memory(message: string): void {
-        if (!this.debugEnabled) { return; }
+        if (!this.memoryDebugEnabled || !this.debugEnabled) { return; }
         let msg: string = "";
         msg += "<span style='color:" + this.cRed + ";'>[Memory]</span> ";
         msg += message;
@@ -84,4 +85,47 @@ export class Debug {
         msg += message;
         console.log(msg);
     }
+}
+
+export function debugEnablers(): void {
+    Debug.Load("Global Debug functions enabled");
+    global.ToggleDebug = function ToggleDebug(): string {
+        if (!Memory.debugEnabled) {
+            Memory.debugEnabled = true;
+            return "Debug Enabled";
+        } else {
+            Memory.debugEnabled = false;
+            return "Debug Disabled";
+        }
+    };
+
+    global.ToggleCreepDebug = function ToggleCreepDebug(): string {
+        if (!Memory.creepDebug) {
+            Memory.creepDebug = true;
+            return "Creep Debug Enabled";
+        } else {
+            Memory.creepDebug = false;
+            return "Creep Debug Disabled";
+        }
+    };
+
+    global.ToggleRoomDebug = function ToggleRoomDebug(): string {
+        if (!Memory.roomDebug) {
+            Memory.roomDebug = true;
+            return "Room Debug Enabled";
+        } else {
+            Memory.roomDebug = false;
+            return "Room Debug Disabled";
+        }
+    };
+
+    global.ToggleMemoryDebug = function ToggleMemorybug(): string {
+        if (!Memory.memoryDebug) {
+            Memory.memoryDebug = true;
+            return "Memory Debug Enabled";
+        } else {
+            Memory.memoryDebug = false;
+            return "Memory Debug Disabled";
+        }
+    };
 }
