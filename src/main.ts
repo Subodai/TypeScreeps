@@ -3,6 +3,7 @@ import { init } from "config/init";
 
 /* Function Imports */
 import { Cleaner } from "./functions/cleaner";
+import { Counter } from "./functions/counter";
 import { Debug, debugEnablers } from "./functions/debug";
 
 /* Prototype imports */
@@ -27,5 +28,5 @@ export const loop = ErrorMapper.wrapLoop(() => {
     Debug.Log(`Current game tick is ${Game.time}: Age:${Game.time - global.born}`);
     // Run Cleaner First
     Cleaner.run();
-
+    Counter.run();
 });

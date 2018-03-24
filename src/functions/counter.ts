@@ -1,3 +1,5 @@
+import { Debug } from "./debug";
+
 export class Counter {
 
     private static notify: boolean = false;
@@ -10,15 +12,15 @@ export class Counter {
         for (const room in Game.rooms) {
             const Room: Room = Game.rooms[room];
             let owned: boolean = false;
-            let list = {};
-            let miners = {};
+            let list = [];
+            let miners = [];
             const hostiles: number = Room.hostiles();
             // If Room is false
             if (!Room || Room === undefined) { continue; }
             // Check ownership
             if (Room.controller && Room.controller!.my) { owned = true; }
             // Init the room
-            // Room.init(); // TODO add init
+            Room.init();
             if (owned) {
                 let minCreeps: number = 1;
                 let desiredCreeps: number = 4;
@@ -52,7 +54,61 @@ export class Counter {
                         Room.memory.links = false;
                     }
                 }
+
+                // If we're not in emergency mode
+                if (!Room.memory.emergency) {
+                    if (list.length <= minCreeps || miners.length < minMiners) {
+                        // activate emergency mode
+                        Room.memory.emergency = true;
+                        Room.log("Emergency Activated");
+                    }
+                } else {
+                    // Are we above the desired levels?
+                    if (list.length >= desiredCreeps && miners.length >= minMiners) {
+                        // Deactivate emergency mode
+                        delete Room.memory.emergency;
+                        Room.log("Emergency Deactivated");
+                    }
+                }
+
+                if (Room.memory.emergency) {
+                    // if in emergency mode, reset prioritise!
+                    Room.memory.prioritise = "none";
+                    Room.log("Still in emergency with " + list.length + " creeps and " + miners.length + " miners");
+                }
+
+                if (hostiles > 0 && Room.memory.mode === "normal") {
+                    Room.memory.mode = "guard";
+                    Room.log("Put into guard mode");
+                }
+
+                if (hostiles === 0 && Room.memory.mode === "guard") {
+                    Room.memory.mode = "normal";
+                    Room.log("No longer in guard mode");
+                }
+
+                if (Room.memory.mode === "guard") {
+                    Room.log("Still in guard mode");
+                }
+                Room.log("Energy Available " + Room.energyAvailable);
+            } else {
+                // non owned rooms can never be in emergency
+                delete Room.memory.emergency;
+                // TODO We should add a tick counter to remove this hostile flag
+                //  based on the life time of the hostile creeps in it
+                if (hostiles > 0 && Room.memory.mode === "safe") {
+                    Room.memory.mode = "hostile";
+                    Room.log("Remote Room has gone Hostile");
+                }
+                if (hostiles === 0 && Room.memory.mode === "hostile") {
+                    Room.memory.mode = "safe";
+                    Room.log("Remote Room is now Safe");
+                }
+                if (Room.memory.mode === "hostile") {
+                    Room.log("Remote Room is still Hostile");
+                }
             }
+            Room.processBuildFlags();
         }
     }
 }

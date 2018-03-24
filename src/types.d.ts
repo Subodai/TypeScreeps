@@ -45,11 +45,14 @@ interface CreepMemory {
 }
 
 interface Room {
+    init(): void;
     clearSites(): number;
     collectableEnergy(): number;
     hostiles(): number;
     drain(): void;
     stopDrain(): void;
+    log(msg: string): void;
+    processBuildFlags(): number;
 }
 
 interface RoomMemory {
@@ -65,6 +68,8 @@ interface RoomMemory {
     hostiles?: number;
     charging?: boolean;
     keep?: boolean;
+    emergency?: boolean;
+    mode?: string;
 }
 
 interface RoomPosition {

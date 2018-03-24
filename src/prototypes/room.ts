@@ -7,6 +7,28 @@ export function loadRoomPrototypes(): void {
         Debug.Room(msg, this);
     };
 
+    /*
+    * Initiate a room's basic memory setup
+    */
+    Room.prototype.init = function(): void {
+        if (!this.memory.init) {
+            this.memory.init = true;
+            if (this.controller && this.controller.my) {
+                if (!this.memory.mode) { this.memory.mode = "normal"; }
+                if (!this.memory.war) { this.memory.war = false; }
+                if (!this.memory.charging) { this.memory.charging = true; }
+                if (!this.memory.roles) { this.memory.roles = {}; }
+                if (!this.memory.links) { this.memory.links = false; }
+            } else {
+                if (!this.memory.mode) { this.memory.mode = "safe"; }
+            }
+            if (!this.memory.sources) { this.memory.sources = {}; }
+            if (!this.memory.assignedSources) { this.memory.assignedSources = {}; }
+            if (!this.memory.assignedExtractors) { this.memory.assignedExtractors = {}; }
+            this.log("Successfully initiated room");
+        }
+    };
+
     Room.prototype.clearSites = function() {
         const sites = this.find(FIND_CONSTRUCTION_SITES);
         for (const s in sites) {
@@ -73,5 +95,77 @@ export function loadRoomPrototypes(): void {
         this.memory.prioritise = "none";
         this.memory.charging = true;
         this.memory.links = false;
+    };
+
+    Room.prototype.processBuildFlags = function(): number {
+        // If we have 100 (or more?) buildsites, ignore this entirely
+        if (_.filter(Game.constructionSites, (site) => site.my).length >= 100) { return OK; }
+        this.log("Checking for buildsites");
+        // Get the buildsites in this room
+        const sitecount = this.find(FIND_CONSTRUCTION_SITES);
+        // If we have more than 1 site, don't add any more
+        if (sitecount.length > 1) {
+            this.log("Already too many buildsites in this room");
+            return OK;
+        }
+        // Get the buildsite flags in this room
+        const flags = _.filter(Game.flags, (flag) => flag.color === global.flagColor.buildsite &&
+        flag.pos.roomName === this.name);
+        // If there's no flags, no point carrying on
+        if (flags.length === 0) {
+            this.log("No buildsites found");
+            return OK;
+        }
+        this.log("Found " + flags.length + " build sites");
+        // Loop through the flags
+        for (const i in flags) {
+            const flag = flags[i];
+            if (!flag) {
+                this.log("Looped for too long or flag broke, forced break from buildsite loop");
+                // console.log(JSON.stringify(flag));
+                // console.log(JSON.stringify(flags));
+                break;
+            }
+            // Get the first flag and check it's secondary colour
+            const _pos = flag.pos;
+            // Check for existing buildsite here
+            const sites = this.lookForAt(LOOK_CONSTRUCTION_SITES, _pos);
+            // Already something here... remove the flag
+            if (sites.length > 0) {
+                this.log("Already a buildsite there");
+                flag.remove();
+                return OK;
+            }
+
+            const structure = global.buildColor[flag.secondaryColor];
+            this.log("Attempting to build " + structure);
+            let result = this.createConstructionSite(_pos, structure);
+            // If there's an error with this build site, remove it's flag so we don't try again later
+            if (result === ERR_INVALID_TARGET || result === ERR_INVALID_ARGS) {
+                this.log("Invalid flag, removing");
+                // Remove the flag, we'll skip over to the next one instead
+                flag.remove();
+            }
+            // If it workes lets feedback and remove the flag
+            if (result === OK) {
+                // Clear the flag
+                flag.remove();
+                // feedback
+                this.log(structure + " Buildsite created");
+                return OK;
+            }
+            // If we're full, just break the loop by changing the result to OK
+            if (result === ERR_FULL) {
+                this.log("Cannot make any more buildsites right now");
+                result = OK;
+                return OK;
+            }
+            // Is the room not high enough level yet? (We can try something else in the list instead)
+            if (result === ERR_RCL_NOT_ENOUGH) {
+                this.log("Skipped trying to place " + structure + " Because RCL");
+            }
+        }
+
+        return OK;
     };
 }
