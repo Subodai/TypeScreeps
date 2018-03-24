@@ -111,4 +111,38 @@ export class Counter {
             Room.processBuildFlags();
         }
     }
+
+    /**
+     * Run the room feed
+     */
+    public static runRoomFeed(): void {
+        Debug.Log("Feeding: ");
+        const terminal = Game.rooms[Memory.feedRoom].terminal;
+        if (_.sum(terminal!.store) >= terminal!.storeCapacity) {
+            Debug.Log("Feed Room Terminal Full Turning off feed");
+            this.clearRoomFeed();
+            Memory.feedEnabled = false;
+            return;
+        }
+        Debug.Log("Feed Room at " + _.sum(terminal!.store) + " Continuing feed");
+        for (const room in Game.rooms) {
+            if (Game.rooms[room].terminal && Game.rooms[room].memory.charging === true) {
+                Game.rooms[room].feedEnergy();
+            }
+        }
+    }
+
+    /**
+     * Clear the room feed
+     */
+    public static clearRoomFeed(): void {
+        if (Memory.feedRoom) {
+            delete Memory.feedRoom;
+            for (const room in Game.rooms) {
+                if (Game.rooms[room].terminal) {
+                    Game.rooms[room].memory.prioritise = "none";
+                }
+            }
+        }
+    }
 }

@@ -53,6 +53,7 @@ interface Room {
     stopDrain(): void;
     log(msg: string): void;
     processBuildFlags(): number;
+    feedEnergy(): void;
 }
 
 interface RoomMemory {

@@ -168,4 +168,56 @@ export function loadRoomPrototypes(): void {
 
         return OK;
     };
+
+    /*
+    * Feed Energy Routine
+    */
+    Room.prototype.feedEnergy = function(): void {
+        // If we don't have a feedRoom, just return
+        if (!Memory.feedRoom) { this.log("No feedRoom Set"); return; }
+        // Do we have a terminal?
+        if (!this.terminal) { this.log("No Terminal"); return; }
+        // Is the terminal on cooldown
+        if (this.terminal.cooldown > 0) {
+            this.log("Terminal on cooldown" + JSON.stringify(this.terminal));
+            return;
+        }
+        // Is this the feedroom?
+        if (this.name === Memory.feedRoom) {
+            this.log("This is the feedroom");
+            // Make sure we're feeding the storage, not the terminal
+            if (this.memory.prioritise !== "none") {
+                this.memory.prioritise = "none";
+            }
+            return;
+        }
+        // Do we have memory of the target (save processing)
+        if (!this.memory.feedTarget || this.memory.feedTarget.room !== Memory.feedRoom) {
+            this.log("Needs a Target");
+            // Run some setup
+            this.setupFeedTarget();
+        }
+        // only feed if we have more than 200k energy in storage (otherwise we flip about too much)
+        if (this.storage.store[RESOURCE_ENERGY] > 200000) {
+            // Does the terminal have enough energy?
+            if (this.terminal.store[RESOURCE_ENERGY] < this.memory.feedTarget.chunk) {
+                this.memory.prioritise = "terminal";
+                this.log("Charging Terminal");
+                return;
+            }
+        } else {
+            this.log("Below Minimum Storage Energy Level");
+            this.memory.prioritise = "none";
+            return;
+        }
+
+        // Get the multiplier
+        const multiplier = (this.terminal.store[RESOURCE_ENERGY] / this.memory.feedTarget.chunk);
+        // now get the total we want to send
+        const total = (multiplier * 1000).toFixed();
+        // Alright, send it
+        const msg = "Feeding [" + this.memory.feedTarget + "]";
+        this.terminal.send(RESOURCE_ENERGY, total, this.memory.feedTarget.room, msg);
+        this.log("Feeding Target");
+    };
 }
