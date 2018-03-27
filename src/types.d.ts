@@ -30,7 +30,8 @@ interface Creep {
 }
 
 interface CreepMemory {
-    role?: string;
+    role: string;
+    state: CreepState;
     level: number;
     sType?: string;
     roomName?: string;
@@ -85,6 +86,21 @@ interface Source {
     memory?: any;
 }
 
+// Consts
+declare const STATE_SPAWN: "spawn";
+declare const STATE_INIT: "init";
+declare const STATE_MOVE: "move";
+
+// Types
+type STATE_SPAWN = "spawn";
+type STATE_INIT = "init";
+type STATE_MOVE = "move";
+
+// Group type
+type CreepState =
+    STATE_SPAWN |
+    STATE_INIT |
+    STATE_MOVE;
 
 /// <reference types="typed-screeps" />
 /**

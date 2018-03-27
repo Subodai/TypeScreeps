@@ -5,8 +5,47 @@ import { Traveler } from "utils/Traveler";
  * Creep Prototype Extension
  */
 export function loadCreepPrototypes(): void {
+    // Consts
+    const STATE_SPAWN = "spawn";
+    const STATE_INIT = "init";
+    const STATE_MOVE = "move";
+
     // Some debug
     Debug.Load("Prototype: Creep");
+
+    /**
+     * The role of the creep
+     */
+    Object.defineProperty(Creep.prototype, "role", {
+        configurable: true,
+        enumerable: true,
+        get(): string {
+            if (!Memory.creeps[this.name].role) {
+                Memory.creeps[this.name].role = "Unknown";
+            }
+            return Memory.creeps[this.name].role;
+        },
+        set(v: string): string {
+            return _.set(Memory, "creeps." + this.name + ".role", v);
+        }
+    });
+
+    /**
+     * The current State of the creep
+     */
+    Object.defineProperty(Creep.prototype, "state", {
+        configurable: true,
+        enumerable: true,
+        get(): CreepState {
+            if (!Memory.creeps[this.name].state) {
+                Memory.creeps[this.name].state = STATE_SPAWN;
+            }
+            return Memory.creeps[this.name].state;
+        },
+        set(v: CreepState): CreepState {
+            return _.set(Memory, "creeps." + this.name + ".state", v);
+        }
+    });
 
     /**
      * Log Handler to make it tidier
@@ -32,7 +71,8 @@ export function loadCreepPrototypes(): void {
             level: this.memory.level,
             role: this.memory.role,
             roomName: this.memory.roomName,
-            sType: this.memory.sType
+            sType: this.memory.sType,
+            state: this.memory.state
         };
         this.memory = mem;
         this.log("Target Reset");
