@@ -33,7 +33,7 @@ export class Spawner {
                 switch (roleName) {
                     // Miners
                     case Miner.roleName:
-                        this.spawnRoutine(Miner, Spawn);
+                        spawned = this.spawnRoutine(Miner, Spawn);
                         break;
 
                     default:
