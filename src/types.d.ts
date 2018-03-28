@@ -27,6 +27,8 @@ interface Creep {
     containerCheck(): void | boolean;
     repairStructures(roads?: boolean, defences?: boolean, structures?: boolean): number;
     findDamagedStructures(): void;
+    state: string;
+    role: string;
 }
 
 interface CreepMemory {

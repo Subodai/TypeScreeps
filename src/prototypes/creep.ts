@@ -5,11 +5,6 @@ import { Traveler } from "utils/Traveler";
  * Creep Prototype Extension
  */
 export function loadCreepPrototypes(): void {
-    // Consts
-    const STATE_SPAWN = "spawn";
-    const STATE_INIT = "init";
-    const STATE_MOVE = "move";
-
     // Some debug
     Debug.Load("Prototype: Creep");
 

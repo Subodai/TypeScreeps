@@ -48,3 +48,8 @@ export function loadConstants(): void {
         RESOURCE_ENERGY
     ];
 }
+
+// Consts
+export const STATE_SPAWN = "spawn";
+export const STATE_INIT = "init";
+export const STATE_MOVE = "move";

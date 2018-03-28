@@ -2,6 +2,7 @@ import { Debug } from "functions/debug";
 
 export class CreepRunner {
     private static runEvery: number = 1;
+    private static softLimit: number = 2;
 
     public static run(): void {
         if (Game.time % this.runEvery === 0) {
@@ -24,10 +25,13 @@ export class CreepRunner {
         Debug.Log("Running Rooms");
     }
 
-    private static role(roleName: string): boolean {
-        return true;
-        // if (Game.cpu.bucket < global.cpuDesired && Game.cpu.getUsed() > Game.cpu.limit - 2) {
+    private static role(role: string): boolean {
+        // for (const name in Game.creeps) {
+        //     const worker = Game.creeps[name];
+        //     if (worker.state === STATE_SPAWN) {
 
+        //     }
         // }
+        return true;
     }
 }

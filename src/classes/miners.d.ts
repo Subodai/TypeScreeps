@@ -1,3 +1,0 @@
-interface Miner extends Creep {
-
-}

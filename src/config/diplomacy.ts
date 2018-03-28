@@ -3,27 +3,46 @@ import { Debug } from "functions/debug";
 export function loadDiplomacy(): void {
     // Debug
     Debug.Load("Config: Diplomacy");
-    /*
-    * The global shitlist
-    */
-    global.enemies = [];
-
-    /*
-    * The global NAPList or friends, add people to this to make
-    * sure your creeps and rooms are not hostile to them
-    */
-    global.friends = [
-        "Source Keeper",
-        "admon", "Baj", "cazantyl", "DoctorPC", "Geir1983",
-        "InvisioBlack", "Issacar", "Komir", "likeafox", "Lolzor",
-        "ncsupheo", "NobodysNightmare", "omnomwombat", "Parthon", "Plemenit",
-        "poppahorse", "Rengare", "Subodai", "Tantalas", "Tijnoz",
-        "Totalschaden", "Vlahn", "W4rl0ck", "weaves", "Xaq",
-        "Yilmas", "Zeekner", "Zyzyzyryxy", "samogot"
-    ];
-
-    /**
-     * Global Yipsilon Prime list
-     */
-    global.prime = [];
 }
+/**
+ * My Enemies
+ */
+export const ENEMIES = {};
+
+/**
+ * My Friends
+ */
+export const ALLIES = {
+    "Baj": true,
+    "DoctorPC": true,
+    "Geir1983": true,
+    "InvisioBlack": true,
+    "Issacar": true,
+    "Komir": true,
+    "Lolzor": true,
+    "NobodysNightmare": true,
+    "Parthon": true,
+    "Plemenit": true,
+    "Rengare": true,
+    "Source Keeper": true,
+    "Subodai": true,
+    "Tantalas": true,
+    "Tijnoz": true,
+    "Totalschaden": true,
+    "Vlahn": true,
+    "W4rl0ck": true,
+    "Xaq": true,
+    "Yilmas": true,
+    "Zeekner": true,
+    "Zyzyzyryxy": true,
+    "admon": true,
+    "cazantyl": true,
+    "likeafox": true,
+    "ncsupheo": true,
+    "omnomwombat": true,
+    "poppahorse": true,
+    "samogot": true,
+    "weaves": true
+};
+
+export const PRIME = {};
