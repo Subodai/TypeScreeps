@@ -74,6 +74,7 @@ interface RoomMemory {
     keep?: boolean;
     emergency?: boolean;
     mode?: string;
+    roles?: any;
 }
 
 interface RoomPosition {
@@ -87,6 +88,28 @@ interface OwnedStructure {
 interface Source {
     memory?: any;
 }
+
+interface Role {
+    roleName: string;
+    roster: {
+        [key: number]: number
+    };
+    rosterLinks?: {
+        [key: number]: number
+    };
+    bodyStructure: {
+        parts: BodyPartConstant[],
+        [key: number]: number
+    };
+    bodyStructureLinks?: {
+        parts: BodyPartConstant[],
+        [key: number]: number
+    };
+}
+
+interface Miner extends Role {}
+
+type CreepRole = Miner;
 
 // Consts
 declare const STATE_SPAWN: "spawn";

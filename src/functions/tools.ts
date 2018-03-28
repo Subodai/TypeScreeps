@@ -1,5 +1,13 @@
 import { Debug } from "./debug";
 
+export function calculateBodyCost(body: BodyPartConstant[]): number {
+    let sum = 0;
+    for (const part of body) {
+        sum += BODYPART_COST[part];
+    }
+    return sum;
+}
+
 export function loadTools(): void {
     Debug.Load("Tools: Global Functions");
 

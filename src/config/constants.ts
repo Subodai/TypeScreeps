@@ -5,20 +5,20 @@ export function loadConstants(): void {
     Debug.Load("Config: Empire Constants");
     // Define our list of roles
     global.roles = [
-        "guard",
-        "miner",
-        "refill",       // Always pulls from storage
-        "harvester",    // Sources and containers always, fill spawns until 4, then only storage
-        "upgrader",     // Sources until 4, storage after
-        "builder",      // Sources until 4, storage after
-        // 'janitor',      // Sources until 4, storage after
-        "extractor",
-        "mharvester",
-        "supergrader",  // Storage always
-        "scout",
-        "reserve",
-        "remoteminer",
-        "hauler"
+        // "guard",
+        "Miner"// ,
+        // "refill",       // Always pulls from storage
+        // "harvester",    // Sources and containers always, fill spawns until 4, then only storage
+        // "upgrader",     // Sources until 4, storage after
+        // "builder",      // Sources until 4, storage after
+        // // 'janitor',      // Sources until 4, storage after
+        // "extractor",
+        // "mharvester",
+        // "supergrader",  // Storage always
+        // "scout",
+        // "reserve",
+        // "remoteminer",
+        // "hauler"
     ];
 
     global.seedRemoteRoads = true;
