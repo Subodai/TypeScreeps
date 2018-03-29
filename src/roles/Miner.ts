@@ -13,14 +13,15 @@ export class Miner {
         8: 2
     };
 
-    public static bodyStructure = {
-        1: [WORK, WORK, WORK, MOVE],
-        2: [WORK, WORK, WORK, WORK, WORK, MOVE],
-        3: [WORK, WORK, WORK, WORK, WORK, MOVE],
-        4: [WORK, WORK, WORK, WORK, WORK, MOVE],
-        5: [WORK, WORK, WORK, WORK, WORK, MOVE],
-        6: [WORK, WORK, WORK, WORK, WORK, MOVE],
-        7: [WORK, WORK, WORK, WORK, WORK, MOVE],
-        8: [WORK, WORK, WORK, WORK, WORK, MOVE]
-    };
+    public static bodyStructure = [
+        [],
+        [WORK, WORK, WORK, MOVE],
+        [WORK, WORK, WORK, WORK, WORK, MOVE],
+        [WORK, WORK, WORK, WORK, WORK, MOVE],
+        [WORK, WORK, WORK, WORK, WORK, MOVE],
+        [WORK, WORK, WORK, WORK, WORK, MOVE],
+        [WORK, WORK, WORK, WORK, WORK, MOVE],
+        [WORK, WORK, WORK, WORK, WORK, MOVE],
+        [WORK, WORK, WORK, WORK, WORK, MOVE]
+    ];
 }

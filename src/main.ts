@@ -5,6 +5,7 @@ import { init } from "config/init";
 import { Cleaner } from "./functions/cleaner";
 import { Counter } from "./functions/counter";
 import { Debug, debugEnablers } from "./functions/debug";
+import { Spawner } from "./functions/spawner";
 
 /* Prototype imports */
 import { loadPrototypes } from "./prototypes/all";
@@ -29,4 +30,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
     // Run Cleaner First
     Cleaner.run();
     Counter.run();
+    Counter.setupRoolRoles();
+    Spawner.run();
 });

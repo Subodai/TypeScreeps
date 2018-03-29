@@ -80,6 +80,14 @@ export class Spawner {
                     state: STATE_SPAWN
                 }
             });
+            spawned = true;
+        }
+
+        if (spawned) {
+            Debug.Log(Role.roleName + " Creep Spawned");
+            return true;
+        } else {
+            return false;
         }
     }
 }

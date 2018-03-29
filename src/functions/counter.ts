@@ -1,3 +1,4 @@
+import { Miner } from "roles/Miner";
 import { Debug } from "./debug";
 
 export class Counter {
@@ -109,6 +110,34 @@ export class Counter {
                 }
             }
             Room.processBuildFlags();
+        }
+    }
+
+    public static setupRoolRoles(): void {
+        // Loop through our rooms
+        for (const room in Game.rooms) {
+            // Get the room object, because we'll need it later
+            const Room = Game.rooms[room];
+            // Make sure we initialise the room memory
+            if (!Room.memory.roles) {
+                Debug.Log("COUNTER] Creating room role object [" + room + "]");
+                Room.memory.roles = {};
+            }
+            // Loop through the roles we have
+            for (const i in global.roles) {
+                // Get the role name
+                const roleName: string = global.roles[i];
+
+                switch (roleName) {
+                    case Miner.roleName:
+                        Room.memory.roles[roleName] = true;
+                        break;
+
+                    default:
+                        Room.memory.roles[roleName] = false;
+                        break;
+                }
+            }
         }
     }
 

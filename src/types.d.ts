@@ -97,14 +97,8 @@ interface Role {
     rosterLinks?: {
         [key: number]: number
     };
-    bodyStructure: {
-        parts: BodyPartConstant[],
-        [key: number]: number
-    };
-    bodyStructureLinks?: {
-        parts: BodyPartConstant[],
-        [key: number]: number
-    };
+    bodyStructure: BodyPartConstant[][];
+    bodyStructureLinks?: BodyPartConstant[][];
 }
 
 interface Miner extends Role {}
