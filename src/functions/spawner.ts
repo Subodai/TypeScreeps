@@ -1,4 +1,5 @@
-import { Miner } from "./../roles/Miner";
+import { ROLES } from "config/constants";
+import { Miner } from "roles/Miner";
 import { Debug } from "./debug";
 import { CalcBodyCost } from "./tools";
 
@@ -25,11 +26,11 @@ export class Spawner {
             }
             const Room = Spawn.room;
             let spawned = false;
-            for (const i in global.roles) {
+            for (const i in ROLES) {
                 // if we've spawned something, stop
                 if (spawned) { break; }
                 // get the roleName
-                const roleName: string = global.roles[i];
+                const roleName: string = ROLES[i];
                 Spawn.log("Checking for role " + roleName);
                 // skip if this role is disabled
                 if (!Room.memory.roles[roleName]) {

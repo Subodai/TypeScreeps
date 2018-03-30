@@ -1,3 +1,4 @@
+import { ROLES } from "config/constants";
 import { Debug } from "functions/debug";
 
 export class CreepRunner {
@@ -16,8 +17,8 @@ export class CreepRunner {
 
     private static creeps(): void {
         Debug.Log("Running Creeps");
-        for (const i in global.roles) {
-            this.role(global.roles[i]);
+        for (const i in ROLES) {
+            this.role(ROLES[i]);
         }
     }
 

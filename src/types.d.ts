@@ -75,6 +75,7 @@ interface RoomMemory {
     emergency?: boolean;
     mode?: string;
     roles?: any;
+    minersNeeded?: number;
 }
 
 interface RoomPosition {
@@ -99,6 +100,8 @@ interface Role {
     rosterLinks?: number[];
     bodyStructure: BodyPartConstant[][];
     bodyStructureLinks?: BodyPartConstant[][];
+    enabled(room: Room): boolean;
+    run(creep: Creep): void;
 }
 
 interface Miner extends Role {}

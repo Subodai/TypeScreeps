@@ -1,7 +1,10 @@
+import { ROLES } from "config/constants";
+import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Debug } from "./debug";
 
 export class Counter {
+    private static runEvery: number = 5;
 
     private static notify: boolean = false;
 
@@ -9,6 +12,15 @@ export class Counter {
      * Run the main counter
      */
     public static run(): void {
+        if (Game.time % this.runEvery === 0) {
+            Debug.Log("Running Counter");
+            const cpu: number = Game.cpu.getUsed();
+            this.runCount();
+            Debug.Log("Counter used " + (Game.cpu.getUsed() - cpu).toFixed(3) + "CPU");
+        }
+    }
+
+    private static runCount(): void {
         // Loop through all rooms
         for (const room in Game.rooms) {
             const Room: Room = Game.rooms[room];
@@ -113,6 +125,9 @@ export class Counter {
         }
     }
 
+    /**
+     * Checks and sets the room roles depending on their enabled methods
+     */
     public static setupRoolRoles(): void {
         // Loop through our rooms
         for (const room in Game.rooms) {
@@ -124,13 +139,18 @@ export class Counter {
                 Room.memory.roles = {};
             }
             // Loop through the roles we have
-            for (const i in global.roles) {
+            for (const i in ROLES) {
                 // Get the role name
-                const roleName: string = global.roles[i];
-
+                const roleName: string = ROLES[i];
+                // switch based on the roleName
                 switch (roleName) {
+                    // Miners
                     case Miner.roleName:
-                        Room.memory.roles[roleName] = true;
+                        Room.memory.roles[roleName] = Miner.enabled(Room);
+                        break;
+                    // Harvesters
+                    case Harvester.roleName:
+                        Room.memory.roles[roleName] = Harvester.enabled(Room);
                         break;
 
                     default:

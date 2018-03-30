@@ -21,14 +21,21 @@ export class Miner {
 
     public static bodyStructure: BodyPartConstant[][] = [
         [],
-        BodyBuilder({ WORK: 2, MOVE: 2 }),
-        [WORK, WORK, WORK, MOVE],
-        [WORK, WORK, WORK, WORK, WORK, MOVE],
-        [WORK, WORK, WORK, WORK, WORK, MOVE],
-        [WORK, WORK, WORK, WORK, WORK, MOVE],
-        [WORK, WORK, WORK, WORK, WORK, MOVE],
-        [WORK, WORK, WORK, WORK, WORK, MOVE],
-        [WORK, WORK, WORK, WORK, WORK, MOVE],
-        [WORK, WORK, WORK, WORK, WORK, MOVE]
+        BodyBuilder({ WORK: 3, MOVE: 1 }),
+        BodyBuilder({ WORK: 5, MOVE: 1 }),
+        BodyBuilder({ WORK: 3, MOVE: 1 }),
+        BodyBuilder({ WORK: 3, MOVE: 1 }),
+        BodyBuilder({ WORK: 3, MOVE: 1 }),
+        BodyBuilder({ WORK: 3, MOVE: 1 }),
+        BodyBuilder({ WORK: 3, MOVE: 1 }),
+        BodyBuilder({ WORK: 3, MOVE: 1 })
     ];
+
+    public static enabled(room: Room): boolean {
+        return true;
+    }
+
+    public static run(creep: Creep): void {
+        return;
+    }
 }

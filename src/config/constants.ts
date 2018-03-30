@@ -4,6 +4,23 @@ const STATE_SPAWN = "spawn";
 const STATE_INIT = "init";
 const STATE_MOVE = "move";
 
+export const ROLES: string[] = [
+    // "guard",
+    "Miner",
+    // "refill",       // Always pulls from storage
+    "Harvester"    // Sources and containers always, fill spawns until 4, then only storage
+    // "upgrader",     // Sources until 4, storage after
+    // "builder",      // Sources until 4, storage after
+    // // 'janitor',      // Sources until 4, storage after
+    // "extractor",
+    // "mharvester",
+    // "supergrader",  // Storage always
+    // "scout",
+    // "reserve",
+    // "remoteminer",
+    // "hauler"
+];
+
 export function loadConstants(): void {
     // Debug
     Debug.Load("Config: Empire Constants");
