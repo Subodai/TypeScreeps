@@ -68,29 +68,33 @@ export class Spawner {
         if (Room.memory.links && Role.rosterLinks) {
             roster = Role.rosterLinks;
         }
-
+        // Get the appropriate level of creep for this room (when upgrading rooms we have less)
         while (Room.energyCapacityAvailable < global.getPartsCost(bodyStructure[level])) { level--; }
+        // Make sure it's minimum level 1
         level = _.max([level, 1]);
         Spawn.log("Able to spawn level " + level + " Creep");
+        // Get the list of these creeps
         const list = _.filter(Game.creeps, (c) => c.memory.role === Role.roleName &&
                                                   c.memory.roomName === Room.name &&
                                                   c.memory.level === level &&
                                                  !c.memory.dying);
         Spawn.log("Found [" + list.length + "/" + roster[level] + "] Creeps");
-        const partCost = global.getPartsCost(bodyStructure[level]);
-
-        if (Room.energyAvailable < partCost) {
-            Spawn.log("Not enough energy [" + Room.energyAvailable + "/" + partCost + "]");
-            return false;
-        }
-
+        // Do we already have enough of these creeps
         if (list.length >= roster[level]) {
             Spawn.log("Already enough creeps");
             return false;
         }
-
+        // Get the partCost of this creep at this level
+        const partCost = global.getPartsCost(bodyStructure[level]);
+        // do we have enough energy?
+        if (Room.energyAvailable < partCost) {
+            Spawn.log("Not enough energy [" + Room.energyAvailable + "/" + partCost + "]");
+            return false;
+        }
+        // make a name
         const name = `${Role.roleName}_${Room.name}_${Math.floor(Math.random() * 100)}`;
         Spawn.log("Attempting to Spawn " + name);
+        // Try spawning
         const result = Spawn.spawnCreep(bodyStructure[level], name, {
             memory: {
                 level,
@@ -101,6 +105,7 @@ export class Spawner {
         });
         Spawn.log(JSON.stringify(result));
         Spawn.log(Role.roleName + " Creep Spawned: " + name);
+        // we did it!
         return true;
     }
 }

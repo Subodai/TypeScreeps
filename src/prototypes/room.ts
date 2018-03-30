@@ -1,3 +1,4 @@
+import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
 
 export function loadRoomPrototypes(): void {
@@ -72,7 +73,7 @@ export function loadRoomPrototypes(): void {
         }
 
         const hostiles = this.find(FIND_HOSTILE_CREEPS, {
-            filter: (i: Creep) => !(global.friends.indexOf(i.owner.username) > -1)
+            filter: (i: Creep) => !(ALLIES.indexOf(i.owner.username) > -1)
         });
         this.memory.hostiles = hostiles.length;
         this.memory.lastHostileCheck = Game.time;

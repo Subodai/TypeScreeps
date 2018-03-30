@@ -7,42 +7,42 @@ export function loadDiplomacy(): void {
 /**
  * My Enemies
  */
-export const ENEMIES = {};
+export const ENEMIES = [];
 
 /**
  * My Friends
  */
-export const ALLIES = {
-    "Baj": true,
-    "DoctorPC": true,
-    "Geir1983": true,
-    "InvisioBlack": true,
-    "Issacar": true,
-    "Komir": true,
-    "Lolzor": true,
-    "NobodysNightmare": true,
-    "Parthon": true,
-    "Plemenit": true,
-    "Rengare": true,
-    "Source Keeper": true,
-    "Subodai": true,
-    "Tantalas": true,
-    "Tijnoz": true,
-    "Totalschaden": true,
-    "Vlahn": true,
-    "W4rl0ck": true,
-    "Xaq": true,
-    "Yilmas": true,
-    "Zeekner": true,
-    "Zyzyzyryxy": true,
-    "admon": true,
-    "cazantyl": true,
-    "likeafox": true,
-    "ncsupheo": true,
-    "omnomwombat": true,
-    "poppahorse": true,
-    "samogot": true,
-    "weaves": true
-};
+export const ALLIES = [
+    "Baj",
+    "DoctorPC",
+    "Geir1983",
+    "InvisioBlack",
+    "Issacar",
+    "Komir",
+    "Lolzor",
+    "NobodysNightmare",
+    "Parthon",
+    "Plemenit",
+    "Rengare",
+    "Source Keeper",
+    "Subodai",
+    "Tantalas",
+    "Tijnoz",
+    "Totalschaden",
+    "Vlahn",
+    "W4rl0ck",
+    "Xaq",
+    "Yilmas",
+    "Zeekner",
+    "Zyzyzyryxy",
+    "admon",
+    "cazantyl",
+    "likeafox",
+    "ncsupheo",
+    "omnomwombat",
+    "poppahorse",
+    "samogot",
+    "weaves"
+];
 
-export const PRIME = {};
+export const PRIME = [];
