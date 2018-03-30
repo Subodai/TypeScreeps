@@ -1,6 +1,6 @@
 import { Debug } from "./debug";
 
-export function calculateBodyCost(body: BodyPartConstant[]): number {
+export function CalcBodyCost(body: BodyPartConstant[]): number {
     let sum = 0;
     for (const part of body) {
         sum += BODYPART_COST[part];
@@ -10,21 +10,6 @@ export function calculateBodyCost(body: BodyPartConstant[]): number {
 
 export function loadTools(): void {
     Debug.Load("Tools: Global Functions");
-
-    // tslint:disable-next-line:only-arrow-functions
-    global.getPartsCost = function(parts: BodyPartConstant[] | undefined) {
-        let bodyCost = 0;
-        // If it's a creep we just want it's body
-        if (parts === undefined) {
-            bodyCost += 0;
-        } else if (parts.length > 1) {
-            for (const i of parts) {
-                bodyCost += BODYPART_COST[i];
-            }
-        }
-        return bodyCost;
-    };
-
     /*
      TODO Maybe put this on the source itself?
     global.getSpaceAtSource = function(source: Source, creep) {
@@ -255,4 +240,15 @@ export function loadTools(): void {
         }
         return Memory.feedRoom;
     };
+}
+
+export function BodyBuilder(config: {[key: string]: number}): BodyPartConstant[] {
+    const body: BodyPartConstant[] = [];
+    for (const partType in config) {
+        const amount = config[partType];
+        for (let i = 0; i < amount; i++) {
+            body.push(partType.toLowerCase() as BodyPartConstant);
+        }
+    }
+    return body;
 }

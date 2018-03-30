@@ -1,5 +1,6 @@
 import { Miner } from "./../roles/Miner";
 import { Debug } from "./debug";
+import { CalcBodyCost } from "./tools";
 
 const STATE_SPAWN = "spawn";
 
@@ -69,7 +70,7 @@ export class Spawner {
             roster = Role.rosterLinks;
         }
         // Get the appropriate level of creep for this room (when upgrading rooms we have less)
-        while (Room.energyCapacityAvailable < global.getPartsCost(bodyStructure[level])) { level--; }
+        while (Room.energyCapacityAvailable < CalcBodyCost(bodyStructure[level])) { level--; }
         // Make sure it's minimum level 1
         level = _.max([level, 1]);
         Spawn.log("Able to spawn level " + level + " Creep");
@@ -85,7 +86,7 @@ export class Spawner {
             return false;
         }
         // Get the partCost of this creep at this level
-        const partCost = global.getPartsCost(bodyStructure[level]);
+        const partCost = CalcBodyCost(bodyStructure[level]);
         // do we have enough energy?
         if (Room.energyAvailable < partCost) {
             Spawn.log("Not enough energy [" + Room.energyAvailable + "/" + partCost + "]");
@@ -95,6 +96,7 @@ export class Spawner {
         const name = `${Role.roleName}_${Room.name}_${Math.floor(Math.random() * 100)}`;
         Spawn.log("Attempting to Spawn " + name);
         // Try spawning
+        Spawn.log("Spawning:" + JSON.stringify(bodyStructure[level]));
         const result = Spawn.spawnCreep(bodyStructure[level], name, {
             memory: {
                 level,
