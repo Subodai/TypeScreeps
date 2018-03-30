@@ -1,8 +1,10 @@
 import { Debug } from "functions/debug";
+import { loadStructureSpawnPrototypes } from "./structurespawn";
 
 export function loadStructurePrototypes(): void {
     // Debug
     Debug.Load("Prototype: Structure");
+    loadStructureSpawnPrototypes();
 
     if (!Memory.structures) {
         Debug.Memory("Initialising Structure Memory");

@@ -6,6 +6,7 @@ import { Cleaner } from "./functions/cleaner";
 import { Counter } from "./functions/counter";
 import { Debug, debugEnablers } from "./functions/debug";
 import { Spawner } from "./functions/spawner";
+import { loadTools } from "./functions/tools";
 
 /* Prototype imports */
 import { loadPrototypes } from "./prototypes/all";
@@ -17,7 +18,7 @@ import { ErrorMapper } from "./utils/ErrorMapper";
 loadPrototypes();
 init();
 debugEnablers();
-
+loadTools();
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {

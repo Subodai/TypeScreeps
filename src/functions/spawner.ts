@@ -1,8 +1,9 @@
 import { Miner } from "./../roles/Miner";
 import { Debug } from "./debug";
 
-export class Spawner {
+const STATE_SPAWN = "spawn";
 
+export class Spawner {
     private static runEvery: number = 10;
 
     public static run(): void {
@@ -18,6 +19,7 @@ export class Spawner {
         for (const spawn in Game.spawns) {
             const Spawn: StructureSpawn = Game.spawns[spawn];
             if (Spawn.spawning) {
+                Spawn.log("Already Spawning");
                 continue;
             }
             const Room = Spawn.room;
@@ -27,12 +29,18 @@ export class Spawner {
                 if (spawned) { break; }
                 // get the roleName
                 const roleName: string = global.roles[i];
+                Spawn.log("Checking for role " + roleName);
                 // skip if this role is disabled
-                if (!Room.memory.roles.roleName) { continue; }
+                if (!Room.memory.roles[roleName]) {
+                    Spawn.log("Role not enabled " + roleName);
+                    continue;
+                }
+                Spawn.log("Role enabled, checking for spawn routine");
                 // Switch on type (for now)
                 switch (roleName) {
                     // Miners
                     case Miner.roleName:
+                        Spawn.log("Role found, running spawn routine");
                         spawned = this.spawnRoutine(Miner, Spawn);
                         break;
 
@@ -45,9 +53,9 @@ export class Spawner {
 
     private static spawnRoutine(Role: CreepRole, Spawn: StructureSpawn): boolean {
         const Room = Spawn.room;
-        let spawned = false;
         let level = Room.controller!.level;
         if (Room.memory.emergency) {
+            Spawn.log("In emergency, defaulting to level 1");
             level = 1;
         }
 
@@ -62,32 +70,37 @@ export class Spawner {
         }
 
         while (Room.energyCapacityAvailable < global.getPartsCost(bodyStructure[level])) { level--; }
-        level = _.min([level, 1]);
-
+        level = _.max([level, 1]);
+        Spawn.log("Able to spawn level " + level + " Creep");
         const list = _.filter(Game.creeps, (c) => c.memory.role === Role.roleName &&
                                                   c.memory.roomName === Room.name &&
                                                   c.memory.level === level &&
                                                  !c.memory.dying);
+        Spawn.log("Found [" + list.length + "/" + roster[level] + "] Creeps");
+        const partCost = global.getPartsCost(bodyStructure[level]);
 
-        if (Room.energyAvailable >= global.getPartsCost(bodyStructure[level]) &&
-        list.length < roster[level] && !spawned) {
-            const name = `${Role.roleName}_${Room.name}_${Math.floor(Math.random() * 100)}`;
-            Spawn.spawnCreep(bodyStructure[level], name, {
-                memory: {
-                    level,
-                    role: Role.roleName,
-                    roomName: Room.name,
-                    state: STATE_SPAWN
-                }
-            });
-            spawned = true;
-        }
-
-        if (spawned) {
-            Debug.Log(Role.roleName + " Creep Spawned");
-            return true;
-        } else {
+        if (Room.energyAvailable < partCost) {
+            Spawn.log("Not enough energy [" + Room.energyAvailable + "/" + partCost + "]");
             return false;
         }
+
+        if (list.length >= roster[level]) {
+            Spawn.log("Already enough creeps");
+            return false;
+        }
+
+        const name = `${Role.roleName}_${Room.name}_${Math.floor(Math.random() * 100)}`;
+        Spawn.log("Attempting to Spawn " + name);
+        const result = Spawn.spawnCreep(bodyStructure[level], name, {
+            memory: {
+                level,
+                role: Role.roleName,
+                roomName: Room.name,
+                state: STATE_SPAWN
+            }
+        });
+        Spawn.log(JSON.stringify(result));
+        Spawn.log(Role.roleName + " Creep Spawned: " + name);
+        return true;
     }
 }

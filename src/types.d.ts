@@ -85,18 +85,18 @@ interface OwnedStructure {
     memory?: any;
 }
 
+interface StructureSpawn {
+    log(msg: string): void;
+}
+
 interface Source {
     memory?: any;
 }
 
 interface Role {
     roleName: string;
-    roster: {
-        [key: number]: number
-    };
-    rosterLinks?: {
-        [key: number]: number
-    };
+    roster: number[];
+    rosterLinks?: number[];
     bodyStructure: BodyPartConstant[][];
     bodyStructureLinks?: BodyPartConstant[][];
 }

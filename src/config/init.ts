@@ -10,4 +10,9 @@ export function init(): void {
     loadColours();
     loadDiplomacy();
     loadSpeech();
+    Memory.debugEnabled = true;
+    Memory.creepDebug = true;
+    Memory.roomDebug = true;
+    Memory.memoryDebug = true;
+    Memory.spawnDebug = true;
 }

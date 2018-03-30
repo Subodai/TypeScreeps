@@ -1,13 +1,14 @@
 export class Debug {
-    private static cGrey: string = "#CCCCCC";
-    private static cRed: string = "#FF0000";
-    private static cGreen: string = "#00FF00";
-    private static cBlue: string = "#0000FF";
-    private static cYellow: string = "#FFFF00";
+    private static cGrey: string = "#e2e2e2";
+    private static cRed: string = "#f45138";
+    private static cGreen: string = "#aff98f";
+    private static cBlue: string = "#42d7f4";
+    private static cYellow: string = "#f8f990";
     private static debugEnabled: boolean = Memory.debugEnabled;
     private static creepDebugEnabled: boolean = Memory.creepDebug;
     private static roomDebugEnabled: boolean = Memory.roomDebug;
     private static memoryDebugEnabled: boolean = Memory.memoryDebug;
+    private static spawnDebugEnabled: boolean = Memory.spawnDebug;
     /**
      * Debug messages for creeps, will spit out room details and creep details
      *
@@ -43,6 +44,27 @@ export class Debug {
             msg += "<a href='/a/#!/room/shard1/" + room.name + "'>";
             msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "]</span>";
             msg += "</a> ";
+        }
+        msg += message;
+        console.log(msg);
+    }
+
+    /**
+     * Debug messages for spawns
+     *
+     * @param message {string}
+     * @param spawn {StructureSpawn}
+     */
+    public static Spawn(message: string, spawn: StructureSpawn): void {
+        if (!this.spawnDebugEnabled || !this.debugEnabled) { return; }
+        let msg: string = "";
+        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
+        const room: Room = spawn.room;
+        if (room) {
+            msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "]</span> ";
+        }
+        if (spawn) {
+            msg += "<span style='color:" + this.cBlue + ";'>[" + spawn.name + "]</span> ";
         }
         msg += message;
         console.log(msg);
@@ -119,13 +141,23 @@ export function debugEnablers(): void {
         }
     };
 
-    global.ToggleMemoryDebug = function ToggleMemorybug(): string {
+    global.ToggleMemoryDebug = function ToggleMemorydebug(): string {
         if (!Memory.memoryDebug) {
             Memory.memoryDebug = true;
             return "Memory Debug Enabled";
         } else {
             Memory.memoryDebug = false;
             return "Memory Debug Disabled";
+        }
+    };
+
+    global.ToggleSpawnDebug = function ToggleSpawnDebug(): string {
+        if (!Memory.spawnDebug) {
+            Memory.spawnDebug = true;
+            return "Spawn Debug Enabled";
+        } else {
+            Memory.spawnDebug = false;
+            return "Spawn Debug Disabled";
         }
     };
 }

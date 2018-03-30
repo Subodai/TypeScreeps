@@ -1,8 +1,13 @@
 import { Debug } from "functions/debug";
 
+const STATE_SPAWN = "spawn";
+const STATE_INIT = "init";
+const STATE_MOVE = "move";
+
 export function loadConstants(): void {
     // Debug
     Debug.Load("Config: Empire Constants");
+
     // Define our list of roles
     global.roles = [
         // "guard",
@@ -48,8 +53,3 @@ export function loadConstants(): void {
         RESOURCE_ENERGY
     ];
 }
-
-// Consts
-export const STATE_SPAWN = "spawn";
-export const STATE_INIT = "init";
-export const STATE_MOVE = "move";
