@@ -1,6 +1,8 @@
 import { Debug } from "functions/debug";
 import { Traveler } from "utils/Traveler";
 
+const STATE_SPAWN = "spawn";
+
 /**
  * Creep Prototype Extension
  */

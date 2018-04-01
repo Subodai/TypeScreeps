@@ -27,8 +27,8 @@ export function loadRoomPrototypes(): void {
                 if (!this.memory.mode) { this.memory.mode = "safe"; }
             }
             if (!this.memory.sources) { this.memory.sources = {}; }
-            if (!this.memory.assignedSources) { this.memory.assignedSources = {}; }
-            if (!this.memory.assignedExtractors) { this.memory.assignedExtractors = {}; }
+            if (!this.memory.assignedSources) { this.memory.assignedSources = []; }
+            if (!this.memory.assignedMinerals) { this.memory.assignedMinerals = []; }
             this.log("Successfully initiated room");
         }
     };
@@ -241,7 +241,7 @@ export function loadRoomPrototypes(): void {
         // set the number of minersNeeded to the length of sources
         this.memory.minersNeeded = sources.length;
         // make an empty array
-        const roomSources = [];
+        const roomSources: any = {};
         // loop through the sources
         for (const i in sources) {
             this.log("Clearing source association for " + sources[i].id);
@@ -250,17 +250,20 @@ export function loadRoomPrototypes(): void {
             // loop through the creeps we found
             for (const c in creeps) {
                 // grab the creep
-                const Creep = Game.creeps[c];
+                const Creep = creeps[c];
+                this.log("Checking creep" + Creep.name);
                 // if this creep is assigned to this source
                 if (Creep.memory.assignedSource === sources[i].id) {
                     this.log("Assigning " + sources[i].id + " to creep " + Creep.name);
                     // update this source to this creepid
                     roomSources[sources[i].id] = Creep.id;
+                    delete creeps[c];
                 }
             }
-            // update the room's assigned sources
-            this.memory.assignedSources = roomSources;
         }
+        this.log(JSON.stringify(roomSources));
+        // update the room's assigned sources
+        this.memory.assignedSources = roomSources;
     };
 
     /**
@@ -271,7 +274,7 @@ export function loadRoomPrototypes(): void {
         delete this.memory.assignedMinerals;
         // get the extractors
         const minerals = this.find(FIND_MINERALS, {
-            filter: (i: Mineral) => i.ticksToRegeneration === 0
+            filter: (i: Mineral) => i.mineralAmount > 0
         });
         // get the mineral extracters in this room
         const creeps = _.filter(Game.creeps, (c: Creep) =>
@@ -281,7 +284,7 @@ export function loadRoomPrototypes(): void {
         // set the number of mineralsNeeded to thelength of active mineral sites
         this.memory.mineralsNeeded = minerals.length;
         // make an empty array
-        const roomMinerals = [];
+        const roomMinerals: any = {};
         // loop through the minerals
         for (const i in minerals) {
             this.log("Clearing mineral association for " + minerals[i].id);
@@ -290,17 +293,20 @@ export function loadRoomPrototypes(): void {
             // loop through the creeps we found
             for (const c in creeps) {
                 // grab the creep
-                const Creep = Game.creeps[c];
+                const Creep = creeps[c];
+                this.log("Checking creep" + Creep.name);
                 // if this assigned to the mineral
                 if (Creep.memory.assignedMineral === minerals[i].id) {
                     this.log("Assigning " + minerals[i].id + " to creep" + Creep.name);
                     // update this source to this creepId
                     roomMinerals[minerals[i].id] = Creep.id;
+                    delete creeps[c];
                 }
             }
-            // update the room's assigned minerals
-            this.memory.assignedMinerals = roomMinerals;
         }
+        this.log(JSON.stringify(roomMinerals));
+        // update the room's assigned minerals
+        this.memory.assignedMinerals = roomMinerals;
     };
 
     /**

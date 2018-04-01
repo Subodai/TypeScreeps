@@ -149,8 +149,9 @@ interface Role {
 }
 
 interface Miner extends Role {}
+interface Harvester extends Role {}
 
-type CreepRole = Miner;
+type CreepRole = Miner | Harvester;
 
 // Consts
 declare const STATE_SPAWN: "spawn";
