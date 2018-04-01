@@ -1,5 +1,8 @@
+import { ROLES } from "config/constants";
 import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
+import { Harvester } from "roles/Harvester";
+import { Miner } from "roles/Miner";
 
 export function loadRoomPrototypes(): void {
     Debug.Load("Prototype: Room");
@@ -220,5 +223,114 @@ export function loadRoomPrototypes(): void {
         const msg = "Feeding [" + this.memory.feedTarget + "]";
         this.terminal.send(RESOURCE_ENERGY, total, this.memory.feedTarget.room, msg);
         this.log("Feeding Target");
+    };
+
+    /**
+     * Setup the energy sources in a room and decide how many miners it needs
+     */
+    Room.prototype.sourceSetup = function(): void {
+        this.log("Setting up energy sources");
+        delete this.memory.assignedSources;
+        // get the sources in this room
+        const sources = this.find(FIND_SOURCES);
+        // get the miners in this room
+        const creeps = _.filter(Game.creeps, (c: Creep) =>
+            c.role === Miner.roleName &&
+            c.memory.roomName === this.name &&
+            !c.memory.dying);
+        // set the number of minersNeeded to the length of sources
+        this.memory.minersNeeded = sources.length;
+        // make an empty array
+        const roomSources = [];
+        // loop through the sources
+        for (const i in sources) {
+            this.log("Clearing source association for " + sources[i].id);
+            // set the source to null first
+            roomSources[sources[i].id] = null;
+            // loop through the creeps we found
+            for (const c in creeps) {
+                // grab the creep
+                const Creep = Game.creeps[c];
+                // if this creep is assigned to this source
+                if (Creep.memory.assignedSource === sources[i].id) {
+                    this.log("Assigning " + sources[i].id + " to creep " + Creep.name);
+                    // update this source to this creepid
+                    roomSources[sources[i].id] = Creep.id;
+                }
+            }
+            // update the room's assigned sources
+            this.memory.assignedSources = roomSources;
+        }
+    };
+
+    /**
+     * Setup the mineral sources in a room and decide how many extractors it needs
+     */
+    Room.prototype.mineralSetup = function(): void {
+        this.log("Setting up Mineral sources");
+        delete this.memory.assignedMinerals;
+        // get the extractors
+        const minerals = this.find(FIND_MINERALS, {
+            filter: (i: Mineral) => i.ticksToRegeneration === 0
+        });
+        // get the mineral extracters in this room
+        const creeps = _.filter(Game.creeps, (c: Creep) =>
+            c.role === "Extractor" &&
+            c.memory.roomName === this.name &&
+            !c.memory.dying);
+        // set the number of mineralsNeeded to thelength of active mineral sites
+        this.memory.mineralsNeeded = minerals.length;
+        // make an empty array
+        const roomMinerals = [];
+        // loop through the minerals
+        for (const i in minerals) {
+            this.log("Clearing mineral association for " + minerals[i].id);
+            // set the mineral to null
+            roomMinerals[minerals[i].id] = null;
+            // loop through the creeps we found
+            for (const c in creeps) {
+                // grab the creep
+                const Creep = Game.creeps[c];
+                // if this assigned to the mineral
+                if (Creep.memory.assignedMineral === minerals[i].id) {
+                    this.log("Assigning " + minerals[i].id + " to creep" + Creep.name);
+                    // update this source to this creepId
+                    roomMinerals[minerals[i].id] = Creep.id;
+                }
+            }
+            // update the room's assigned minerals
+            this.memory.assignedMinerals = roomMinerals;
+        }
+    };
+
+    /**
+     * Loop through the available roles and check enabled
+     */
+    Room.prototype.roleSetup = function(): void {
+        // Make sure we initialise the room memory
+        if (!this.memory.roles) {
+            this.log("Creating room role object");
+            this.memory.roles = {};
+        }
+        // Loop through the roles we have
+        for (const i in ROLES) {
+            // Get the role name
+            const roleName: string = ROLES[i];
+            // switch based on the roleName
+            switch (roleName) {
+                // Miners
+                case Miner.roleName:
+                    this.memory.roles[roleName] = Miner.enabled(this);
+                    break;
+                // Harvesters
+                case Harvester.roleName:
+                    this.memory.roles[roleName] = Harvester.enabled(this);
+                    break;
+
+                default:
+                    this.memory.roles[roleName] = false;
+                    break;
+            }
+        }
     };
 }

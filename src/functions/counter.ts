@@ -45,9 +45,9 @@ export class Counter {
                     minMiners = 1;
                 }
                 list = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
-                    i.memory.role !== "hauler" && i.memory.role !== "guard");
+                    i.role !== "hauler" && i.role !== "guard");
                 miners = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
-                    (i.memory.role === "miner" || i.memory.role === "linkminer"));
+                    (i.role === Miner.roleName || i.role === "linkminer")); // TODO replace with linkMiner rolename?
                 if (!Room.storage) {
                     Room.memory.links = false;
                 } else {
@@ -121,43 +121,14 @@ export class Counter {
                     Room.log("Remote Room is still Hostile");
                 }
             }
+            // Run build flags
             Room.processBuildFlags();
-        }
-    }
-
-    /**
-     * Checks and sets the room roles depending on their enabled methods
-     */
-    public static setupRoolRoles(): void {
-        // Loop through our rooms
-        for (const room in Game.rooms) {
-            // Get the room object, because we'll need it later
-            const Room = Game.rooms[room];
-            // Make sure we initialise the room memory
-            if (!Room.memory.roles) {
-                Debug.Log("COUNTER] Creating room role object [" + room + "]");
-                Room.memory.roles = {};
-            }
-            // Loop through the roles we have
-            for (const i in ROLES) {
-                // Get the role name
-                const roleName: string = ROLES[i];
-                // switch based on the roleName
-                switch (roleName) {
-                    // Miners
-                    case Miner.roleName:
-                        Room.memory.roles[roleName] = Miner.enabled(Room);
-                        break;
-                    // Harvesters
-                    case Harvester.roleName:
-                        Room.memory.roles[roleName] = Harvester.enabled(Room);
-                        break;
-
-                    default:
-                        Room.memory.roles[roleName] = false;
-                        break;
-                }
-            }
+            // Run role setup
+            Room.roleSetup();
+            // Run source setup
+            Room.sourceSetup();
+            // Run mineral setup
+            Room.mineralSetup();
         }
     }
 

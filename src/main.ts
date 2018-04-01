@@ -31,6 +31,5 @@ export const loop = ErrorMapper.wrapLoop(() => {
     // Run Cleaner First
     Cleaner.run();
     Counter.run();
-    Counter.setupRoolRoles();
     Spawner.run();
 });
