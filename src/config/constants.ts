@@ -1,9 +1,5 @@
 import { Debug } from "functions/debug";
 
-const STATE_SPAWN = "spawn";
-const STATE_INIT = "init";
-const STATE_MOVE = "move";
-
 export const ROLES: string[] = [
     // "guard",
     "Miner",
@@ -20,6 +16,13 @@ export const ROLES: string[] = [
     // "remoteminer",
     // "hauler"
 ];
+
+export const STATE_SPAWN: CreepState = 0;
+export const STATE_INIT: CreepState = 1;
+export const STATE_MOVE: CreepState = 2;
+export const STATE_ARRIVED: CreepState = 3;
+export const STATE_DELIVER: CreepState = 4;
+export const STATE_DONE: CreepState = 5;
 
 export function loadConstants(): void {
     // Debug

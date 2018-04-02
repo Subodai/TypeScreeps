@@ -1,9 +1,9 @@
 import { ROLES } from "config/constants";
+import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
+import { STATE_ARRIVED, STATE_DELIVER, STATE_DONE, STATE_INIT, STATE_MOVE, STATE_SPAWN } from "../config/constants";
 import { Debug } from "./debug";
 import { CalcBodyCost } from "./tools";
-
-const STATE_SPAWN = "spawn";
 
 export class Spawner {
     private static runEvery: number = 10;
@@ -44,6 +44,12 @@ export class Spawner {
                     case Miner.roleName:
                         Spawn.log("Role found, running spawn routine");
                         spawned = this.spawnRoutine(Miner, Spawn);
+                        break;
+
+                    // Harvesters
+                    case Harvester.roleName:
+                        Spawn.log("Role found, running spawn routine");
+                        spawned = this.spawnRoutine(Harvester, Spawn);
                         break;
 
                     default:

@@ -1,7 +1,6 @@
+import { STATE_ARRIVED, STATE_DELIVER, STATE_DONE, STATE_INIT, STATE_MOVE, STATE_SPAWN } from "config/constants";
 import { Debug } from "functions/debug";
 import { Traveler } from "utils/Traveler";
-
-const STATE_SPAWN = "spawn";
 
 /**
  * Creep Prototype Extension

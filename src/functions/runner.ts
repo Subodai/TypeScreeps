@@ -1,7 +1,7 @@
 import { ROLES } from "config/constants";
 import { Debug } from "functions/debug";
 
-export class CreepRunner {
+export class Runner {
     private static runEvery: number = 1;
     private static softLimit: number = 2;
 

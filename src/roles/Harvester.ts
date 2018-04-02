@@ -54,6 +54,42 @@ export class Harvester {
      * @param creep {Creep}
      */
     public static run(creep: Creep): void {
-        return;
+        switch (creep.state) {
+            case STATE_SPAWN:
+                if (!creep.isTired()) {
+                    creep.state = STATE_INIT;
+                }
+                break;
+            case STATE_INIT:
+                if (this.atHome(creep)) {
+                    return;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Is creep in it's home room?
+     * @param creep {Creep}
+     */
+    private static atHome(creep: Creep): boolean {
+        if (creep.room.name !== creep.memory.roomName) {
+            delete creep.memory.energyPickup;
+            if (creep.memory.roomName) {
+                const pos = new RoomPosition(25, 25, creep.memory.roomName);
+                creep.travelTo(pos);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static checkLoad(creep: Creep): void {
+        // check if this creep is full/empty done?
+        if (_.sum(creep.carry) === 0) {
+            return;
+        }
     }
 }
