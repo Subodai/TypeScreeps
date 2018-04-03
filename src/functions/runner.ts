@@ -8,11 +8,11 @@ export class Runner {
 
     public static run(): void {
         if (Game.time % this.runEvery === 0) {
-            Debug.Log("Running Creeps");
+            Debug.Log("Runner Start");
             const cpu: number = Game.cpu.getUsed();
             this.creeps();
             this.rooms();
-            Debug.Log("Creep Runner used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
+            Debug.Log("Runner Finished used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
         }
     }
 
