@@ -27,7 +27,7 @@ export class Debug {
         if (creep) {
             msg += "<span style='color:" + this.cGreen + ";'>[" + creep.name + "] </span>";
         }
-        if (creep.state) {
+        if (creep.state !== undefined) {
             msg += "<span style='color:" + this.cLBlue + ";'>[" + creep.state + "] </span>";
         }
         msg += message;

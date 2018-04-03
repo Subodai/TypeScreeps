@@ -59,16 +59,25 @@ export class Harvester {
             case STATE._SPAWN:
                 creep.log("In spawn state");
                 if (!creep.isTired()) {
+                    creep.log("Done spawning setting to init");
                     creep.state = STATE._INIT;
+                    this.run(creep);
                 }
+                break;
             // fall through
             case STATE._INIT:
                 creep.log("In init state");
                 if (this.atHome(creep)) {
-                    return;
+                    creep.log("at home ready to collect");
+                    creep.state = STATE._MOVE;
+                    this.run(creep);
                 }
-
+                break;
+            case STATE._MOVE:
+                creep.log("In move state");
+                break;
             default:
+                creep.log("No state set");
                 break;
         }
     }
