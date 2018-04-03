@@ -1,3 +1,4 @@
+import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
 
 /**
@@ -55,16 +56,18 @@ export class Harvester {
      */
     public static run(creep: Creep): void {
         switch (creep.state) {
-            case STATE_SPAWN:
+            case STATE._SPAWN:
+                creep.log("In spawn state");
                 if (!creep.isTired()) {
-                    creep.state = STATE_INIT;
+                    creep.state = STATE._INIT;
                 }
-                break;
-            case STATE_INIT:
+            // fall through
+            case STATE._INIT:
+                creep.log("In init state");
                 if (this.atHome(creep)) {
                     return;
                 }
-                break;
+
             default:
                 break;
         }

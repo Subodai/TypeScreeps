@@ -3,6 +3,7 @@ export class Debug {
     private static cRed: string = "#f45138";
     private static cGreen: string = "#aff98f";
     private static cBlue: string = "#42d7f4";
+    private static cLBlue: string = "#8da6c6";
     private static cYellow: string = "#f8f990";
     private static debugEnabled: boolean = Memory.debugEnabled;
     private static creepDebugEnabled: boolean = Memory.creepDebug;
@@ -18,13 +19,16 @@ export class Debug {
     public static creep(message: string, creep: Creep): void {
         if (!this.creepDebugEnabled || !this.debugEnabled) { return; }
         let msg: string = "";
-        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
+        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "] </span>";
         const room: Room = creep.room;
         if (room) {
-            msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "]</span> ";
+            msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "] </span>";
         }
         if (creep) {
-            msg += "<span style='color:" + this.cGreen + ";'>[" + creep.name + "]</span> ";
+            msg += "<span style='color:" + this.cGreen + ";'>[" + creep.name + "] </span>";
+        }
+        if (creep.state) {
+            msg += "<span style='color:" + this.cLBlue + ";'>[" + creep.state + "] </span>";
         }
         msg += message;
         console.log(msg);

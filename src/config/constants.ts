@@ -17,13 +17,6 @@ export const ROLES: string[] = [
     // "hauler"
 ];
 
-export const STATE_SPAWN: CreepState = 0;
-export const STATE_INIT: CreepState = 1;
-export const STATE_MOVE: CreepState = 2;
-export const STATE_ARRIVED: CreepState = 3;
-export const STATE_DELIVER: CreepState = 4;
-export const STATE_DONE: CreepState = 5;
-
 export function loadConstants(): void {
     // Debug
     Debug.Load("Config: Empire Constants");

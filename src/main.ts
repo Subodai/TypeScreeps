@@ -2,11 +2,12 @@
 import { init } from "config/init";
 
 /* Function Imports */
-import { Cleaner } from "./functions/cleaner";
-import { Counter } from "./functions/counter";
-import { Debug, debugEnablers } from "./functions/debug";
-import { Spawner } from "./functions/spawner";
-import { loadTools } from "./functions/tools";
+import { Cleaner } from "functions/cleaner";
+import { Counter } from "functions/counter";
+import { Debug, debugEnablers } from "functions/debug";
+import { Runner } from "functions/runner";
+import { Spawner } from "functions/spawner";
+import { loadTools } from "functions/tools";
 
 /* Prototype imports */
 import { loadPrototypes } from "./prototypes/all";
@@ -32,4 +33,5 @@ export const loop = ErrorMapper.wrapLoop(() => {
     Cleaner.run();
     Counter.run();
     Spawner.run();
+    Runner.run();
 });

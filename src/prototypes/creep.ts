@@ -1,4 +1,4 @@
-import { STATE_ARRIVED, STATE_DELIVER, STATE_DONE, STATE_INIT, STATE_MOVE, STATE_SPAWN } from "config/constants";
+import * as STATE from "config/states";
 import { Debug } from "functions/debug";
 import { Traveler } from "utils/Traveler";
 
@@ -34,7 +34,7 @@ export function loadCreepPrototypes(): void {
         enumerable: true,
         get(): CreepState {
             if (!Memory.creeps[this.name].state) {
-                Memory.creeps[this.name].state = STATE_SPAWN;
+                Memory.creeps[this.name].state = STATE._SPAWN;
             }
             return Memory.creeps[this.name].state;
         },

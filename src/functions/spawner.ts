@@ -1,7 +1,7 @@
 import { ROLES } from "config/constants";
+import * as STATE from "config/states";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
-import { STATE_ARRIVED, STATE_DELIVER, STATE_DONE, STATE_INIT, STATE_MOVE, STATE_SPAWN } from "../config/constants";
 import { Debug } from "./debug";
 import { CalcBodyCost } from "./tools";
 
@@ -109,7 +109,7 @@ export class Spawner {
                 level,
                 role: Role.roleName,
                 roomName: Room.name,
-                state: STATE_SPAWN
+                state: STATE._SPAWN
             }
         });
         Spawn.log(JSON.stringify(result));

@@ -1,5 +1,6 @@
 import { ROLES } from "config/constants";
 import { Debug } from "functions/debug";
+import { Harvester } from "roles/Harvester";
 
 export class Runner {
     private static runEvery: number = 1;
@@ -27,6 +28,19 @@ export class Runner {
     }
 
     private static role(role: string): boolean {
+        // Grab the creeps
+        const creeps = _.filter(Game.creeps, (c: Creep) => c.role === role);
+        // switch based on role
+        switch (role) {
+            case Harvester.roleName:
+                for (const Creep of creeps) {
+                    Harvester.run(Creep);
+                }
+                break;
+
+            default:
+                break;
+        }
         // for (const name in Game.creeps) {
         //     const worker = Game.creeps[name];
         //     if (worker.state === STATE_SPAWN) {

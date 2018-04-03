@@ -154,29 +154,29 @@ declare class Harvester extends Role {}
 type CreepRole = Miner | Harvester;
 
 // Consts
-declare const STATE_SPAWN = 0;
-declare const STATE_INIT = 1;
-declare const STATE_MOVE = 2;
-declare const STATE_ARRIVED = 3;
-declare const STATE_DELIVER = 4;
-declare const STATE_DONE = 5;
+declare const _SPAWN = 0;
+declare const _INIT = 1;
+declare const _MOVE = 2;
+declare const _ARRIVED = 3;
+declare const _DELIVER = 4;
+declare const _DONE = 5;
 
 // Types
-type STATE_SPAWN = 0;
-type STATE_INIT = 1;
-type STATE_MOVE = 2;
-type STATE_ARRIVED = 3;
-type STATE_DELIVER = 4;
-type STATE_DONE = 5;
+type _SPAWN = 0;
+type _INIT = 1;
+type _MOVE = 2;
+type _ARRIVED = 3;
+type _DELIVER = 4;
+type _DONE = 5;
 
 // Group type
 type CreepState =
-    STATE_SPAWN |
-    STATE_INIT |
-    STATE_MOVE |
-    STATE_ARRIVED |
-    STATE_DELIVER |
-    STATE_DONE;
+    _SPAWN |
+    _INIT |
+    _MOVE |
+    _ARRIVED |
+    _DELIVER |
+    _DONE;
 
 /// <reference types="typed-screeps" />
 /**
