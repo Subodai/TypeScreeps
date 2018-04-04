@@ -51,6 +51,7 @@ interface CreepMemory {
     assignedSource?: string;
     assignedMineral?: string;
     idle?: number;
+    lastSpaceCheck?: number;
 }
 
 interface Room {

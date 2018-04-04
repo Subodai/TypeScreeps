@@ -153,6 +153,14 @@ export function loadCreepPrototypes(): void {
         if (!source.memory.lastSpaceCheck) {
             source.memory.lastSpaceCheck = 0;
         }
+        if (this.memory.lastSpaceCheck === Game.time) {
+            if (this.memory.lastSpaceCheck && this.memory.lastSpaceCheck === source.memory.lastSpaceCheck) {
+                this.log("Already checked this tick, assuming space available");
+                return true;
+            }
+        } else {
+            delete this.memory.lastSpaceCheck;
+        }
         // If we checked the space this tick and there's no space left,
         // we don't need to check again we just need to decrement the spaces
         if (source.memory.lastSpaceCheck === Game.time) {
@@ -164,26 +172,27 @@ export function loadCreepPrototypes(): void {
                 // Decrement the spaces left
                 source.memory.spaces = source.memory.spaces - 1;
                 this.log("Found a space " + source.memory.spaces + "remaining");
+                this.memory.lastSpaceCheck = source.memory.lastSpaceCheck;
                 return true;
             }
         }
         this.log("First check for space at source");
         let spaces = 1;
-        const n: RoomPosition = new RoomPosition(source.pos.x, source.pos.y - 1, source.pos.roomName);
+        const n: RoomPosition = new RoomPosition(source.pos.x, (source.pos.y - 1), source.pos.roomName);
         if (this.checkEmptyAtPos(n)) { spaces++; }
-        const ne: RoomPosition = new RoomPosition(source.pos.x + 1, source.pos.y - 1, source.pos.roomName);
+        const ne: RoomPosition = new RoomPosition((source.pos.x + 1), (source.pos.y - 1), source.pos.roomName);
         if (this.checkEmptyAtPos(ne)) { spaces++; }
-        const e: RoomPosition = new RoomPosition(source.pos.x + 1, source.pos.y, source.pos.roomName);
+        const e: RoomPosition = new RoomPosition((source.pos.x + 1), source.pos.y, source.pos.roomName);
         if (this.checkEmptyAtPos(e)) { spaces++; }
-        const se: RoomPosition = new RoomPosition(source.pos.x + 1, source.pos.y + 1, source.pos.roomName);
+        const se: RoomPosition = new RoomPosition((source.pos.x + 1), (source.pos.y + 1), source.pos.roomName);
         if (this.checkEmptyAtPos(se)) { spaces++; }
-        const s: RoomPosition = new RoomPosition(source.pos.x, source.pos.y + 1, source.pos.roomName);
+        const s: RoomPosition = new RoomPosition(source.pos.x, (source.pos.y + 1), source.pos.roomName);
         if (this.checkEmptyAtPos(s)) { spaces++; }
-        const sw: RoomPosition = new RoomPosition(source.pos.x - 1, source.pos.y + 1, source.pos.roomName);
+        const sw: RoomPosition = new RoomPosition((source.pos.x - 1), (source.pos.y + 1), source.pos.roomName);
         if (this.checkEmptyAtPos(sw)) { spaces++; }
-        const w: RoomPosition = new RoomPosition(source.pos.x - 1, source.pos.y, source.pos.roomName);
+        const w: RoomPosition = new RoomPosition((source.pos.x - 1), source.pos.y, source.pos.roomName);
         if (this.checkEmptyAtPos(w)) { spaces++; }
-        const nw: RoomPosition = new RoomPosition(source.pos.x - 1, source.pos.y - 1, source.pos.roomName);
+        const nw: RoomPosition = new RoomPosition((source.pos.x - 1), (source.pos.y - 1), source.pos.roomName);
         if (this.checkEmptyAtPos(nw)) { spaces++; }
         this.log("We found " + spaces + " spaces at source" + source.id);
         // Set our memory

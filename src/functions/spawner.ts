@@ -100,7 +100,7 @@ export class Spawner {
             return false;
         }
         // make a name
-        const name = `${Role.roleName}_${Room.name}_${Math.floor(Math.random() * 100)}`;
+        const name = `${Role.roleName}_${level}_${Room.name}_${Math.floor(Math.random() * 100)}`;
         Spawn.log("Attempting to Spawn " + name);
         // Try spawning
         Spawn.log("Spawning:" + JSON.stringify(bodyStructure[level]));

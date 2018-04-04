@@ -2,7 +2,7 @@ import { Debug } from "functions/debug";
 
 export const ROLES: string[] = [
     // "guard",
-    "Miner",
+    // "Miner",
     // "refill",       // Always pulls from storage
     "Harvester"    // Sources and containers always, fill spawns until 4, then only storage
     // "upgrader",     // Sources until 4, storage after
