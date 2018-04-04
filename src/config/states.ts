@@ -4,3 +4,4 @@ export const _MOVE: CreepState = 2;
 export const _ARRIVED: CreepState = 3;
 export const _DELIVER: CreepState = 4;
 export const _DONE: CreepState = 5;
+export const _MINE: CreepState = 6;

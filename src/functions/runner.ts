@@ -1,6 +1,7 @@
 import { ROLES } from "config/constants";
 import { Debug } from "functions/debug";
 import { Harvester } from "roles/Harvester";
+import { Miner } from "roles/Miner";
 
 export class Runner {
     private static runEvery: number = 1;
@@ -32,12 +33,18 @@ export class Runner {
         const creeps = _.filter(Game.creeps, (c: Creep) => c.role === role);
         // switch based on role
         switch (role) {
+            // Harvesters
             case Harvester.roleName:
                 for (const Creep of creeps) {
                     Harvester.run(Creep);
                 }
                 break;
-
+            // Miners
+            case Miner.roleName:
+                for (const Creep of creeps) {
+                    Miner.run(Creep);
+                }
+                break;
             default:
                 break;
         }

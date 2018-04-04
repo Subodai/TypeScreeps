@@ -24,6 +24,7 @@ interface Creep {
     moveToAndPickupMinerals(): number;
     canPickup(target: RoomObject, range?: number): boolean;
     full(): boolean;
+    empty(): boolean;
     roadCheck(work?: boolean): void;
     containerCheck(): void | boolean;
     repairStructures(roads?: boolean, defences?: boolean, structures?: boolean): number;
@@ -123,8 +124,8 @@ interface RoomMemory {
     roles?: any;
     minersNeeded?: number;
     mineralsNeeded?: number;
-    assignedSources?: string[];
-    assignedMinerals?: string[];
+    assignedSources?: { [key: string]: string | null};
+    assignedMinerals?: { [key: string]: string | null };
 }
 
 interface RoomPosition {
@@ -173,6 +174,7 @@ type _MOVE = 2;
 type _ARRIVED = 3;
 type _DELIVER = 4;
 type _DONE = 5;
+type _MINE = 6;
 
 // Group type
 type CreepState =
@@ -181,7 +183,8 @@ type CreepState =
     _MOVE |
     _ARRIVED |
     _DELIVER |
-    _DONE;
+    _DONE |
+    _MINE;
 
 /// <reference types="typed-screeps" />
 /**

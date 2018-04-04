@@ -232,16 +232,16 @@ export function loadRoomPrototypes(): void {
         this.log("Setting up energy sources");
         delete this.memory.assignedSources;
         // get the sources in this room
-        const sources = this.find(FIND_SOURCES);
+        const sources: Source[] = this.find(FIND_SOURCES);
         // get the miners in this room
-        const creeps = _.filter(Game.creeps, (c: Creep) =>
+        const creeps: Creep[] = _.filter(Game.creeps, (c: Creep) =>
             c.role === Miner.roleName &&
             c.memory.roomName === this.name &&
             !c.memory.dying);
         // set the number of minersNeeded to the length of sources
         this.memory.minersNeeded = sources.length;
         // make an empty array
-        const roomSources: any = {};
+        const roomSources: {[key: string]: string | null} = {};
         // loop through the sources
         for (const i in sources) {
             this.log("Clearing source association for " + sources[i].id);

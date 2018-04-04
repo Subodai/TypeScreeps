@@ -18,7 +18,7 @@ export class Harvester {
     /**
      * How many of this role to spawn at each RCL
      */
-    public static roster: number[] = [ 0, 2, 2, 2, 2, 2, 2, 2, 2 ];
+    public static roster: number[] = [ 0, 4, 3, 2, 2, 2, 2, 2, 2 ];
 
     /**
      * The body make up of the creep at each RCL
@@ -83,10 +83,12 @@ export class Harvester {
                 break;
             case STATE._DELIVER:
                 creep.log("Delivering energy");
+                if (creep.empty()) {
+                    creep.state = STATE._MOVE;
+                    this.run(creep);
+                }
                 if (creep.deliverEnergy() === OK) {
                     creep.log("Delivered some energy");
-                    creep.state = STATE._MOVE;
-                    // this.run(creep);
                 }
                 break;
             default:

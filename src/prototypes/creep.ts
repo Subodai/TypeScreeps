@@ -691,7 +691,8 @@ export function loadCreepPrototypes(): void {
                 });
                 const spawn = spawns[0];
                 if (spawn) {
-                    this.travelTo(spawn);
+                    // this.travelTo(spawn);
+                    this.moveTo(spawn);
                     return ERR_NOT_FOUND;
                 }
                 // }
@@ -883,6 +884,13 @@ export function loadCreepPrototypes(): void {
      */
     Creep.prototype.full = function() {
         return _.sum(this.carry) >= this.carryCapacity;
+    };
+
+    /**
+     * Is Creep empty?
+     */
+    Creep.prototype.empty = function() {
+        return _.sum(this.carry) === 0;
     };
 
     /**
