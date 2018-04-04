@@ -9,6 +9,11 @@ export function loadCreepPrototypes(): void {
     // Some debug
     Debug.Load("Prototype: Creep");
 
+    // tslint:disable-next-line:max-line-length
+    // Creep.prototype.travelTo = function(destination: RoomPosition | { pos: RoomPosition }, options?: TravelToOptions) {
+    //     return Traveler.travelTo(this, destination, options);
+    // };
+
     /**
      * The role of the creep
      */
@@ -118,7 +123,8 @@ export function loadCreepPrototypes(): void {
                 if (this.memory.roomName) {
                     const pos: RoomPosition = new RoomPosition(25, 25, this.memory.roomName);
                     // Move the creep
-                    this.travelTo(pos);
+                    // this.travelTo(pos);
+                    this.moveTo(pos);
                 }
             }
             // Are we at max health?
@@ -223,7 +229,9 @@ export function loadCreepPrototypes(): void {
      * @param useStorage bool
      * @param emergency bool
      */
-    Creep.prototype.getNearbyEnergy = function(useStorage: boolean = false, emergency: boolean = false): number {
+    Creep.prototype.getNearbyEnergy = function(
+        useStorage: boolean = false,
+        emergency: boolean = false): ScreepsReturnCode {
         // First, are we full?
         if (_.sum(this.carry) === this.carryCapacity) {
             this.log("Creep Full Cannot Get Nearby Energy");
@@ -481,11 +489,207 @@ export function loadCreepPrototypes(): void {
             } else {
                 this.log("Moving closer to target");
                 // We probably need to move
-                this.travelTo(target);
+                // this.travelTo(target);
+                this.moveTo(target);
                 return OK;
             }
         }
         return ERR_BUSY;
+    };
+
+    Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
+        let fillSpawns = false;
+        if (this.room.energyAvailable < this.room.energyCapacityAvailable * 0.75) {
+            fillSpawns = true;
+        }
+        let target: any;
+        // only refill spawns and other things if room level below 4 after 4 we just fill storage
+        // after 5 we fill storage and terminal
+        // unless emergency, then we fill spawns too
+        if (fillSpawns || this.room.controller!.level < 4 || this.room.memory.emergency || !this.room.storage) {
+            // Do we have energy?
+            if (this.carry.energy > 0) {
+                // We do, try to find a spawn or extension to fill
+                target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+                    filter: (s: AnyStructure) => {
+                        return (
+                            s.structureType === STRUCTURE_EXTENSION ||
+                            s.structureType === STRUCTURE_SPAWN
+                        ) && s.energy < s.energyCapacity;
+                    }
+                });
+            }
+            // Did we find a spawn or extension?
+            if (target) {
+                this.log("found spawn or extension");
+                // Yep, so reset idle
+                this.memory.idle = 0;
+                // Loop through our carry
+                for (const res in this.carry) {
+                    // Only try to delivery energy to spawn and exention
+                    if (res === RESOURCE_ENERGY) {
+                        const result = this.transfer(target, res);
+                        // If we're not in range
+                        if (result === ERR_NOT_IN_RANGE) {
+                            // Move to it
+                            // this.travelTo(target);
+                            this.moveTo(target);
+                            return ERR_NOT_IN_RANGE;
+                        } else if (result === OK) {
+                            this.log("transfered energy to spawn or extension");
+                            return OK;
+                        } else {
+                            this.log(JSON.stringify(result));
+                            return result;
+                        }
+                    }
+                }
+            }
+            // We didn't find a target yet, do we still have energy to use?
+            if (this.carry.energy > 0) {
+                let tower: any;
+                // First find towers with less than 400 energy
+                tower = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                    filter: (i: AnyStructure) => i.structureType === STRUCTURE_TOWER && i.energy < 400
+                });
+
+                // If we didn't find any get them with less than 800
+                if (!tower) {
+                    tower = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        filter: (i: AnyStructure) => i.structureType === STRUCTURE_TOWER && i.energy < 800
+                    });
+                }
+
+                // Okay all above 800, get any now
+                if (!tower) {
+                    tower = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        filter: (i: AnyStructure) => i.structureType === STRUCTURE_TOWER && i.energy < i.energyCapacity
+                    });
+                }
+
+                // If towers are full, can we dump it into a lab?
+                if (!tower) {
+                    tower = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                        filter: (i: AnyStructure) => i.structureType === STRUCTURE_LAB && i.energy < i.energyCapacity
+                    });
+                }
+                // So did we find one?
+                if (tower) {
+                    this.log("found a tower");
+                    // Attempt transfer, unless out of range
+                    if (this.transfer(tower, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                        // Let's go to the tower
+                        // this.travelTo(tower);
+                        this.moveTo(tower);
+                        return ERR_NOT_IN_RANGE;
+                    } else {
+                        this.log("transfered to a tower");
+                        // Succesful drop off
+                        return OK;
+                    }
+                }
+            }
+        }
+        // Okay time for some fancy maths
+        const terminal = this.room.terminal;
+        const storage = this.room.storage;
+
+        // If we have both storage and terminal
+        if (storage && terminal) {
+            if (this.room.memory.prioritise) {
+                if (this.room.memory.prioritise === "terminal") {
+                    if (_.sum(terminal.store) < terminal.storeCapacity) {
+                        target = terminal;
+                    } else {
+                        target = storage;
+                    }
+                } else if (this.room.memory.prioritise === "storage") {
+                    if (_.sum(storage.store) < storage.storeCapacity) {
+                        target = storage;
+                    } else {
+                        target = terminal;
+                    }
+                } else {
+                    if (this.carry.energy > 0) {
+                        target = storage;
+                    } else {
+                        target = terminal;
+                    }
+                }
+            } else {
+                // Do we have energy?
+                if (this.carry.energy > 0) {
+                    // Lets just assume these exist and get the percentage filled
+                    // We need to know the relative filled of each of these, \
+                    // so [filled / (capacity/100)] should give us the percentage?
+                    const terminalP = (_.sum(terminal.store) / (terminal.storeCapacity / 100));
+                    const storageP = (_.sum(storage.store) / (storage.storeCapacity / 100));
+                    // If the fill percentage is less or equal
+                    if (terminalP <= storageP) {
+                        target = terminal;
+                    }
+                    // if it's the other way around use storage
+                    if (storageP < terminalP) {
+                        target = storage;
+                    }
+                } else {
+                    // Prioritise the terminal for non-energy
+                    target = terminal;
+                    // If we don't have one
+                    if (!target || _.sum(terminal.store) === terminal.storeCapacity) {
+                        // try storage
+                        target = storage;
+                    }
+                }
+            }
+
+        } else if (storage) { // Room storage?
+            target = storage;
+        } else {
+            // We've no targets... now what?
+        }
+        // Did we find a target?
+        if (target) {
+            this.log("found storage or terminal");
+            // reset idle
+            this.memory.idle = 0;
+            // Loop through our resources
+            for (const res in this.carry) {
+                // Attempt to transfer them
+                if (this.carry.hasOwnProperty(res)) {
+                    if (this.transfer(target, res as ResourceConstant) === ERR_NOT_IN_RANGE) {
+                        // this.travelTo(target);
+                        this.moveTo(target);
+                        return ERR_NOT_IN_RANGE;
+                    } else {
+                        this.log("transferred to storage or terminal");
+                        return OK;
+                    }
+                }
+            }
+        } else {
+            if (!this.memory.idle) {
+                this.memory.idle = 0;
+            }
+            this.memory.idle ++;
+
+            if (this.memory.idle && this.memory.idle >= 10) {
+                // Are we in our home room?
+                // if (creep.room.name != creep.memory.roomName) {
+                // lets go home
+                const spawns = Game.rooms[this.memory.roomName!].find(FIND_STRUCTURES, {
+                    filter: (i) => i.structureType === STRUCTURE_SPAWN
+                });
+                const spawn = spawns[0];
+                if (spawn) {
+                    this.travelTo(spawn);
+                    return ERR_NOT_FOUND;
+                }
+                // }
+            }
+        }
+        this.log("Got to end of deliver method with no return");
+        return ERR_NOT_FOUND;
     };
 
     /**
@@ -604,7 +808,8 @@ export function loadCreepPrototypes(): void {
             if (!this.canPickup(target)) {
                 this.say(global.sayMove);
                 // We can't pick it up yet, let's move to it
-                this.travelTo(target);
+                // this.travelTo(target);
+                this.moveTo(target);
             }
             // Can we pick it up after our move?
             if (this.canPickup(target)) {
@@ -628,7 +833,8 @@ export function loadCreepPrototypes(): void {
             if (!this.canPickup(target)) {
                 this.say(global.sayMove);
                 // Can't pick it up yet, so lets move towards it
-                this.travelTo(target);
+                // this.travelTo(target);
+                this.moveTo(target);
             }
             // Can we pick it up now?
             if (this.canPickup(target)) {
@@ -906,7 +1112,8 @@ export function loadCreepPrototypes(): void {
                     }
                 } else {
                     this.log("Travelling to target");
-                    this.travelTo(target);
+                    // this.travelTo(target);
+                    this.moveTo(target);
                     return OK;
                 }
             }
@@ -918,7 +1125,8 @@ export function loadCreepPrototypes(): void {
             }) as StructureSpawn;
             if (spawn) {
                 if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
-                    this.travelTo(spawn);
+                    // this.travelTo(spawn);
+                    this.moveTo(spawn);
                 }
             }
             return ERR_INVALID_TARGET;

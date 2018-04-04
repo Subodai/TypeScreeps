@@ -10,9 +10,19 @@ export function init(): void {
     loadColours();
     loadDiplomacy();
     loadSpeech();
-    Memory.debugEnabled = true;
-    Memory.creepDebug = true;
-    Memory.roomDebug = true;
-    Memory.memoryDebug = true;
-    Memory.spawnDebug = true;
+    if (Memory.debugEnabled === undefined) {
+        Memory.debugEnabled = true;
+    }
+    if (Memory.creepDebug === undefined) {
+        Memory.creepDebug = true;
+    }
+    if (Memory.roomDebug === undefined) {
+        Memory.roomDebug = true;
+    }
+    if (Memory.memoryDebug === undefined) {
+        Memory.memoryDebug = true;
+    }
+    if (Memory.spawnDebug === undefined) {
+        Memory.spawnDebug = true;
+    }
 }

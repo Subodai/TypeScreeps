@@ -75,6 +75,19 @@ export class Harvester {
                 break;
             case STATE._MOVE:
                 creep.log("In move state");
+                if (creep.getNearbyEnergy() === ERR_FULL) {
+                    creep.log("Got some energy");
+                    creep.state = STATE._DELIVER;
+                    this.run(creep);
+                }
+                break;
+            case STATE._DELIVER:
+                creep.log("Delivering energy");
+                if (creep.deliverEnergy() === OK) {
+                    creep.log("Delivered some energy");
+                    creep.state = STATE._MOVE;
+                    // this.run(creep);
+                }
                 break;
             default:
                 creep.log("No state set");
