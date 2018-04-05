@@ -4,7 +4,7 @@ import { BodyBuilder } from "functions/tools";
 /**
  * Harvesters collect energy in a room and bring it back to the base
  */
-export class Harvester {
+export class Harvester extends Role {
     /**
      * The role's identifier
      */

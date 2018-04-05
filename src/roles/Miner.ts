@@ -4,7 +4,7 @@ import { BodyBuilder } from "functions/tools";
 /**
  * Miners go to sources in a room and mine them
  */
-export class Miner {
+export class Miner extends Role {
 
     public static roleName: string = "Miner";
 
@@ -89,8 +89,8 @@ export class Miner {
 
     /**
      * Pick a source to mine in a room
-     *
      * @param creep {Creep}
+     * @returns {boolean}
      */
     private static pickSource(creep: Creep): boolean {
         // Does it have a source
@@ -123,9 +123,9 @@ export class Miner {
     }
 
     /**
-     * Move to the assigned source
-     *
+     * Move to the source we have stored in memory
      * @param creep {Creep}
+     * @returns {ScreepsReturnCode}
      */
     private static moveToSource(creep: Creep): ScreepsReturnCode {
         if (creep.isTired()) {
@@ -147,8 +147,9 @@ export class Miner {
     }
 
     /**
-     * Mine the stored target source
+     * Mine the source we have stored in memory
      * @param creep {Creep}
+     * @returns {ScreepsReturnCode}
      */
     private static mineSource(creep: Creep): ScreepsReturnCode {
         if (!creep.memory.dying && creep.ticksToLive! <= 150) {
