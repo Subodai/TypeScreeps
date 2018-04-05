@@ -339,4 +339,14 @@ export function loadRoomPrototypes(): void {
             }
         }
     };
+    /**
+     * Returns list of creeps of a certain role
+     */
+    Room.prototype.activeCreepsInRole = function(Role: CreepRole): Creep[] {
+        const list: Creep[] = _.filter(Game.creeps, (c: Creep) =>
+            c.memory.role === Role.roleName &&
+            c.memory.roomName === this.name &&
+           !c.memory.dying);
+        return list;
+    };
 }

@@ -37,13 +37,12 @@ export class Harvester extends Role {
 
     /**
      * Is the Harvester role enabled for a room?
-     * @param Room {Room}
+     * @param room {Room}
      */
-    public static enabled(Room: Room): boolean {
-        if (Room.controller && Room.memory.minersNeeded && Room.memory.minersNeeded > 0) {
-            const list = _.filter(Game.creeps, (c) => c.memory.role === this.roleName &&
-                                  c.memory.roomName === Room.name && !c.memory.dying);
-            if (list.length < Room.memory.minersNeeded * this.multiplier) {
+    public static enabled(room: Room): boolean {
+        if (room.controller && room.memory.minersNeeded && room.memory.minersNeeded > 0) {
+            const list = room.activeCreepsInRole(this);
+            if (list.length < room.memory.minersNeeded * this.multiplier) {
                 return true;
             }
         }

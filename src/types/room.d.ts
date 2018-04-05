@@ -50,6 +50,10 @@ interface Room {
      * Setup the roles in a room
      */
     roleSetup(): void;
+    /**
+     * Returns list of creeps of a certain role
+     */
+    activeCreepsInRole(Role: CreepRole): Creep[];
 }
 
 interface RoomMemory {

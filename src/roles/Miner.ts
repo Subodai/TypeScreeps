@@ -38,8 +38,7 @@ export class Miner extends Role {
      */
     public static enabled(room: Room): boolean {
         if (room.controller && room.controller.level > 1 && room.memory.minersNeeded && room.memory.minersNeeded > 0) {
-            const list = _.filter(Game.creeps, (c: Creep) => c.memory.role === this.roleName &&
-                                                             c.memory.roomName === room.name && !c.memory.dying);
+            const list = room.activeCreepsInRole(this);
             if (list.length < room.memory.minersNeeded) {
                 return true;
             }
