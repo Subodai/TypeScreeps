@@ -30,6 +30,7 @@ interface Creep {
     state: CreepState;
     role: string;
     upgradeHomeRoom(): ScreepsReturnCode;
+    atHome(): boolean;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
 }
 

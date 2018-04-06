@@ -1178,4 +1178,20 @@ export function loadCreepPrototypes(): void {
         this.log("ERROR invalid upgrader target halp");
         return ERR_INVALID_TARGET;
     };
+
+    /**
+     * Is creep in it's home room?
+     * @param creep {Creep}
+     */
+    Creep.prototype.atHome = function(): boolean {
+        if (this.room.name !== this.memory.roomName) {
+            delete this.memory.energyPickup;
+            if (this.memory.roomName) {
+                const pos = new RoomPosition(25, 25, this.memory.roomName);
+                this.travelTo(pos);
+                return false;
+            }
+        }
+        return true;
+    };
 }

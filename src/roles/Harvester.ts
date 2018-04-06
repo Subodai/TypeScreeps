@@ -66,7 +66,7 @@ export class Harvester {
             // fall through
             case STATE._INIT:
                 creep.log("In init state");
-                if (this.atHome(creep)) {
+                if (creep.atHome()) {
                     creep.log("at home ready to collect");
                     creep.state = STATE._MOVE;
                     this.run(creep);
@@ -93,29 +93,6 @@ export class Harvester {
             default:
                 creep.log("No state set");
                 break;
-        }
-    }
-
-    /**
-     * Is creep in it's home room?
-     * @param creep {Creep}
-     */
-    private static atHome(creep: Creep): boolean {
-        if (creep.room.name !== creep.memory.roomName) {
-            delete creep.memory.energyPickup;
-            if (creep.memory.roomName) {
-                const pos = new RoomPosition(25, 25, creep.memory.roomName);
-                creep.travelTo(pos);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static checkLoad(creep: Creep): void {
-        // check if this creep is full/empty done?
-        if (_.sum(creep.carry) === 0) {
-            return;
         }
     }
 }
