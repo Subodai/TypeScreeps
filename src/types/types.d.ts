@@ -3,7 +3,7 @@
 declare const require: (module: string) => any;
 
 // Delcare global object
-declare let global: { [k: string]: any }
+declare let global: { [k: string]: any };
 
 interface RoomPosition {
     isRoomEdge(): boolean;

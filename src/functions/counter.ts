@@ -1,5 +1,3 @@
-import { ROLES } from "config/constants";
-import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Debug } from "./debug";
 
