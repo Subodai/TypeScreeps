@@ -7,7 +7,7 @@ interface Creep {
     findSpaceAtSource(source: Source): boolean;
     isTired(): boolean;
     clearTargets(): void;
-    getNearbyEnergy(): ScreepsReturnCode;
+    getNearbyEnergy(useStorage?: boolean, emergency?: boolean): ScreepsReturnCode;
     deliverEnergy(): ScreepsReturnCode;
     getNearbyMinerals(storage: boolean): number;
     canWork(): boolean;
@@ -29,6 +29,7 @@ interface Creep {
     findDamagedStructures(): void;
     state: CreepState;
     role: string;
+    upgradeHomeRoom(): ScreepsReturnCode;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
 }
 

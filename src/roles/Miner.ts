@@ -4,8 +4,7 @@ import { BodyBuilder } from "functions/tools";
 /**
  * Miners go to sources in a room and mine them
  */
-export class Miner extends Role {
-
+export class Miner {
     public static roleName: string = "Miner";
 
     public static roster: number[] = [
@@ -48,6 +47,7 @@ export class Miner extends Role {
 
     public static run(creep: Creep): void {
         switch (creep.state) {
+            // SPAWN state
             case STATE._SPAWN:
                 creep.log("In spawn state");
                 if (!creep.isTired()) {

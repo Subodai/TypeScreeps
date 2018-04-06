@@ -2,6 +2,8 @@ import { ROLES } from "config/constants";
 import * as STATE from "config/states";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
+import { Supergrader } from "roles/Supergrader";
+import { Upgrader } from "roles/Upgrader";
 import { Debug } from "./debug";
 import { CalcBodyCost } from "./tools";
 
@@ -50,6 +52,18 @@ export class Spawner {
                     case Harvester.roleName:
                         Spawn.log("Role found, running spawn routine");
                         spawned = this.spawnRoutine(Harvester, Spawn);
+                        break;
+
+                    // Upgraders
+                    case Upgrader.roleName:
+                        Spawn.log("Role found, running spawn routine");
+                        spawned = this.spawnRoutine(Upgrader, Spawn);
+                        break;
+
+                    // Supergraders
+                    case Supergrader.roleName:
+                        Spawn.log("Role found, runnning spawn routine");
+                        spawned = this.spawnRoutine(Supergrader, Spawn);
                         break;
 
                     default:

@@ -3,6 +3,8 @@ import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
+import { Supergrader } from "roles/Supergrader";
+import { Upgrader } from "roles/Upgrader";
 
 export function loadRoomPrototypes(): void {
     Debug.Load("Prototype: Room");
@@ -332,7 +334,14 @@ export function loadRoomPrototypes(): void {
                 case Harvester.roleName:
                     this.memory.roles[roleName] = Harvester.enabled(this);
                     break;
-
+                // Upgraders
+                case Upgrader.roleName:
+                    this.memory.roles[roleName] = Upgrader.enabled(this);
+                    break;
+                // Supergraders
+                case Supergrader.roleName:
+                    this.memory.roles[roleName] = Supergrader.enabled(this);
+                    break;
                 default:
                     this.memory.roles[roleName] = false;
                     break;

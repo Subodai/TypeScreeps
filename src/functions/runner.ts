@@ -2,6 +2,8 @@ import { ROLES } from "config/constants";
 import { Debug } from "functions/debug";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
+import { Supergrader } from "roles/Supergrader";
+import { Upgrader } from "roles/Upgrader";
 
 export class Runner {
     private static runEvery: number = 1;
@@ -35,14 +37,26 @@ export class Runner {
         switch (role) {
             // Harvesters
             case Harvester.roleName:
-                for (const Creep of creeps) {
-                    Harvester.run(Creep);
+                for (const creep of creeps) {
+                    Harvester.run(creep);
                 }
                 break;
             // Miners
             case Miner.roleName:
-                for (const Creep of creeps) {
-                    Miner.run(Creep);
+                for (const creep of creeps) {
+                    Miner.run(creep);
+                }
+                break;
+            // Upgraders
+            case Upgrader.roleName:
+                for (const creep of creeps) {
+                    Upgrader.run(creep);
+                }
+                break;
+            // Supergraders
+            case Supergrader.roleName:
+                for (const creep of creeps) {
+                    Supergrader.run(creep);
                 }
                 break;
             default:

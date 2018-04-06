@@ -72,7 +72,7 @@ export function loadCreepPrototypes(): void {
             level: this.memory.level,
             role: this.memory.role,
             roomName: this.memory.roomName,
-            sType: this.memory.sType,
+            sType: this.memory.sType, // todo remove?
             state: this.memory.state
         };
         this.memory = mem;
@@ -1149,5 +1149,33 @@ export function loadCreepPrototypes(): void {
             return ERR_INVALID_TARGET;
         }
         return OK;
+    };
+
+    /**
+     *
+     */
+    Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
+        if (Game.rooms[this.memory.roomName!]) {
+            const controller: StructureController | undefined = Game.rooms[this.memory.roomName!].controller;
+            if (controller) {
+                // if we're move than 3 spaces away, get close
+                if (this.pos.getRangeTo(controller.pos) > 3) {
+                    // this.travelTo(controller);
+                    this.moveTo(controller);
+                    return ERR_NOT_IN_RANGE;
+                }
+                // we must be within 3 spaces
+                return this.upgradeController(controller);
+            }
+        } else {
+            // we're not in the right room wtf?! move to it
+            const pos = new RoomPosition(25, 25, this.memory.roomName!);
+            // this.travelTo(pos);
+            this.moveTo(pos);
+            return ERR_NOT_IN_RANGE;
+        }
+        // invalid target halp
+        this.log("ERROR invalid upgrader target halp");
+        return ERR_INVALID_TARGET;
     };
 }

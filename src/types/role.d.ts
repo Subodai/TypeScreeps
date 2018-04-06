@@ -68,7 +68,11 @@ declare class Miner extends Role {
  */
 declare class Harvester extends Role { }
 
+declare class Upgrader extends Role { }
+
+declare class Supergrader extends Role { }
+
 /**
  * Defines what a creep does during it's lifespan
  */
-type CreepRole = Miner | Harvester;
+type CreepRole = Role | Miner | Harvester | Upgrader;
