@@ -54,4 +54,3 @@ interface CreepMemory {
     idle?: number;
     lastSpaceCheck?: number;
 }
-

@@ -5,35 +5,35 @@ declare class Role {
     /**
      * Name of the role
      */
-    roleName: string;
+    public roleName: string;
     /**
      * The amount of creeps we need per RCL level
      */
-    roster: number[];
+    public roster: number[];
     /**
      * The amount of creeps we need per RCL when links are enabled
      */
-    rosterLinks?: number[];
+    public rosterLinks?: number[];
     /**
      * The body makeup of the role per RCL
      */
-    bodyStructure: BodyPartConstant[][];
+    public bodyStructure: BodyPartConstant[][];
     /**
      * The body makeup of the role per RCL when links are enabled
      */
-    bodyStructureLinks?: BodyPartConstant[][];
+    public bodyStructureLinks?: BodyPartConstant[][];
     /**
      * Is this role enabled for a given room?
      * @param room {Room}
      * @returns {boolean}
      */
-    enabled(room: Room): boolean;
+    public enabled(room: Room): boolean;
     /**
      * Run the role in it's state machine
      * @param creep {Creep}
      * @returns {void}
      */
-    run(creep: Creep): void;
+    public run(creep: Creep): void;
 }
 
 /**

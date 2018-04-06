@@ -4,7 +4,7 @@ import { Debug } from "./debug";
 export class Counter {
     private static runEvery: number = 5;
 
-    private static notify: boolean = false;
+    // private static notify: boolean = false;
 
     /**
      * Run the main counter

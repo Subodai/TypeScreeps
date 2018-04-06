@@ -7,7 +7,7 @@ import { Upgrader } from "roles/Upgrader";
 
 export class Runner {
     private static runEvery: number = 1;
-    private static softLimit: number = 2;
+    // private static softLimit: number = 2;
 
     public static run(): void {
         if (Game.time % this.runEvery === 0) {
