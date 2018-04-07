@@ -4,6 +4,8 @@ import { Supergrader } from "./Supergrader";
 
 export class Upgrader {
 
+    private static ticksBeforeRenew: number = 100;
+
     public static roleName: string = "Upgrader";
 
     public static roster: number[] = [
@@ -67,6 +69,7 @@ export class Upgrader {
     }
 
     public static run(creep: Creep): void {
+        creep.deathCheck(this.ticksBeforeRenew);
         switch (creep.state) {
             // SPAWN state
             case STATE._SPAWN:

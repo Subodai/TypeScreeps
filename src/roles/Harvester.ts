@@ -5,6 +5,7 @@ import { BodyBuilder } from "functions/tools";
  * Harvesters collect energy in a room and bring it back to the base
  */
 export class Harvester {
+    public static ticksBeforeRenew: number = 100;
     /**
      * The role's identifier
      */
@@ -54,6 +55,7 @@ export class Harvester {
      * @param creep {Creep}
      */
     public static run(creep: Creep): void {
+        creep.deathCheck(this.ticksBeforeRenew);
         switch (creep.state) {
             case STATE._SPAWN:
                 creep.log("In spawn state");

@@ -31,6 +31,10 @@ interface Creep {
     role: string;
     upgradeHomeRoom(): ScreepsReturnCode;
     atHome(): boolean;
+    pickSource(): boolean;
+    moveToSource(): ScreepsReturnCode;
+    mineSource(): ScreepsReturnCode;
+    deathCheck(ticks: number): void;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
 }
 

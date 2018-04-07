@@ -5,6 +5,9 @@ import { BodyBuilder } from "functions/tools";
  * Miners go to sources in a room and mine them
  */
 export class Miner {
+
+    public static ticksBeforeRenew: number = 100;
+
     public static roleName: string = "Miner";
 
     public static roster: number[] = [
@@ -46,6 +49,7 @@ export class Miner {
     }
 
     public static run(creep: Creep): void {
+        creep.deathCheck(this.ticksBeforeRenew);
         switch (creep.state) {
             // SPAWN state
             case STATE._SPAWN:
@@ -59,7 +63,7 @@ export class Miner {
             // INIT state
             case STATE._INIT:
                 creep.log("Intitating Miner");
-                if (this.pickSource(creep)) {
+                if (creep.pickSource()) {
                     creep.log("Source Chosen, transitioning to move");
                     creep.state = STATE._MOVE;
                     this.run(creep);
@@ -68,7 +72,7 @@ export class Miner {
             // MOVE state
             case STATE._MOVE:
                 creep.log("Moving to source");
-                if (this.moveToSource(creep) === OK) {
+                if (creep.moveToSource() === OK) {
                     creep.state = STATE._MINE;
                     this.run(creep);
                 }
@@ -76,7 +80,7 @@ export class Miner {
             // MINE state
             case STATE._MINE:
                 creep.log("Mining Source");
-                this.mineSource(creep);
+                creep.mineSource();
                 break;
             // Default catcher
             default:
@@ -84,85 +88,5 @@ export class Miner {
                 creep.state = STATE._INIT;
                 this.run(creep);
         }
-    }
-
-    /**
-     * Pick a source to mine in a room
-     * @param creep {Creep}
-     * @returns {boolean}
-     */
-    private static pickSource(creep: Creep): boolean {
-        // Does it have a source
-        if (creep.memory.assignedSource) {
-            return true;
-        }
-        // Make sure the room has cleaned it's sources if necessary
-        creep.room.sourceSetup();
-        // get all the sources in a room
-        const sources: Source[] = creep.room.find(FIND_SOURCES);
-        // get the room's opinion on what is assigned
-        // todo move this straight into the source's memory!!???
-        const roomSources: {[key: string]: string | null} = creep.room.memory.assignedSources!;
-        // loop
-        for (const i in sources) {
-            // get the source
-            const source: Source = sources[i];
-            // if this item is null in the room's memory
-            if (roomSources[source.id] === null) {
-                // assign the creep to the source
-                creep.room.memory.assignedSources![source.id] = creep.id;
-                // assign the source to the creep
-                creep.memory.assignedSource = source.id;
-                // success!
-                return true;
-            }
-        }
-        // could not assign source
-        return false;
-    }
-
-    /**
-     * Move to the source we have stored in memory
-     * @param creep {Creep}
-     * @returns {ScreepsReturnCode}
-     */
-    private static moveToSource(creep: Creep): ScreepsReturnCode {
-        if (creep.isTired()) {
-            return ERR_TIRED;
-        }
-        const source: Source | null = Game.getObjectById(creep.memory.assignedSource);
-        if (source) {
-            if (creep.pos.getRangeTo(source.pos) === 1) {
-                return OK;
-            }
-            // creep.travelTo(source);
-            creep.moveTo(source);
-            return ERR_NOT_IN_RANGE;
-        }
-        creep.log("Issue with source, resetting memory, and putting in init");
-        creep.clearTargets();
-        creep.state = STATE._INIT;
-        return ERR_INVALID_TARGET;
-    }
-
-    /**
-     * Mine the source we have stored in memory
-     * @param creep {Creep}
-     * @returns {ScreepsReturnCode}
-     */
-    private static mineSource(creep: Creep): ScreepsReturnCode {
-        if (!creep.memory.dying && creep.ticksToLive! <= 150) {
-            creep.memory.dying = true;
-            creep.room.memory.assignedSources![creep.memory.assignedSource!] = null;
-        }
-        if (creep.memory.assignedSource) {
-            const source: Source | null = Game.getObjectById(creep.memory.assignedSource);
-            if (source) {
-                return creep.harvest(source);
-            }
-        }
-        creep.clearTargets();
-        creep.state = STATE._INIT;
-        return ERR_INVALID_TARGET;
     }
 }

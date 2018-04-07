@@ -2,6 +2,7 @@
  * Creep Role Definition
  */
 declare class Role {
+    public ticksBeforeRenew: number;
     /**
      * Name of the role
      */
@@ -36,43 +37,12 @@ declare class Role {
     public run(creep: Creep): void;
 }
 
-/**
- * Miner Class
- * @description Is assigned a source in a room, and will mine it to the floor or
- * container that is is standing on
- */
-declare class Miner extends Role {
-    /**
-     * Pick a source in a room for the miner
-     * @param creep {Creep}
-     * @returns {boolean}
-     */
-    private static pickSource(creep: Creep): boolean;
-    /**
-     * Move to the source we have stored in memory
-     * @param creep {Creep}
-     * @returns {ScreepsReturnCode}
-     */
-    private static moveToSource(creep: Creep): ScreepsReturnCode;
-    /**
-     * Mine the source we have stored in memory
-     * @param creep {Creep}
-     * @returns {ScreepsReturnCode}
-     */
-    private static mineSource(creep: Creep): ScreepsReturnCode;
-}
-
-/**
- * Harvester Class
- * @description Energy Gatherer
- */
-declare class Harvester extends Role { }
-
-declare class Upgrader extends Role { }
-
-declare class Supergrader extends Role { }
-
+declare class Miner extends Role {}
+declare class Harvester extends Role {}
+declare class Upgrader extends Role {}
+declare class Supergrader extends Role {}
+declare class Builder extends Role {}
 /**
  * Defines what a creep does during it's lifespan
  */
-type CreepRole = Role | Miner | Harvester | Upgrader;
+type CreepRole = Role | Miner | Harvester | Upgrader | Supergrader | Builder;
