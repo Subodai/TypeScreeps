@@ -89,12 +89,12 @@ export class Upgrader {
                     // Supergrader.run(creep);
                     return;
                 }
-                creep.log("Changing to move state");
-                creep.state = STATE._MOVE;
+                creep.log("Changing to gather state");
+                creep.state = STATE._GATHER;
                 break;
-            // MOVE state
-            case STATE._MOVE:
-                creep.log("In move state");
+            // GATHER state
+            case STATE._GATHER:
+                creep.log("In gather state");
                 if (_.sum(creep.carry) === creep.carryCapacity || creep.getNearbyEnergy(true) === ERR_FULL) {
                     creep.log("Got some energy");
                     creep.clearTargets();

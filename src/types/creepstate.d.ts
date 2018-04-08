@@ -9,6 +9,7 @@ declare const _DELIVER = 4;
 declare const _DONE = 5;
 declare const _MINE = 6;
 declare const _UPGRADE = 7;
+declare const _GATHER = 8;
 
 /**
  * State types
@@ -21,6 +22,7 @@ type _DELIVER = 4;
 type _DONE = 5;
 type _MINE = 6;
 type _UPGRADE = 7;
+type _GATHER = 8;
 
 /**
  * CreepStates
@@ -33,4 +35,5 @@ type CreepState =
     _DELIVER |
     _DONE |
     _MINE |
-    _UPGRADE;
+    _UPGRADE |
+    _GATHER;

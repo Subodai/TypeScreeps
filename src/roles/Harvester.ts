@@ -70,18 +70,20 @@ export class Harvester {
                 creep.log("In init state");
                 if (creep.atHome()) {
                     creep.log("at home ready to collect");
-                    creep.state = STATE._MOVE;
+                    creep.state = STATE._GATHER;
                     this.run(creep);
                 }
                 break;
-            case STATE._MOVE:
-                creep.log("In move state");
+            // GATHER state
+            case STATE._GATHER:
+                creep.log("In gather state");
                 if (creep.getNearbyEnergy() === ERR_FULL) {
                     creep.log("Got some energy");
                     creep.state = STATE._DELIVER;
                     this.run(creep);
                 }
                 break;
+            // DELIVER state
             case STATE._DELIVER:
                 creep.log("Delivering energy");
                 if (creep.empty()) {
