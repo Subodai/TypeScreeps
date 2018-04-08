@@ -1,5 +1,6 @@
 import { ROLES } from "config/constants";
 import * as STATE from "config/states";
+import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Supergrader } from "roles/Supergrader";
@@ -64,6 +65,12 @@ export class Spawner {
                     case Supergrader.roleName:
                         Spawn.log("Role found, runnning spawn routine");
                         spawned = this.spawnRoutine(Supergrader, Spawn);
+                        break;
+
+                    // Builders
+                    case Builder.roleName:
+                        Spawn.log("Role found, running spawn routine");
+                        spawned = this.spawnRoutine(Builder, Spawn);
                         break;
 
                     default:

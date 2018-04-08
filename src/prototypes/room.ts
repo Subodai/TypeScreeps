@@ -1,6 +1,7 @@
 import { ROLES } from "config/constants";
 import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
+import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Supergrader } from "roles/Supergrader";
@@ -324,6 +325,7 @@ export function loadRoomPrototypes(): void {
         for (const i in ROLES) {
             // Get the role name
             const roleName: string = ROLES[i];
+            this.log("Checking if " + roleName + " Enabled");
             // switch based on the roleName
             switch (roleName) {
                 // Miners
@@ -341,6 +343,10 @@ export function loadRoomPrototypes(): void {
                 // Supergraders
                 case Supergrader.roleName:
                     this.memory.roles[roleName] = Supergrader.enabled(this);
+                    break;
+                // Builders
+                case Builder.roleName:
+                    this.memory.roles[roleName] = Builder.enabled(this);
                     break;
                 default:
                     this.memory.roles[roleName] = false;

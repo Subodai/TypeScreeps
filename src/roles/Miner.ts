@@ -49,7 +49,14 @@ export class Miner {
     }
 
     public static run(creep: Creep): void {
+        // if creep is tired don't waste intents
+        if (creep.isTired()) {
+            creep.log("Tired");
+            return;
+        }
+        // if creep is dying, make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
+        // run as normal
         switch (creep.state) {
             // SPAWN state
             case STATE._SPAWN:

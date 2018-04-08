@@ -55,7 +55,14 @@ export class Harvester {
      * @param creep {Creep}
      */
     public static run(creep: Creep): void {
+        // if creep is tired don't waste intents
+        if (creep.isTired()) {
+            creep.log("Tired");
+            return;
+        }
+        // if creep is dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
+        // run as normal
         switch (creep.state) {
             case STATE._SPAWN:
                 creep.log("In spawn state");
@@ -67,7 +74,7 @@ export class Harvester {
                 break;
             // fall through
             case STATE._INIT:
-                creep.log("In init state");
+                creep.log("Initiating Harvester");
                 if (creep.atHome()) {
                     creep.log("at home ready to collect");
                     creep.state = STATE._GATHER;
@@ -95,7 +102,8 @@ export class Harvester {
                 }
                 break;
             default:
-                creep.log("No state set");
+                creep.log("Creep in unknown state");
+                creep.state = STATE._INIT;
                 break;
         }
     }

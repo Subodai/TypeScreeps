@@ -4,7 +4,7 @@ import { Supergrader } from "./Supergrader";
 
 export class Upgrader {
 
-    private static ticksBeforeRenew: number = 100;
+    public static ticksBeforeRenew: number = 100;
 
     public static roleName: string = "Upgrader";
 
@@ -69,7 +69,14 @@ export class Upgrader {
     }
 
     public static run(creep: Creep): void {
+        // if creep is tired, don't waste intents
+        if (creep.isTired()) {
+            creep.log("Tired");
+            return;
+        }
+        // if creep is dying make sure it get's renewed
         creep.deathCheck(this.ticksBeforeRenew);
+        // run as normal
         switch (creep.state) {
             // SPAWN state
             case STATE._SPAWN:

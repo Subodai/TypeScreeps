@@ -1,4 +1,5 @@
 import { Debug } from "functions/debug";
+import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Upgrader } from "roles/Upgrader";
@@ -7,6 +8,7 @@ export const ROLES: string[] = [
     // "guard",
     Miner.roleName,
     Harvester.roleName,
+    Builder.roleName,
     Upgrader.roleName
     // "refill",       // Always pulls from storage
     // "Harvester",    // Sources and containers always, fill spawns until 4, then only storage

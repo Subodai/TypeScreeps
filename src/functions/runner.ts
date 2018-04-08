@@ -1,5 +1,6 @@
 import { ROLES } from "config/constants";
 import { Debug } from "functions/debug";
+import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Supergrader } from "roles/Supergrader";
@@ -57,6 +58,12 @@ export class Runner {
             case Supergrader.roleName:
                 for (const creep of creeps) {
                     Supergrader.run(creep);
+                }
+                break;
+            // Builders
+            case Builder.roleName:
+                for (const creep of creeps) {
+                    Builder.run(creep);
                 }
                 break;
             default:

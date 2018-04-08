@@ -1,7 +1,7 @@
 import { BodyBuilder } from "functions/tools";
 
 export class Supergrader {
-    private static ticksBeforeRenew: number = 100;
+    public static ticksBeforeRenew: number = 100;
 
     public static roleName: string = "Supergrader";
 
