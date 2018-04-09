@@ -9,10 +9,12 @@ export function loadCreepPrototypes(): void {
     // Some debug
     Debug.Load("Prototype: Creep");
 
-    // tslint:disable-next-line:max-line-length
-    // Creep.prototype.travelTo = function(destination: RoomPosition | { pos: RoomPosition }, options?: TravelToOptions) {
-    //     return Traveler.travelTo(this, destination, options);
-    // };
+    // assigns a function to Creep.prototype: creep.travelTo(destination)
+    Creep.prototype.travelTo = function(
+        destination: RoomPosition | { pos: RoomPosition },
+        options?: TravelToOptions) {
+        return Traveler.travelTo(this, destination, options);
+    };
 
     /**
      * The role of the creep
@@ -123,8 +125,7 @@ export function loadCreepPrototypes(): void {
                 if (this.memory.roomName) {
                     const pos: RoomPosition = new RoomPosition(25, 25, this.memory.roomName);
                     // Move the creep
-                    // this.travelTo(pos);
-                    this.moveTo(pos);
+                    this.travelTo(pos);
                 }
             }
             // Are we at max health?
@@ -498,8 +499,7 @@ export function loadCreepPrototypes(): void {
             } else {
                 this.log("Moving closer to target");
                 // We probably need to move
-                // this.travelTo(target);
-                this.moveTo(target);
+                this.travelTo(target);
                 return OK;
             }
         }
@@ -541,8 +541,7 @@ export function loadCreepPrototypes(): void {
                         // If we're not in range
                         if (result === ERR_NOT_IN_RANGE) {
                             // Move to it
-                            // this.travelTo(target);
-                            this.moveTo(target);
+                            this.travelTo(target);
                             return ERR_NOT_IN_RANGE;
                         } else if (result === OK) {
                             this.log("transfered energy to spawn or extension");
@@ -588,8 +587,7 @@ export function loadCreepPrototypes(): void {
                     // Attempt transfer, unless out of range
                     if (this.transfer(tower, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                         // Let's go to the tower
-                        // this.travelTo(tower);
-                        this.moveTo(tower);
+                        this.travelTo(tower);
                         return ERR_NOT_IN_RANGE;
                     } else {
                         this.log("transfered to a tower");
@@ -667,8 +665,7 @@ export function loadCreepPrototypes(): void {
                 // Attempt to transfer them
                 if (this.carry.hasOwnProperty(res)) {
                     if (this.transfer(target, res as ResourceConstant) === ERR_NOT_IN_RANGE) {
-                        // this.travelTo(target);
-                        this.moveTo(target);
+                        this.travelTo(target);
                         return ERR_NOT_IN_RANGE;
                     } else {
                         this.log("transferred to storage or terminal");
@@ -691,8 +688,7 @@ export function loadCreepPrototypes(): void {
                 });
                 const spawn = spawns[0];
                 if (spawn) {
-                    // this.travelTo(spawn);
-                    this.moveTo(spawn);
+                    this.travelTo(spawn);
                     return ERR_NOT_FOUND;
                 }
                 // }
@@ -818,8 +814,7 @@ export function loadCreepPrototypes(): void {
             if (!this.canPickup(target)) {
                 this.say(global.sayMove);
                 // We can't pick it up yet, let's move to it
-                // this.travelTo(target);
-                this.moveTo(target);
+                this.travelTo(target);
             }
             // Can we pick it up after our move?
             if (this.canPickup(target)) {
@@ -843,8 +838,7 @@ export function loadCreepPrototypes(): void {
             if (!this.canPickup(target)) {
                 this.say(global.sayMove);
                 // Can't pick it up yet, so lets move towards it
-                // this.travelTo(target);
-                this.moveTo(target);
+                this.travelTo(target);
             }
             // Can we pick it up now?
             if (this.canPickup(target)) {
@@ -1129,8 +1123,7 @@ export function loadCreepPrototypes(): void {
                     }
                 } else {
                     this.log("Travelling to target");
-                    // this.travelTo(target);
-                    this.moveTo(target);
+                    this.travelTo(target);
                     return OK;
                 }
             }
@@ -1142,8 +1135,7 @@ export function loadCreepPrototypes(): void {
             }) as StructureSpawn;
             if (spawn) {
                 if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
-                    // this.travelTo(spawn);
-                    this.moveTo(spawn);
+                    this.travelTo(spawn);
                 }
             }
             return ERR_INVALID_TARGET;
@@ -1161,8 +1153,7 @@ export function loadCreepPrototypes(): void {
             if (controller) {
                 // if we're move than 3 spaces away, get close
                 if (this.pos.getRangeTo(controller.pos) > 3) {
-                    // this.travelTo(controller);
-                    this.moveTo(controller);
+                    this.travelTo(controller);
                     return ERR_NOT_IN_RANGE;
                 }
                 // we must be within 3 spaces
@@ -1171,8 +1162,7 @@ export function loadCreepPrototypes(): void {
         } else {
             // we're not in the right room wtf?! move to it
             const pos = new RoomPosition(25, 25, this.memory.roomName!);
-            // this.travelTo(pos);
-            this.moveTo(pos);
+            this.travelTo(pos);
             return ERR_NOT_IN_RANGE;
         }
         // invalid target halp
@@ -1243,8 +1233,7 @@ export function loadCreepPrototypes(): void {
             if (this.pos.getRangeTo(source.pos) === 1) {
                 return OK;
             }
-            // this.travelTo(source);
-            this.moveTo(source);
+            this.travelTo(source);
             return ERR_NOT_IN_RANGE;
         }
         this.log("Issue with source, resetting memory, and putting in init");
@@ -1311,8 +1300,7 @@ export function loadCreepPrototypes(): void {
         // if we're more than 3 away
         if (this.pos.getRangeTo(site.pos) > 3) {
             // go to it
-            // this.travelTo(site);
-            this.moveTo(site);
+            this.travelTo(site);
             return ERR_NOT_IN_RANGE;
         }
         return this.build(site);
