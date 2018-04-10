@@ -4,6 +4,10 @@
 declare class Role {
     public ticksBeforeRenew: number;
     /**
+     * Colour to use for visuals
+     */
+    public colour: string;
+    /**
      * Name of the role
      */
     public roleName: string;
@@ -25,14 +29,14 @@ declare class Role {
     public bodyStructureLinks?: BodyPartConstant[][];
     /**
      * Is this role enabled for a given room?
-     * @param room {Room}
-     * @returns {boolean}
+     * @param room Room
+     * @returns boolean
      */
     public enabled(room: Room): boolean;
     /**
      * Run the role in it's state machine
-     * @param creep {Creep}
-     * @returns {void}
+     * @param creep
+     * @returns void
      */
     public run(creep: Creep): void;
 }

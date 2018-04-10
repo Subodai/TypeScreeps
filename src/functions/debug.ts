@@ -10,6 +10,7 @@ export class Debug {
     private static roomDebugEnabled: boolean = Memory.roomDebug;
     private static memoryDebugEnabled: boolean = Memory.memoryDebug;
     private static spawnDebugEnabled: boolean = Memory.spawnDebug;
+    private static towerDebugEnabled: boolean = Memory.towerDebug;
     /**
      * Debug messages for creeps, will spit out room details and creep details
      *
@@ -69,6 +70,27 @@ export class Debug {
         }
         if (spawn) {
             msg += "<span style='color:" + this.cBlue + ";'>[" + spawn.name + "]</span> ";
+        }
+        msg += message;
+        console.log(msg);
+    }
+
+    /**
+     * Debug messages for towers
+     *
+     * @param message {string}
+     * @param tower {StructureTower}
+     */
+    public static Tower(message: string, tower: StructureTower): void {
+        if (!this.towerDebugEnabled || !this.debugEnabled) { return; }
+        let msg: string = "";
+        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
+        const room: Room = tower.room;
+        if (room) {
+            msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "]</span> ";
+        }
+        if (tower) {
+            msg += "<span style='color:" + this.cBlue + ";'>[" + tower.id + "]</span> ";
         }
         msg += message;
         console.log(msg);
@@ -162,6 +184,16 @@ export function debugEnablers(): void {
         } else {
             Memory.spawnDebug = false;
             return "Spawn Debug Disabled";
+        }
+    };
+
+    global.ToggleTowerDebug = function ToggleTowerDebug(): string {
+        if (!Memory.towerDebug) {
+            Memory.towerDebug = true;
+            return "Tower Debug Enabled";
+        } else {
+            Memory.towerDebug = false;
+            return "Tower Debug Disabled";
         }
     };
 }

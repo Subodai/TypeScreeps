@@ -364,4 +364,24 @@ export function loadRoomPrototypes(): void {
            !c.memory.dying);
         return list;
     };
+
+    Room.prototype.runTowers = function(): number {
+        // record cpu use before we go
+        const start = Game.cpu.getUsed();
+        // get towers in this room
+        const towers = this.find(FIND_MY_STRUCTURES, {
+            filter: (s: AnyStructure) => s.structureType === STRUCTURE_TOWER && s.energy > 0
+        });
+        // if we have any
+        if (towers.length > 0) {
+            // loop
+            for (const i in towers) {
+                // get the tower
+                const tower: StructureTower = towers[i];
+                // run it
+                tower.run();
+            }
+        }
+        return Game.cpu.getUsed() - start;
+    };
 }

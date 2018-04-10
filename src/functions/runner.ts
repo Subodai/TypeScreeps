@@ -39,31 +39,46 @@ export class Runner {
             // Harvesters
             case Harvester.roleName:
                 for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
                     Harvester.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.colour(creep, Harvester.colour, cost);
                 }
                 break;
             // Miners
             case Miner.roleName:
                 for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
                     Miner.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.colour(creep, Miner.colour, cost);
                 }
                 break;
             // Upgraders
             case Upgrader.roleName:
                 for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
                     Upgrader.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.colour(creep, Upgrader.colour, cost);
                 }
                 break;
             // Supergraders
             case Supergrader.roleName:
                 for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
                     Supergrader.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.colour(creep, Supergrader.colour, cost);
                 }
                 break;
             // Builders
             case Builder.roleName:
                 for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
                     Builder.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.colour(creep, Builder.colour, cost);
                 }
                 break;
             default:
@@ -76,5 +91,19 @@ export class Runner {
         //     }
         // }
         return true;
+    }
+
+    private static colour(creep: Creep, colour: string, cost: number): void {
+        creep.room.visual.circle(creep.pos, {
+            fill: colour,
+            opacity: 0.1,
+            radius: 0.4,
+            stroke: colour
+        }).text(cost.toFixed(2), creep.pos, {
+            align: "left",
+            color: colour,
+            font: 0.5,
+            stroke: "rgba(0,0,0,0.5)"
+        });
     }
 }

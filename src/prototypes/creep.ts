@@ -508,7 +508,7 @@ export function loadCreepPrototypes(): void {
 
     Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         let fillSpawns = false;
-        if (this.room.energyAvailable < this.room.energyCapacityAvailable * 0.75) {
+        if (this.room.energyAvailable < this.room.energyCapacityAvailable * 0.85) {
             fillSpawns = true;
         }
         let target: any;
@@ -524,7 +524,7 @@ export function loadCreepPrototypes(): void {
                         return (
                             s.structureType === STRUCTURE_EXTENSION ||
                             s.structureType === STRUCTURE_SPAWN
-                        ) && s.energy < s.energyCapacity;
+                        ) && s.isActive && s.energy < s.energyCapacity;
                     }
                 });
             }
@@ -1357,6 +1357,34 @@ export function loadCreepPrototypes(): void {
         if (site) {
             this.memory.siteId = site.id;
             this.memory.targetRoom = JSON.stringify(site.pos);
+        }
+    };
+
+    /**
+     * Go to nearest spawn and despawn
+     */
+    Creep.prototype.deSpawn = function(): void {
+        this.log("Despawning Creep");
+        let spawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (i) => i.structureType === STRUCTURE_SPAWN
+        });
+        if (!spawn) {
+            const spawns = Game.rooms[this.memory.roomName!].find(FIND_STRUCTURES, {
+                filter: (i) => i.structureType === STRUCTURE_SPAWN
+            });
+            spawn = spawns[0];
+        }
+        // if we found a spawn and it's a.. spawn
+        if (spawn && spawn instanceof StructureSpawn) {
+            // if we're more than 1 away
+            if (this.pos.getRangeTo(spawn.pos) > 1) {
+                this.log("Moving to spawn");
+                // move to it
+                this.travelTo(spawn);
+                return;
+            }
+            // otherwise, recycle self using the spawn
+            spawn.recycleCreep(this);
         }
     };
 }

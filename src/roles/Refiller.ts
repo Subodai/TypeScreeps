@@ -4,6 +4,8 @@ import { BodyBuilder } from "functions/tools";
 export class Refiller {
     // when to renew
     public static ticksBeforeRenew: number = 100;
+    // colour for visuals
+    public static colour: string = "#888888";
     // role name
     public static roleName: string = "Refiller";
     // Roster
@@ -76,6 +78,38 @@ export class Refiller {
                     creep.state = STATE._INIT;
                     this.run(creep);
                 }
+                break;
+            // INIT state
+            case STATE._INIT:
+                creep.log("Initiating Refiller");
+                if (creep.atHome()) {
+                    creep.log("at home ready to gather");
+                    creep.state = STATE._GATHER;
+                    this.run(creep);
+                }
+                break;
+            // GATHER state
+            case STATE._GATHER:
+                creep.log("In gather state");
+                if (creep.getNearbyEnergy(true) === ERR_FULL) {
+                    creep.log("Got some energy");
+                    creep.state = STATE._DELIVER;
+                    this.run(creep);
+                }
+                break;
+            // DELIVER state
+            case STATE._DELIVER:
+                creep.log("Delivering energy");
+                if (creep.empty()) {
+                    creep.state = STATE._INIT;
+                    this.run(creep);
+                }
+
+                break;
+            // default unknown state
+            default:
+                creep.log("Creep in unknown state");
+                creep.state = STATE._INIT;
                 break;
 
         }

@@ -6,6 +6,8 @@ export class Upgrader {
 
     public static ticksBeforeRenew: number = 100;
 
+    public static colour: string = "#009900";
+
     public static roleName: string = "Upgrader";
 
     public static roster: number[] = [

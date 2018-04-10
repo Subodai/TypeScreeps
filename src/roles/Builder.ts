@@ -7,17 +7,19 @@ import { BodyBuilder } from "functions/tools";
 export class Builder {
     // when to renew
     public static ticksBeforeRenew: number = 100;
+    // the colour for visuals
+    public static colour: string = "#99ccff";
     // Rolename
     public static roleName: string = "Builder";
     // Roster
     public static roster: number[] = [
         0,
-        2,
-        2,
-        2,
-        2,
-        1,
-        1,
+        6,
+        6,
+        4,
+        4,
+        4,
+        4,
         1,
         1
     ];

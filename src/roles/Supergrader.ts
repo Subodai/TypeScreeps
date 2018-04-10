@@ -3,6 +3,8 @@ import { BodyBuilder } from "functions/tools";
 export class Supergrader {
     public static ticksBeforeRenew: number = 100;
 
+    public static colour: string = "#ff6600";
+
     public static roleName: string = "Supergrader";
 
     public static roster: number[] = [

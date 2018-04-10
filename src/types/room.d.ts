@@ -54,6 +54,10 @@ interface Room {
      * Returns list of creeps of a certain role
      */
     activeCreepsInRole(Role: CreepRole): Creep[];
+    /**
+     * Runs the towers in a room
+     */
+    runTowers(): number;
 }
 
 interface RoomMemory {

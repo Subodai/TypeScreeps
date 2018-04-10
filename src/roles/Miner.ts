@@ -8,6 +8,8 @@ export class Miner {
 
     public static ticksBeforeRenew: number = 100;
 
+    public static colour: string = "#996600";
+
     public static roleName: string = "Miner";
 
     public static roster: number[] = [

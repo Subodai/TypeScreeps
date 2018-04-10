@@ -7,6 +7,10 @@ import { BodyBuilder } from "functions/tools";
 export class Harvester {
     public static ticksBeforeRenew: number = 100;
     /**
+     * Colour for visuals
+     */
+    public static colour: string = "#ffff00";
+    /**
      * The role's identifier
      */
     public static roleName: string = "Harvester";
@@ -94,7 +98,7 @@ export class Harvester {
             case STATE._DELIVER:
                 creep.log("Delivering energy");
                 if (creep.empty()) {
-                    creep.state = STATE._MOVE;
+                    creep.state = STATE._INIT;
                     this.run(creep);
                 }
                 if (creep.deliverEnergy() === OK) {
