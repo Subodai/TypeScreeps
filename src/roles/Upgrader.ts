@@ -144,31 +144,29 @@ export class Upgrader {
     }
 }
 
-export function loadUpgraderActions(): void {
-    /**
-     * Upgrade the creep's homeroom controller
-     * @returns {ScreepsReturnCode}
-     */
-    Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
-        if (Game.rooms[this.memory.roomName!]) {
-            const controller: StructureController | undefined = Game.rooms[this.memory.roomName!].controller;
-            if (controller) {
-                // if we're move than 3 spaces away, get close
-                if (this.pos.getRangeTo(controller.pos) > 3) {
-                    this.travelTo(controller);
-                    return ERR_NOT_IN_RANGE;
-                }
-                // we must be within 3 spaces
-                return this.upgradeController(controller);
+/**
+ * Upgrade the creep's homeroom controller
+ * @returns {ScreepsReturnCode}
+ */
+Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
+    if (Game.rooms[this.memory.roomName!]) {
+        const controller: StructureController | undefined = Game.rooms[this.memory.roomName!].controller;
+        if (controller) {
+            // if we're move than 3 spaces away, get close
+            if (this.pos.getRangeTo(controller.pos) > 3) {
+                this.travelTo(controller);
+                return ERR_NOT_IN_RANGE;
             }
-        } else {
-            // we're not in the right room wtf?! move to it
-            const pos = new RoomPosition(25, 25, this.memory.roomName!);
-            this.travelTo(pos);
-            return ERR_NOT_IN_RANGE;
+            // we must be within 3 spaces
+            return this.upgradeController(controller);
         }
-        // invalid target halp
-        this.log("ERROR invalid upgrader target halp");
-        return ERR_INVALID_TARGET;
-    };
-}
+    } else {
+        // we're not in the right room wtf?! move to it
+        const pos = new RoomPosition(25, 25, this.memory.roomName!);
+        this.travelTo(pos);
+        return ERR_NOT_IN_RANGE;
+    }
+    // invalid target halp
+    this.log("ERROR invalid upgrader target halp");
+    return ERR_INVALID_TARGET;
+};

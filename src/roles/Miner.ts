@@ -1,6 +1,6 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
-import { loadCreepMineralActions } from "prototypes/creep/mineralActions";
+import "prototypes/creep/mineralActions";
 
 /**
  * Miners go to sources in a room and mine them
@@ -104,80 +104,79 @@ export class Miner {
 /**
  * Functions required by the miner class of creeps
  */
-export function loadMinerActions(): void {
-    /**
-     * Pick a source to mine in a room
-     * @returns {boolean}
-     */
-    Creep.prototype.pickSource = function(): boolean {
-        // Does it have a source
-        if (this.memory.assignedSource) {
+
+/**
+ * Pick a source to mine in a room
+ * @returns {boolean}
+ */
+Creep.prototype.pickSource = function(): boolean {
+    // Does it have a source
+    if (this.memory.assignedSource) {
+        return true;
+    }
+    // Make sure the room has cleaned it's sources if necessary
+    this.room.sourceSetup();
+    // get all the sources in a room
+    const sources: Source[] = this.room.find(FIND_SOURCES);
+    // get the room's opinion on what is assigned
+    // todo move this straight into the source's memory!!???
+    const roomSources: { [key: string]: string | null } = this.room.memory.assignedSources!;
+    // loop
+    for (const i in sources) {
+        // get the source
+        const source: Source = sources[i];
+        // if this item is null in the room's memory
+        if (roomSources[source.id] === null) {
+            // assign the creep to the source
+            this.room.memory.assignedSources![source.id] = this.id;
+            // assign the source to the creep
+            this.memory.assignedSource = source.id;
+            // success!
             return true;
         }
-        // Make sure the room has cleaned it's sources if necessary
-        this.room.sourceSetup();
-        // get all the sources in a room
-        const sources: Source[] = this.room.find(FIND_SOURCES);
-        // get the room's opinion on what is assigned
-        // todo move this straight into the source's memory!!???
-        const roomSources: { [key: string]: string | null } = this.room.memory.assignedSources!;
-        // loop
-        for (const i in sources) {
-            // get the source
-            const source: Source = sources[i];
-            // if this item is null in the room's memory
-            if (roomSources[source.id] === null) {
-                // assign the creep to the source
-                this.room.memory.assignedSources![source.id] = this.id;
-                // assign the source to the creep
-                this.memory.assignedSource = source.id;
-                // success!
-                return true;
-            }
-        }
-        // could not assign source
-        return false;
-    };
+    }
+    // could not assign source
+    return false;
+};
 
-    /**
-     * Move to the source we have stored in memory
-     * @returns {ScreepsReturnCode}
-     */
-    Creep.prototype.moveToSource = function(): ScreepsReturnCode {
-        if (this.isTired()) {
-            return ERR_TIRED;
+/**
+ * Move to the source we have stored in memory
+ * @returns {ScreepsReturnCode}
+ */
+Creep.prototype.moveToSource = function(): ScreepsReturnCode {
+    if (this.isTired()) {
+        return ERR_TIRED;
+    }
+    const source: Source | null = Game.getObjectById(this.memory.assignedSource);
+    if (source) {
+        if (this.pos.getRangeTo(source.pos) === 1) {
+            return OK;
         }
+        this.travelTo(source);
+        return ERR_NOT_IN_RANGE;
+    }
+    this.log("Issue with source, resetting memory, and putting in init");
+    this.clearTargets();
+    this.state = STATE._INIT;
+    return ERR_INVALID_TARGET;
+};
+
+/**
+ * Mine the source we have stored in memory
+ * @returns {ScreepsReturnCode}
+ */
+Creep.prototype.mineSource = function(): ScreepsReturnCode {
+    if (!this.memory.dying && this.ticksToLive! <= 150) {
+        this.memory.dying = true;
+        this.room.memory.assignedSources![this.memory.assignedSource!] = null;
+    }
+    if (this.memory.assignedSource) {
         const source: Source | null = Game.getObjectById(this.memory.assignedSource);
         if (source) {
-            if (this.pos.getRangeTo(source.pos) === 1) {
-                return OK;
-            }
-            this.travelTo(source);
-            return ERR_NOT_IN_RANGE;
+            return this.harvest(source);
         }
-        this.log("Issue with source, resetting memory, and putting in init");
-        this.clearTargets();
-        this.state = STATE._INIT;
-        return ERR_INVALID_TARGET;
-    };
-
-    /**
-     * Mine the source we have stored in memory
-     * @returns {ScreepsReturnCode}
-     */
-    Creep.prototype.mineSource = function(): ScreepsReturnCode {
-        if (!this.memory.dying && this.ticksToLive! <= 150) {
-            this.memory.dying = true;
-            this.room.memory.assignedSources![this.memory.assignedSource!] = null;
-        }
-        if (this.memory.assignedSource) {
-            const source: Source | null = Game.getObjectById(this.memory.assignedSource);
-            if (source) {
-                return this.harvest(source);
-            }
-        }
-        this.clearTargets();
-        this.state = STATE._INIT;
-        return ERR_INVALID_TARGET;
-    };
-}
+    }
+    this.clearTargets();
+    this.state = STATE._INIT;
+    return ERR_INVALID_TARGET;
+};
