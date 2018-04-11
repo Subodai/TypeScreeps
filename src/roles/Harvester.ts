@@ -99,7 +99,7 @@ export class Harvester {
                 creep.log("Delivering energy");
                 if (creep.empty()) {
                     creep.state = STATE._INIT;
-                    this.run(creep);
+                    // this.run(creep);
                 }
                 if (creep.deliverEnergy() === OK) {
                     creep.log("Delivered some energy");
