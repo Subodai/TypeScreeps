@@ -91,12 +91,12 @@ export class Builder {
                     creep.log("Out of energy");
                     creep.clearTargets();
                     creep.state = STATE._GATHER;
-                    this.run(creep);
+                    // this.run(creep);
                 }
                 if (result === ERR_INVALID_TARGET) {
                     creep.log("Invalid Site Resetting Memory");
                     creep.clearTargets();
-                    this.run(creep);
+                    // this.run(creep);
                 }
                 break;
             // default fallback
