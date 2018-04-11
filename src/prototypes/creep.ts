@@ -2,20 +2,7 @@ import * as STATE from "config/states";
 import { Debug } from "functions/debug";
 import { Traveler } from "utils/Traveler";
 
-/**
- * Creep Prototype Extension
- */
-export function loadCreepPrototypes(): void {
-    // Some debug
-    Debug.Load("Prototype: Creep");
-
-    // assigns a function to Creep.prototype: creep.travelTo(destination)
-    Creep.prototype.travelTo = function(
-        destination: RoomPosition | { pos: RoomPosition },
-        options?: TravelToOptions) {
-        return Traveler.travelTo(this, destination, options);
-    };
-
+function loadCreepMemory(): void {
     /**
      * The role of the creep
      */
@@ -49,12 +36,14 @@ export function loadCreepPrototypes(): void {
             return _.set(Memory, "creeps." + this.name + ".state", v);
         }
     });
+}
 
-    /**
-     * Log Handler to make it tidier
-     */
-    Creep.prototype.log = function(msg: string): void {
-        Debug.creep(msg, this);
+function loadCreepBasics(): void {
+    // assigns a function to Creep.prototype: creep.travelTo(destination)
+    Creep.prototype.travelTo = function(
+        destination: RoomPosition | { pos: RoomPosition },
+        options?: TravelToOptions) {
+        return Traveler.travelTo(this, destination, options);
     };
 
     /**
@@ -63,6 +52,45 @@ export function loadCreepPrototypes(): void {
      */
     Creep.prototype.isTired = function(): boolean {
         return this.spawning || this.fatigue > 0;
+    };
+
+    /**
+     * Is creep in range of target to pick it up?
+     */
+    Creep.prototype.canPickup = function(target: RoomObject, range: number = 1): boolean {
+        if (!target) { return false; }
+        // Are we within 1 range?
+        return this.pos.inRangeTo(target, range);
+    };
+
+    /**
+     * Is Creep Full?
+     */
+    Creep.prototype.full = function() {
+        return _.sum(this.carry) >= this.carryCapacity;
+    };
+
+    /**
+     * Is Creep empty?
+     */
+    Creep.prototype.empty = function() {
+        return _.sum(this.carry) === 0;
+    };
+
+    /**
+     * Is creep in it's home room?
+     * @param creep {Creep}
+     */
+    Creep.prototype.atHome = function(): boolean {
+        if (this.room.name !== this.memory.roomName) {
+            delete this.memory.energyPickup;
+            if (this.memory.roomName) {
+                const pos = new RoomPosition(25, 25, this.memory.roomName);
+                this.travelTo(pos);
+                return false;
+            }
+        }
+        return true;
     };
 
     /**
@@ -140,99 +168,214 @@ export function loadCreepPrototypes(): void {
         return true;
     };
 
-    Creep.prototype.findSpaceAtSource = function(source: Source): boolean {
-        if (source.id === "5982fecbb097071b4adc1835") {
-            // this.DBG = true;
-        }
-        if (this.pos.getRangeTo(source) === 1) {
-            this.log("Already at the source");
-            return true;
-        }
-        this.log("Checking for space at source " + source.id);
-        // return true;
-        // Make sure to initialise the source's last check memory
-        if (!source.memory.lastSpaceCheck) {
-            source.memory.lastSpaceCheck = 0;
-        }
-        if (this.memory.lastSpaceCheck === Game.time) {
-            if (this.memory.lastSpaceCheck && this.memory.lastSpaceCheck === source.memory.lastSpaceCheck) {
-                this.log("Already checked this tick, assuming space available");
-                return true;
-            }
-        } else {
-            delete this.memory.lastSpaceCheck;
-        }
-        // If we checked the space this tick and there's no space left,
-        // we don't need to check again we just need to decrement the spaces
-        if (source.memory.lastSpaceCheck === Game.time) {
-            this.log("Last Check was this tick");
-            if (source.memory.spaces === 0) {
-                this.log("No more spaces");
-                return false;
-            } else {
-                // Decrement the spaces left
-                source.memory.spaces = source.memory.spaces - 1;
-                this.log("Found a space " + source.memory.spaces + "remaining");
-                this.memory.lastSpaceCheck = source.memory.lastSpaceCheck;
-                return true;
-            }
-        }
-        this.log("First check for space at source");
-        let spaces = 1;
-        const n: RoomPosition = new RoomPosition(source.pos.x, (source.pos.y - 1), source.pos.roomName);
-        if (this.checkEmptyAtPos(n)) { spaces++; }
-        const ne: RoomPosition = new RoomPosition((source.pos.x + 1), (source.pos.y - 1), source.pos.roomName);
-        if (this.checkEmptyAtPos(ne)) { spaces++; }
-        const e: RoomPosition = new RoomPosition((source.pos.x + 1), source.pos.y, source.pos.roomName);
-        if (this.checkEmptyAtPos(e)) { spaces++; }
-        const se: RoomPosition = new RoomPosition((source.pos.x + 1), (source.pos.y + 1), source.pos.roomName);
-        if (this.checkEmptyAtPos(se)) { spaces++; }
-        const s: RoomPosition = new RoomPosition(source.pos.x, (source.pos.y + 1), source.pos.roomName);
-        if (this.checkEmptyAtPos(s)) { spaces++; }
-        const sw: RoomPosition = new RoomPosition((source.pos.x - 1), (source.pos.y + 1), source.pos.roomName);
-        if (this.checkEmptyAtPos(sw)) { spaces++; }
-        const w: RoomPosition = new RoomPosition((source.pos.x - 1), source.pos.y, source.pos.roomName);
-        if (this.checkEmptyAtPos(w)) { spaces++; }
-        const nw: RoomPosition = new RoomPosition((source.pos.x - 1), (source.pos.y - 1), source.pos.roomName);
-        if (this.checkEmptyAtPos(nw)) { spaces++; }
-        this.log("We found " + spaces + " spaces at source" + source.id);
-        // Set our memory
-        source.memory.lastSpaceCheck = Game.time;
-        source.memory.spaces = spaces;
-        // If it's 0 there's no space
-        if (source.memory.spaces === 0) {
-            return false;
-        } else {
-            // If it's not 0, there is a space, lets take one off our count and return true
-            // Decrement the spaces left
-            source.memory.spaces = source.memory.spaces - 1;
-            return true;
+    /**
+     * Is creep near end of life?
+     * @returns {void}
+     */
+    Creep.prototype.deathCheck = function(ticks: number): void {
+        if (!this.memory.dying && this.ticksToLive && this.ticksToLive < ticks) {
+            this.memory.dying = true;
         }
     };
 
-    Creep.prototype.checkEmptyAtPos = function(pos: RoomPosition): boolean {
-        const terrain: Terrain = Game.map.getTerrainAt(pos);
-        if (terrain === "wall") {
-            this.log("Wall found at " + JSON.stringify(pos));
-            return false;
-        } else {
-            const creeps: Creep[] = pos.lookFor(LOOK_CREEPS);
-            if (creeps.length === 0) {
-                this.log("Space found at " + JSON.stringify(pos));
-                return true;
-            } else {
-                // is this, the creep we're trying to find a space for
-                if (creeps[0] === this) {
-                    this.log("We are at " + JSON.stringify(pos));
-                    return true;
-                } else {
-                    this.log("Other creep [" + creeps[0].name + "] found at " + JSON.stringify(pos));
-                    return false;
+    /**
+     * Go to nearest spawn and despawn
+     */
+    Creep.prototype.deSpawn = function(): void {
+        this.log("Despawning Creep");
+        let spawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (i) => i.structureType === STRUCTURE_SPAWN
+        });
+        if (!spawn) {
+            const spawns = Game.rooms[this.memory.roomName!].find(FIND_STRUCTURES, {
+                filter: (i) => i.structureType === STRUCTURE_SPAWN
+            });
+            spawn = spawns[0];
+        }
+        // if we found a spawn and it's a.. spawn
+        if (spawn && spawn instanceof StructureSpawn) {
+            // if we're more than 1 away
+            if (this.pos.getRangeTo(spawn.pos) > 1) {
+                this.log("Moving to spawn");
+                // move to it
+                this.travelTo(spawn);
+                return;
+            }
+            // otherwise, recycle self using the spawn
+            spawn.recycleCreep(this);
+        }
+    };
+}
+
+function loadCreepMineralOps(): void {
+    /**
+     * Get Nearby minerals to pickup
+     */
+    Creep.prototype.getNearbyMinerals = function(storage: boolean = false): number {
+        // First are we full?
+        if (this.full()) {
+            this.log("Creep full cannot get nearby minerals");
+            // Clear the pickup target
+            this.invalidateMineralTarget(true);
+        }
+        if (!this.memory.mineralPickup && storage) { this.findStorageMinerals(); }
+        // Start with ground minerals
+        if (!this.memory.mineralPickup) { this.findGroundMinerals(); }
+        // Next Container Minerals
+        if (!this.memory.mineralPickup) { this.findContainerMinerals(); }
+        // Do we have a target?
+        if (this.memory.mineralPickup) { return this.moveToAndPickupMinerals(); }
+        // No target return not found
+        return ERR_NOT_FOUND;
+    };
+
+    /**
+     * Invalidate mineral storage in creep memory
+     */
+    Creep.prototype.invalidateMineralTarget = function(full: boolean = false): number {
+        delete this.memory.mineralPickup;
+        if (full) { return ERR_FULL; }
+        return ERR_INVALID_TARGET;
+    };
+
+    /**
+     * Find minerals in storage
+     */
+    Creep.prototype.findStorageMinerals = function(): void {
+        // Have an override, call it storeMinerals for now (it'l do)
+        if (this.room.memory.storeMinerals) { return; }
+        const storage = this.room.storage;
+        // Does this room have a storage? (no harm in checking)
+        if (storage) {
+            // Is there something other than energy in the storage?
+            if (_.sum(storage.store) - storage.store[RESOURCE_ENERGY] > 0) {
+                // Set the target to be the storage
+                this.memory.mineralPickup = storage.id;
+            }
+        }
+    };
+
+    /**
+     * Find ground based minerals
+     */
+    Creep.prototype.findGroundMinerals = function(): void {
+        let resource: boolean | Resource = false;
+        const thisCreep = this;
+        this.log("Creep has no mineral memory, finding stuff to pickup");
+        // First check for nearby dropped resources
+        const resources = this.room.find(FIND_DROPPED_RESOURCES, {
+            filter: (i) => i.resourceType !== RESOURCE_ENERGY &&
+                i.amount > (this.pos.getRangeTo(i) / this.moveEfficiency())
+        });
+        // Did we find resources?
+        if (resources.length > 0) {
+            this.log("Found some minerals picking the clostest");
+            // get the closest resource
+            resource = _.min(resources, (r) => thisCreep.pos.getRangeTo(r));
+            // Did we find some resources?
+            if (resource) {
+                // We did, let's store their id
+                this.memory.mineralPickup = resource.id;
+            }
+        }
+    };
+
+    /**
+     * Find minerals on containers
+     */
+    Creep.prototype.findContainerMinerals = function(): void {
+        let container: boolean | Structure = false;
+        const thisCreep = this;
+        this.log("Creep searching for mineral containers");
+        // Check for containers with anything other than energy in them
+        const containers = this.room.find(FIND_STRUCTURES, {
+            filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
+                (_.sum(i.store) - i.store[RESOURCE_ENERGY]) > 0
+        });
+        // Any containers?
+        if (containers.length > 0) {
+            this.log("Found some mineral containers, picking the most cost effective");
+            container = _.max(containers, (c: StructureContainer) =>
+                (_.sum(c.store) - c.store[RESOURCE_ENERGY]) / thisCreep.pos.getRangeTo(c));
+            // Did we find a container
+            if (container) {
+                // We did it, store the id
+                this.memory.mineralPickup = container.id;
+            }
+        }
+    };
+
+    /**
+     * Move to and pickup minerals
+     */
+    Creep.prototype.moveToAndPickupMinerals = function(): number {
+        this.log("Found minerals in memory");
+        const target: Resource | StructureContainer | StructureStorage | null =
+            Game.getObjectById(this.memory.mineralPickup);
+        // if the target is invalid, or cannot be found let's clear it
+        if (!target) { return this.invalidateMineralTarget(); }
+        // Quick validation pass on the target
+        if (target instanceof Resource) {
+            // If it's going to disapwn before we get there, then there's no point in carrying on
+            if (target.amount < (this.pos.getRangeTo(target) / this.moveEfficiency())) {
+                return this.invalidateMineralTarget();
+            }
+            // Can we pick it up yet?
+            if (!this.canPickup(target)) {
+                this.say(global.sayMove);
+                // We can't pick it up yet, let's move to it
+                this.travelTo(target);
+            }
+            // Can we pick it up after our move?
+            if (this.canPickup(target)) {
+                // Attempt to pick it up
+                const pickupResult = this.pickup(target);
+                // Check the result
+                if (pickupResult === ERR_NOT_IN_RANGE) {
+                    // something went wrong
+                } else if (pickupResult === OK) {
+                    this.say(global.sayPickup);
+                    // Invalidate and return full
+                    return this.invalidateMineralTarget(true);
+                }
+            }
+        } else if (target instanceof StructureContainer || target instanceof StructureStorage) {
+            // Check there is still res in the container
+            if (_.sum(target.store) - target.store[RESOURCE_ENERGY] === 0) {
+                return this.invalidateMineralTarget();
+            }
+            // Can we pick it up yet?
+            if (!this.canPickup(target)) {
+                this.say(global.sayMove);
+                // Can't pick it up yet, so lets move towards it
+                this.travelTo(target);
+            }
+            // Can we pick it up now?
+            if (this.canPickup(target)) {
+                // Loop through all the resources in the container
+                for (const r in target.store) {
+                    // If there is more than 0 of this mineral, let's pick it up
+                    if (target.store.hasOwnProperty(r) && r !== RESOURCE_ENERGY) {
+                        // Attempt to pick it up
+                        const pickupResult = this.withdraw(target, r as ResourceConstant);
+                        // check the result
+                        if (pickupResult === ERR_NOT_IN_RANGE) {
+                            // something probbaly went wrong
+                        } else if (pickupResult === OK) {
+                            this.say(global.sayWithdraw);
+                            // Invalidate and return full
+                            return this.invalidateMineralTarget(this.full());
+                        }
+                    }
                 }
             }
         }
+        // We've probably moved return ok
+        return OK;
     };
+}
 
+function loadCreepEnergyOps(): void {
     /**
      * Find and collect nearby energy
      *
@@ -259,7 +402,7 @@ export function loadCreepPrototypes(): void {
                 // Lets find the nearest link with energy that has the right flag
                 const links: Structure[] = this.room.find(FIND_STRUCTURES, {
                     filter: (i) => i.structureType === STRUCTURE_LINK &&
-                                   i.memory.linkType === "receiver" && i.energy > 0
+                        i.memory.linkType === "receiver" && i.energy > 0
                 });
                 if (links.length > 0) {
                     // Temporary creep object
@@ -304,12 +447,12 @@ export function loadCreepPrototypes(): void {
             // Get dropped resources in the room
             const resources: Resource[] = this.room.find(FIND_DROPPED_RESOURCES, {
                 filter: (i) => i.resourceType === RESOURCE_ENERGY &&
-                               i.amount > (this.carryCapacity - _.sum(this.carry)) / 4
+                    i.amount > (this.carryCapacity - _.sum(this.carry)) / 4
             });
             // Get Containers in the room
             const containers: Structure[] = this.room.find(FIND_STRUCTURES, {
                 filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
-                               i.store[RESOURCE_ENERGY] > (this.carryCapacity - _.sum(this.carry)) / 4
+                    i.store[RESOURCE_ENERGY] > (this.carryCapacity - _.sum(this.carry)) / 4
             });
             // False some things
             let resource: Resource | boolean = false;
@@ -324,7 +467,7 @@ export function loadCreepPrototypes(): void {
             if (containers.length > 0) {
                 this.log(" Found " + containers.length + " containers");
                 container = _.max(containers, (c: StructureContainer) =>
-                            c.store[RESOURCE_ENERGY] / thisCreep.pos.getRangeTo(c));
+                    c.store[RESOURCE_ENERGY] / thisCreep.pos.getRangeTo(c));
             }
             // If we have both we need to pick the closest one
             if (resource && container) {
@@ -400,8 +543,8 @@ export function loadCreepPrototypes(): void {
                     pickupSuccess = false;
                 }
             } else if (target instanceof StructureContainer ||
-                       target instanceof StructureStorage ||
-                       target instanceof StructureTerminal) { // Container, Storage, Terminal
+                target instanceof StructureStorage ||
+                target instanceof StructureTerminal) { // Container, Storage, Terminal
                 this.log("Target is Container, Storage or Terminal");
                 // Check the container still has the energy
                 if (target.store[RESOURCE_ENERGY] <= 0 /* (this.carryCapacity - _.sum(this.carry))/4*/) {
@@ -677,7 +820,7 @@ export function loadCreepPrototypes(): void {
             if (!this.memory.idle) {
                 this.memory.idle = 0;
             }
-            this.memory.idle ++;
+            this.memory.idle++;
 
             if (this.memory.idle && this.memory.idle >= 10) {
                 // Are we in our home room?
@@ -697,194 +840,317 @@ export function loadCreepPrototypes(): void {
         this.log("Got to end of deliver method with no return");
         return ERR_NOT_FOUND;
     };
+}
 
+function loadMinerOps(): void {
     /**
-     * Get Nearby minerals to pickup
+     * Pick a source to mine in a room
+     * @returns {boolean}
      */
-    Creep.prototype.getNearbyMinerals = function(storage: boolean = false): number {
-        // First are we full?
-        if (this.full()) {
-            this.log("Creep full cannot get nearby minerals");
-            // Clear the pickup target
-            this.invalidateMineralTarget(true);
+    Creep.prototype.pickSource = function(): boolean {
+        // Does it have a source
+        if (this.memory.assignedSource) {
+            return true;
         }
-        if (!this.memory.mineralPickup && storage) { this.findStorageMinerals(); }
-        // Start with ground minerals
-        if (!this.memory.mineralPickup) { this.findGroundMinerals(); }
-        // Next Container Minerals
-        if (!this.memory.mineralPickup) { this.findContainerMinerals(); }
-        // Do we have a target?
-        if (this.memory.mineralPickup) { return this.moveToAndPickupMinerals(); }
-        // No target return not found
-        return ERR_NOT_FOUND;
+        // Make sure the room has cleaned it's sources if necessary
+        this.room.sourceSetup();
+        // get all the sources in a room
+        const sources: Source[] = this.room.find(FIND_SOURCES);
+        // get the room's opinion on what is assigned
+        // todo move this straight into the source's memory!!???
+        const roomSources: { [key: string]: string | null } = this.room.memory.assignedSources!;
+        // loop
+        for (const i in sources) {
+            // get the source
+            const source: Source = sources[i];
+            // if this item is null in the room's memory
+            if (roomSources[source.id] === null) {
+                // assign the creep to the source
+                this.room.memory.assignedSources![source.id] = this.id;
+                // assign the source to the creep
+                this.memory.assignedSource = source.id;
+                // success!
+                return true;
+            }
+        }
+        // could not assign source
+        return false;
     };
 
     /**
-     * Invalidate mineral storage in creep memory
+     * Move to the source we have stored in memory
+     * @returns {ScreepsReturnCode}
      */
-    Creep.prototype.invalidateMineralTarget = function(full: boolean = false): number {
-        delete this.memory.mineralPickup;
-        if (full) { return ERR_FULL; }
+    Creep.prototype.moveToSource = function(): ScreepsReturnCode {
+        if (this.isTired()) {
+            return ERR_TIRED;
+        }
+        const source: Source | null = Game.getObjectById(this.memory.assignedSource);
+        if (source) {
+            if (this.pos.getRangeTo(source.pos) === 1) {
+                return OK;
+            }
+            this.travelTo(source);
+            return ERR_NOT_IN_RANGE;
+        }
+        this.log("Issue with source, resetting memory, and putting in init");
+        this.clearTargets();
+        this.state = STATE._INIT;
         return ERR_INVALID_TARGET;
     };
 
     /**
-     * Find minerals in storage
+     * Mine the source we have stored in memory
+     * @returns {ScreepsReturnCode}
      */
-    Creep.prototype.findStorageMinerals = function(): void {
-        // Have an override, call it storeMinerals for now (it'l do)
-        if (this.room.memory.storeMinerals) { return; }
-        const storage = this.room.storage;
-        // Does this room have a storage? (no harm in checking)
-        if (storage) {
-            // Is there something other than energy in the storage?
-            if (_.sum(storage.store) - storage.store[RESOURCE_ENERGY] > 0) {
-                // Set the target to be the storage
-                this.memory.mineralPickup = storage.id;
+    Creep.prototype.mineSource = function(): ScreepsReturnCode {
+        if (!this.memory.dying && this.ticksToLive! <= 150) {
+            this.memory.dying = true;
+            this.room.memory.assignedSources![this.memory.assignedSource!] = null;
+        }
+        if (this.memory.assignedSource) {
+            const source: Source | null = Game.getObjectById(this.memory.assignedSource);
+            if (source) {
+                return this.harvest(source);
+            }
+        }
+        this.clearTargets();
+        this.state = STATE._INIT;
+        return ERR_INVALID_TARGET;
+    };
+}
+
+function loadBuilderOps(): void {
+    /**
+     * Choose, goto and build the nearest construction site
+     * @returns {ScreepsReturnCode | void}
+     */
+    Creep.prototype.buildNearestSite = function(): ScreepsReturnCode | void {
+        this.checkSiteInMemory();
+        if (!this.memory.siteId) {
+            this.findNearestConstructionSite();
+        }
+        if (this.memory.siteId) {
+            return this.goToAndBuild(this.memory.siteId);
+        } else {
+            return this.deSpawn();
+        }
+    };
+
+    /**
+     * Go to and build a construction site
+     * @param siteId {string}
+     */
+    Creep.prototype.goToAndBuild = function(siteId: string): ScreepsReturnCode {
+        const site: ConstructionSite | null = Game.getObjectById(siteId);
+        if (!site) {
+            return ERR_INVALID_TARGET;
+        }
+        // if we're more than 3 away
+        if (this.pos.getRangeTo(site.pos) > 3) {
+            // go to it
+            this.travelTo(site);
+            return ERR_NOT_IN_RANGE;
+        }
+        return this.build(site);
+    };
+
+    /**
+     * Make sure the site stored in memory is valid
+     * @returns {void}
+     */
+    Creep.prototype.checkSiteInMemory = function(): void {
+        // do we have an item in memory
+        if (this.memory.siteId) {
+            // Check the object exists first
+            if (!Game.getObjectById(this.memory.siteId)) {
+                // if it doesn't clear it
+                delete this.memory.siteId;
+                delete this.memory.targetRoom;
             }
         }
     };
 
     /**
-     * Find ground based minerals
+     * Find the nearest constructionSite to a creep
+     * @param my {boolean} optional, if false will pick enemy site
+     * @returns {void}
      */
-    Creep.prototype.findGroundMinerals = function(): void {
-        let resource: boolean | Resource = false;
-        const thisCreep = this;
-        this.log("Creep has no mineral memory, finding stuff to pickup");
-        // First check for nearby dropped resources
-        const resources = this.room.find(FIND_DROPPED_RESOURCES, {
-            filter: (i) => i.resourceType !== RESOURCE_ENERGY &&
-                           i.amount > (this.pos.getRangeTo(i) / this.moveEfficiency())
-        });
-        // Did we find resources?
-        if (resources.length > 0) {
-            this.log("Found some minerals picking the clostest");
-            // get the closest resource
-            resource = _.min(resources, (r) => thisCreep.pos.getRangeTo(r));
-            // Did we find some resources?
-            if (resource) {
-                // We did, let's store their id
-                this.memory.mineralPickup = resource.id;
+    Creep.prototype.findNearestConstructionSite = function(my: boolean = true): void {
+        // get the nearest site by range
+        let site: ConstructionSite | null | undefined;
+        if (my) {
+            site = this.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+        } else {
+            site = this.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+        }
+        // if the findClosest failed (it does that sometimes)
+        if (site === undefined || site === null) {
+            for (const i in Game.constructionSites) {
+                site = Game.getObjectById(i);
+                if (Game.map.getRoomLinearDistance(this.room.name, site!.pos.roomName) > 2) {
+                    continue;
+                }
+                // did we find a site?
+                if (site && my && site.my) {
+                    break;
+                }
+
+                if (site && !my && !site.my) {
+                    break;
+                }
+                // not sure how but we got here but clear the site
+                site = null;
             }
+        }
+        if (site) {
+            this.memory.siteId = site.id;
+            this.memory.targetRoom = JSON.stringify(site.pos);
+        }
+    };
+}
+
+function loadUpgraderOps(): void {
+    /**
+     * Upgrade the creep's homeroom controller
+     * @returns {ScreepsReturnCode}
+     */
+    Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
+        if (Game.rooms[this.memory.roomName!]) {
+            const controller: StructureController | undefined = Game.rooms[this.memory.roomName!].controller;
+            if (controller) {
+                // if we're move than 3 spaces away, get close
+                if (this.pos.getRangeTo(controller.pos) > 3) {
+                    this.travelTo(controller);
+                    return ERR_NOT_IN_RANGE;
+                }
+                // we must be within 3 spaces
+                return this.upgradeController(controller);
+            }
+        } else {
+            // we're not in the right room wtf?! move to it
+            const pos = new RoomPosition(25, 25, this.memory.roomName!);
+            this.travelTo(pos);
+            return ERR_NOT_IN_RANGE;
+        }
+        // invalid target halp
+        this.log("ERROR invalid upgrader target halp");
+        return ERR_INVALID_TARGET;
+    };
+}
+/**
+ * Creep Prototype Extension
+ */
+export function loadCreepPrototypes(): void {
+    // Some debug
+    Debug.Load("Prototype: Creep");
+
+    /**
+     * Log Handler to make it tidier
+     */
+    Creep.prototype.log = function(msg: string): void {
+        Debug.creep(msg, this);
+    };
+
+    loadCreepMemory();
+    loadCreepBasics();
+    loadCreepMineralOps();
+    loadCreepEnergyOps();
+    loadMinerOps();
+    loadBuilderOps();
+    loadUpgraderOps();
+
+    Creep.prototype.findSpaceAtSource = function(source: Source): boolean {
+        if (source.id === "5982fecbb097071b4adc1835") {
+            // this.DBG = true;
+        }
+        if (this.pos.getRangeTo(source) === 1) {
+            this.log("Already at the source");
+            return true;
+        }
+        this.log("Checking for space at source " + source.id);
+        // return true;
+        // Make sure to initialise the source's last check memory
+        if (!source.memory.lastSpaceCheck) {
+            source.memory.lastSpaceCheck = 0;
+        }
+        if (this.memory.lastSpaceCheck === Game.time) {
+            if (this.memory.lastSpaceCheck && this.memory.lastSpaceCheck === source.memory.lastSpaceCheck) {
+                this.log("Already checked this tick, assuming space available");
+                return true;
+            }
+        } else {
+            delete this.memory.lastSpaceCheck;
+        }
+        // If we checked the space this tick and there's no space left,
+        // we don't need to check again we just need to decrement the spaces
+        if (source.memory.lastSpaceCheck === Game.time) {
+            this.log("Last Check was this tick");
+            if (source.memory.spaces === 0) {
+                this.log("No more spaces");
+                return false;
+            } else {
+                // Decrement the spaces left
+                source.memory.spaces = source.memory.spaces - 1;
+                this.log("Found a space " + source.memory.spaces + "remaining");
+                this.memory.lastSpaceCheck = source.memory.lastSpaceCheck;
+                return true;
+            }
+        }
+        this.log("First check for space at source");
+        let spaces = 1;
+        const n: RoomPosition = new RoomPosition(source.pos.x, (source.pos.y - 1), source.pos.roomName);
+        if (this.checkEmptyAtPos(n)) { spaces++; }
+        const ne: RoomPosition = new RoomPosition((source.pos.x + 1), (source.pos.y - 1), source.pos.roomName);
+        if (this.checkEmptyAtPos(ne)) { spaces++; }
+        const e: RoomPosition = new RoomPosition((source.pos.x + 1), source.pos.y, source.pos.roomName);
+        if (this.checkEmptyAtPos(e)) { spaces++; }
+        const se: RoomPosition = new RoomPosition((source.pos.x + 1), (source.pos.y + 1), source.pos.roomName);
+        if (this.checkEmptyAtPos(se)) { spaces++; }
+        const s: RoomPosition = new RoomPosition(source.pos.x, (source.pos.y + 1), source.pos.roomName);
+        if (this.checkEmptyAtPos(s)) { spaces++; }
+        const sw: RoomPosition = new RoomPosition((source.pos.x - 1), (source.pos.y + 1), source.pos.roomName);
+        if (this.checkEmptyAtPos(sw)) { spaces++; }
+        const w: RoomPosition = new RoomPosition((source.pos.x - 1), source.pos.y, source.pos.roomName);
+        if (this.checkEmptyAtPos(w)) { spaces++; }
+        const nw: RoomPosition = new RoomPosition((source.pos.x - 1), (source.pos.y - 1), source.pos.roomName);
+        if (this.checkEmptyAtPos(nw)) { spaces++; }
+        this.log("We found " + spaces + " spaces at source" + source.id);
+        // Set our memory
+        source.memory.lastSpaceCheck = Game.time;
+        source.memory.spaces = spaces;
+        // If it's 0 there's no space
+        if (source.memory.spaces === 0) {
+            return false;
+        } else {
+            // If it's not 0, there is a space, lets take one off our count and return true
+            // Decrement the spaces left
+            source.memory.spaces = source.memory.spaces - 1;
+            return true;
         }
     };
 
-    /**
-     * Find minerals on containers
-     */
-    Creep.prototype.findContainerMinerals = function(): void {
-        let container: boolean | Structure = false;
-        const thisCreep = this;
-        this.log("Creep searching for mineral containers");
-        // Check for containers with anything other than energy in them
-        const containers = this.room.find(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
-                           (_.sum(i.store) - i.store[RESOURCE_ENERGY]) > 0
-        });
-        // Any containers?
-        if (containers.length > 0) {
-            this.log("Found some mineral containers, picking the most cost effective");
-            container = _.max(containers, (c: StructureContainer) =>
-                        (_.sum(c.store) - c.store[RESOURCE_ENERGY]) / thisCreep.pos.getRangeTo(c));
-            // Did we find a container
-            if (container) {
-                // We did it, store the id
-                this.memory.mineralPickup = container.id;
-            }
-        }
-    };
-
-    /**
-     * Move to and pickup minerals
-     */
-    Creep.prototype.moveToAndPickupMinerals = function(): number {
-        this.log("Found minerals in memory");
-        const target: Resource | StructureContainer | StructureStorage | null =
-        Game.getObjectById(this.memory.mineralPickup);
-        // if the target is invalid, or cannot be found let's clear it
-        if (!target) { return this.invalidateMineralTarget(); }
-        // Quick validation pass on the target
-        if (target instanceof Resource) {
-            // If it's going to disapwn before we get there, then there's no point in carrying on
-            if (target.amount < (this.pos.getRangeTo(target) / this.moveEfficiency())) {
-                return this.invalidateMineralTarget();
-            }
-            // Can we pick it up yet?
-            if (!this.canPickup(target)) {
-                this.say(global.sayMove);
-                // We can't pick it up yet, let's move to it
-                this.travelTo(target);
-            }
-            // Can we pick it up after our move?
-            if (this.canPickup(target)) {
-                // Attempt to pick it up
-                const pickupResult = this.pickup(target);
-                // Check the result
-                if (pickupResult === ERR_NOT_IN_RANGE) {
-                    // something went wrong
-                } else if (pickupResult === OK) {
-                    this.say(global.sayPickup);
-                    // Invalidate and return full
-                    return this.invalidateMineralTarget(true);
+    Creep.prototype.checkEmptyAtPos = function(pos: RoomPosition): boolean {
+        const terrain: Terrain = Game.map.getTerrainAt(pos);
+        if (terrain === "wall") {
+            this.log("Wall found at " + JSON.stringify(pos));
+            return false;
+        } else {
+            const creeps: Creep[] = pos.lookFor(LOOK_CREEPS);
+            if (creeps.length === 0) {
+                this.log("Space found at " + JSON.stringify(pos));
+                return true;
+            } else {
+                // is this, the creep we're trying to find a space for
+                if (creeps[0] === this) {
+                    this.log("We are at " + JSON.stringify(pos));
+                    return true;
+                } else {
+                    this.log("Other creep [" + creeps[0].name + "] found at " + JSON.stringify(pos));
+                    return false;
                 }
             }
-        } else if (target instanceof StructureContainer || target instanceof StructureStorage) {
-            // Check there is still res in the container
-            if (_.sum(target.store) - target.store[RESOURCE_ENERGY] === 0) {
-                return this.invalidateMineralTarget();
-            }
-            // Can we pick it up yet?
-            if (!this.canPickup(target)) {
-                this.say(global.sayMove);
-                // Can't pick it up yet, so lets move towards it
-                this.travelTo(target);
-            }
-            // Can we pick it up now?
-            if (this.canPickup(target)) {
-                // Loop through all the resources in the container
-                for (const r in target.store) {
-                    // If there is more than 0 of this mineral, let's pick it up
-                    if (target.store.hasOwnProperty(r) && r !== RESOURCE_ENERGY) {
-                        // Attempt to pick it up
-                        const pickupResult = this.withdraw(target, r as ResourceConstant);
-                        // check the result
-                        if (pickupResult === ERR_NOT_IN_RANGE) {
-                            // something probbaly went wrong
-                        } else if (pickupResult === OK) {
-                            this.say(global.sayWithdraw);
-                            // Invalidate and return full
-                            return this.invalidateMineralTarget(this.full());
-                        }
-                    }
-                }
-            }
         }
-        // We've probably moved return ok
-        return OK;
-    };
-
-    /**
-     * Is creep in range of target to pick it up?
-     */
-    Creep.prototype.canPickup = function(target: RoomObject, range: number = 1): boolean {
-        if (!target) { return false; }
-        // Are we within 1 range?
-        return this.pos.inRangeTo(target, range);
-    };
-
-    /**
-     * Is Creep Full?
-     */
-    Creep.prototype.full = function() {
-        return _.sum(this.carry) >= this.carryCapacity;
-    };
-
-    /**
-     * Is Creep empty?
-     */
-    Creep.prototype.empty = function() {
-        return _.sum(this.carry) === 0;
     };
 
     /**
@@ -1141,250 +1407,5 @@ export function loadCreepPrototypes(): void {
             return ERR_INVALID_TARGET;
         }
         return OK;
-    };
-
-    /**
-     * Upgrade the creep's homeroom controller
-     * @returns {ScreepsReturnCode}
-     */
-    Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
-        if (Game.rooms[this.memory.roomName!]) {
-            const controller: StructureController | undefined = Game.rooms[this.memory.roomName!].controller;
-            if (controller) {
-                // if we're move than 3 spaces away, get close
-                if (this.pos.getRangeTo(controller.pos) > 3) {
-                    this.travelTo(controller);
-                    return ERR_NOT_IN_RANGE;
-                }
-                // we must be within 3 spaces
-                return this.upgradeController(controller);
-            }
-        } else {
-            // we're not in the right room wtf?! move to it
-            const pos = new RoomPosition(25, 25, this.memory.roomName!);
-            this.travelTo(pos);
-            return ERR_NOT_IN_RANGE;
-        }
-        // invalid target halp
-        this.log("ERROR invalid upgrader target halp");
-        return ERR_INVALID_TARGET;
-    };
-
-    /**
-     * Is creep in it's home room?
-     * @param creep {Creep}
-     */
-    Creep.prototype.atHome = function(): boolean {
-        if (this.room.name !== this.memory.roomName) {
-            delete this.memory.energyPickup;
-            if (this.memory.roomName) {
-                const pos = new RoomPosition(25, 25, this.memory.roomName);
-                this.travelTo(pos);
-                return false;
-            }
-        }
-        return true;
-    };
-
-    /**
-     * Pick a source to mine in a room
-     * @returns {boolean}
-     */
-    Creep.prototype.pickSource = function(): boolean {
-        // Does it have a source
-        if (this.memory.assignedSource) {
-            return true;
-        }
-        // Make sure the room has cleaned it's sources if necessary
-        this.room.sourceSetup();
-        // get all the sources in a room
-        const sources: Source[] = this.room.find(FIND_SOURCES);
-        // get the room's opinion on what is assigned
-        // todo move this straight into the source's memory!!???
-        const roomSources: { [key: string]: string | null } = this.room.memory.assignedSources!;
-        // loop
-        for (const i in sources) {
-            // get the source
-            const source: Source = sources[i];
-            // if this item is null in the room's memory
-            if (roomSources[source.id] === null) {
-                // assign the creep to the source
-                this.room.memory.assignedSources![source.id] = this.id;
-                // assign the source to the creep
-                this.memory.assignedSource = source.id;
-                // success!
-                return true;
-            }
-        }
-        // could not assign source
-        return false;
-    };
-
-    /**
-     * Move to the source we have stored in memory
-     * @returns {ScreepsReturnCode}
-     */
-    Creep.prototype.moveToSource = function(): ScreepsReturnCode {
-        if (this.isTired()) {
-            return ERR_TIRED;
-        }
-        const source: Source | null = Game.getObjectById(this.memory.assignedSource);
-        if (source) {
-            if (this.pos.getRangeTo(source.pos) === 1) {
-                return OK;
-            }
-            this.travelTo(source);
-            return ERR_NOT_IN_RANGE;
-        }
-        this.log("Issue with source, resetting memory, and putting in init");
-        this.clearTargets();
-        this.state = STATE._INIT;
-        return ERR_INVALID_TARGET;
-    };
-
-    /**
-     * Mine the source we have stored in memory
-     * @returns {ScreepsReturnCode}
-     */
-    Creep.prototype.mineSource = function(): ScreepsReturnCode {
-        if (!this.memory.dying && this.ticksToLive! <= 150) {
-            this.memory.dying = true;
-            this.room.memory.assignedSources![this.memory.assignedSource!] = null;
-        }
-        if (this.memory.assignedSource) {
-            const source: Source | null = Game.getObjectById(this.memory.assignedSource);
-            if (source) {
-                return this.harvest(source);
-            }
-        }
-        this.clearTargets();
-        this.state = STATE._INIT;
-        return ERR_INVALID_TARGET;
-    };
-
-    /**
-     * Is creep near end of life?
-     * @returns {void}
-     */
-    Creep.prototype.deathCheck = function(ticks: number): void {
-        if (!this.memory.dying && this.ticksToLive && this.ticksToLive < ticks) {
-            this.memory.dying = true;
-        }
-    };
-
-    /**
-     * Choose, goto and build the nearest construction site
-     * @returns {ScreepsReturnCode | void}
-     */
-    Creep.prototype.buildNearestSite = function(): ScreepsReturnCode | void {
-        this.checkSiteInMemory();
-        if (!this.memory.siteId) {
-            this.findNearestConstructionSite();
-        }
-        if (this.memory.siteId) {
-            return this.goToAndBuild(this.memory.siteId);
-        } else {
-            return this.deSpawn();
-        }
-    };
-
-    /**
-     * Go to and build a construction site
-     * @param siteId {string}
-     */
-    Creep.prototype.goToAndBuild = function(siteId: string): ScreepsReturnCode {
-        const site: ConstructionSite | null = Game.getObjectById(siteId);
-        if (!site) {
-            return ERR_INVALID_TARGET;
-        }
-        // if we're more than 3 away
-        if (this.pos.getRangeTo(site.pos) > 3) {
-            // go to it
-            this.travelTo(site);
-            return ERR_NOT_IN_RANGE;
-        }
-        return this.build(site);
-    };
-
-    /**
-     * Make sure the site stored in memory is valid
-     * @returns {void}
-     */
-    Creep.prototype.checkSiteInMemory = function(): void {
-        // do we have an item in memory
-        if (this.memory.siteId) {
-            // Check the object exists first
-            if (!Game.getObjectById(this.memory.siteId)) {
-                // if it doesn't clear it
-                delete this.memory.siteId;
-                delete this.memory.targetRoom;
-            }
-        }
-    };
-
-    /**
-     * Find the nearest constructionSite to a creep
-     * @param my {boolean} optional, if false will pick enemy site
-     * @returns {void}
-     */
-    Creep.prototype.findNearestConstructionSite = function(my: boolean = true): void {
-        // get the nearest site by range
-        let site: ConstructionSite | null | undefined;
-        if (my) {
-            site = this.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
-        } else {
-            site = this.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
-        }
-        // if the findClosest failed (it does that sometimes)
-        if (site === undefined || site === null) {
-            for (const i in Game.constructionSites) {
-                site = Game.getObjectById(i);
-                if (Game.map.getRoomLinearDistance(this.room.name, site!.pos.roomName) > 2) {
-                    continue;
-                }
-                // did we find a site?
-                if (site && my && site.my) {
-                    break;
-                }
-
-                if (site && !my && !site.my) {
-                    break;
-                }
-                // not sure how but we got here but clear the site
-                site = null;
-            }
-        }
-        if (site) {
-            this.memory.siteId = site.id;
-            this.memory.targetRoom = JSON.stringify(site.pos);
-        }
-    };
-
-    /**
-     * Go to nearest spawn and despawn
-     */
-    Creep.prototype.deSpawn = function(): void {
-        this.log("Despawning Creep");
-        let spawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_SPAWN
-        });
-        if (!spawn) {
-            const spawns = Game.rooms[this.memory.roomName!].find(FIND_STRUCTURES, {
-                filter: (i) => i.structureType === STRUCTURE_SPAWN
-            });
-            spawn = spawns[0];
-        }
-        // if we found a spawn and it's a.. spawn
-        if (spawn && spawn instanceof StructureSpawn) {
-            // if we're more than 1 away
-            if (this.pos.getRangeTo(spawn.pos) > 1) {
-                this.log("Moving to spawn");
-                // move to it
-                this.travelTo(spawn);
-                return;
-            }
-            // otherwise, recycle self using the spawn
-            spawn.recycleCreep(this);
-        }
     };
 }

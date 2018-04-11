@@ -23,7 +23,20 @@ interface StructureTower {
      */
     countCPU(start: number): number;
 
-    healCreeps(): boolean;
+    /**
+     * Attack any creeps not in ALLIES, will notify user if not an Invader
+     */
+    attackEnemies(): boolean;
+
+    /**
+     * Heal my own injured creeps in the room
+     */
+    healMyCreeps(): boolean;
+
+    /**
+     * Heal Creeps who's owners are in ALLIES
+     */
+    healFriendlyCreeps(): boolean;
 
     repairRamparts(percentage: number): boolean;
 
@@ -33,5 +46,5 @@ interface StructureTower {
 
     repairRoads(): boolean;
 
-    attackEnemies(): boolean;
+
 }
