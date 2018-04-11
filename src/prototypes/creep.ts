@@ -106,22 +106,19 @@ export function loadCreepPrototypes(): void {
         if (terrain === "wall") {
             this.log("Wall found at " + JSON.stringify(pos));
             return false;
-        } else {
-            const creeps: Creep[] = pos.lookFor(LOOK_CREEPS);
-            if (creeps.length === 0) {
-                this.log("Space found at " + JSON.stringify(pos));
-                return true;
-            } else {
-                // is this, the creep we're trying to find a space for
-                if (creeps[0] === this) {
-                    this.log("We are at " + JSON.stringify(pos));
-                    return true;
-                } else {
-                    this.log("Other creep [" + creeps[0].name + "] found at " + JSON.stringify(pos));
-                    return false;
-                }
-            }
         }
+        const creeps: Creep[] = pos.lookFor(LOOK_CREEPS);
+        if (creeps.length === 0) {
+            this.log("Space found at " + JSON.stringify(pos));
+            return true;
+        }
+        // is this the creep we're trying to find a space for
+        if (creeps[0] === this) {
+            this.log("We are at " + JSON.stringify(pos));
+            return true;
+        }
+        this.log("Other creep [" + creeps[0].name + "] found at " + JSON.stringify(pos));
+        return false;
     };
 
     /**
