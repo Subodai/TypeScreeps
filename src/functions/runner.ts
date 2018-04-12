@@ -35,6 +35,7 @@ export class Runner {
         Debug.Log("Running Rooms");
         const cpu: number = Game.cpu.getUsed();
         for (const name in Game.rooms) {
+            const roomCPU = Game.cpu.getUsed();
             const room = Game.rooms[name];
             room.log("Running Towers");
             const towers = room.find(FIND_MY_STRUCTURES, {
@@ -50,6 +51,17 @@ export class Runner {
                 }
             }
             room.log("Towers used " + towerCost + "CPU");
+
+            const storedEnergy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
+            room.visual.text("CPU : " + (Game.cpu.getUsed() - roomCPU), 1, 1, {
+                align : "left"
+            }).text("Towers : " + towerCost, 1, 2, {
+                align: "left"
+            }).text("Energy : " + room.energyAvailable + "/" + room.energyCapacityAvailable,  1, 3, {
+                align: "left", color: this.percentToColour(room.energyAvailable / room.energyCapacityAvailable)
+            }).text("Stored : " + storedEnergy, 1, 4, {
+                align: "left", color: this.percentToColour(storedEnergy / 1000000)
+            });
         }
         Debug.Log("Rooms used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
     }
@@ -140,11 +152,15 @@ export class Runner {
     }
 
     private static visualiseTower(tower: StructureTower, cost: number): void {
-        const p = tower.energy / tower.energyCapacity;
+        const colour = this.percentToColour(tower.energy / tower.energyCapacity);
+        this.visualise(tower, colour, cost);
+    }
+
+    private static percentToColour(p: number): string {
         const r = Math.round(255 - (255 * p));
         const g = Math.round(255 * p);
         const b = 0;
         const colour = "#" + toHex(r) + toHex(g) + toHex(b);
-        this.visualise(tower, colour, cost);
+        return colour;
     }
 }
