@@ -1,11 +1,28 @@
 import { Debug } from "./debug";
 
+/**
+ * Calculate the cost of a body made up of an array of parts
+ * @param body BodyPartConstant[]
+ * @returns number
+ */
 export function CalcBodyCost(body: BodyPartConstant[]): number {
     let sum = 0;
     for (const part of body) {
         sum += BODYPART_COST[part];
     }
     return sum;
+}
+/**
+ * Converts a decimal (0-255) to a hex for use in colours, applies leading 0 padding
+ * @param dec
+ * @param padding
+ * @returns string
+ */
+export function toHex(dec: number, padding?: number): string {
+    let hex = Number(dec).toString(16);
+    padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+    while (hex.length < padding) { hex = "0" + hex; }
+    return hex;
 }
 
 export function loadTools(): void {

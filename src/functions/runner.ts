@@ -3,8 +3,10 @@ import { Debug } from "functions/debug";
 import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
+import { Refiller } from "roles/Refiller";
 import { Supergrader } from "roles/Supergrader";
 import { Upgrader } from "roles/Upgrader";
+import { toHex } from "./tools";
 
 export class Runner {
     private static runEvery: number = 1;
@@ -22,13 +24,34 @@ export class Runner {
 
     private static creeps(): void {
         Debug.Log("Running Creeps");
+        const cpu: number = Game.cpu.getUsed();
         for (const i in ROLES) {
             this.role(ROLES[i]);
         }
+        Debug.Log("Creeps used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
     }
 
     private static rooms(): void {
         Debug.Log("Running Rooms");
+        const cpu: number = Game.cpu.getUsed();
+        for (const name in Game.rooms) {
+            const room = Game.rooms[name];
+            room.log("Running Towers");
+            const towers = room.find(FIND_MY_STRUCTURES, {
+                filter: (s) => s.structureType === STRUCTURE_TOWER && s.energy > 0
+            });
+            let towerCost = 0;
+            if (towers.length > 0) {
+                for (const i in towers) {
+                    const tower: StructureTower = towers[i] as StructureTower;
+                    const cost = tower.run();
+                    this.visualiseTower(tower, cost);
+                    towerCost += cost;
+                }
+            }
+            room.log("Towers used " + towerCost + "CPU");
+        }
+        Debug.Log("Rooms used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
     }
 
     private static role(role: string): boolean {
@@ -42,7 +65,7 @@ export class Runner {
                     const a = Game.cpu.getUsed();
                     Harvester.run(creep);
                     const cost = Game.cpu.getUsed() - a;
-                    this.colour(creep, Harvester.colour, cost);
+                    this.visualise(creep, Harvester.colour, cost);
                 }
                 break;
             // Miners
@@ -51,7 +74,7 @@ export class Runner {
                     const a = Game.cpu.getUsed();
                     Miner.run(creep);
                     const cost = Game.cpu.getUsed() - a;
-                    this.colour(creep, Miner.colour, cost);
+                    this.visualise(creep, Miner.colour, cost);
                 }
                 break;
             // Upgraders
@@ -60,7 +83,7 @@ export class Runner {
                     const a = Game.cpu.getUsed();
                     Upgrader.run(creep);
                     const cost = Game.cpu.getUsed() - a;
-                    this.colour(creep, Upgrader.colour, cost);
+                    this.visualise(creep, Upgrader.colour, cost);
                 }
                 break;
             // Supergraders
@@ -69,7 +92,7 @@ export class Runner {
                     const a = Game.cpu.getUsed();
                     Supergrader.run(creep);
                     const cost = Game.cpu.getUsed() - a;
-                    this.colour(creep, Supergrader.colour, cost);
+                    this.visualise(creep, Supergrader.colour, cost);
                 }
                 break;
             // Builders
@@ -78,7 +101,16 @@ export class Runner {
                     const a = Game.cpu.getUsed();
                     Builder.run(creep);
                     const cost = Game.cpu.getUsed() - a;
-                    this.colour(creep, Builder.colour, cost);
+                    this.visualise(creep, Builder.colour, cost);
+                }
+                break;
+            // Refillers
+            case Refiller.roleName:
+                for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
+                    Refiller.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.visualise(creep, Refiller.colour, cost);
                 }
                 break;
             default:
@@ -93,17 +125,26 @@ export class Runner {
         return true;
     }
 
-    private static colour(creep: Creep, colour: string, cost: number): void {
-        creep.room.visual.circle(creep.pos, {
+    private static visualise(item: Creep | StructureTower, colour: string, cost: number): void {
+        item.room.visual.circle(item.pos, {
             fill: colour,
             opacity: 0.1,
             radius: 0.4,
             stroke: colour
-        }).text(cost.toFixed(2), creep.pos, {
-            align: "left",
+        }).text(cost.toFixed(2), item.pos, {
+            align: "center",
             color: colour,
             font: 0.5,
             stroke: "rgba(0,0,0,0.5)"
         });
+    }
+
+    private static visualiseTower(tower: StructureTower, cost: number): void {
+        const p = tower.energy / tower.energyCapacity;
+        const r = Math.round(255 - (255 * p));
+        const g = Math.round(255 * p);
+        const b = 0;
+        const colour = "#" + toHex(r) + toHex(g) + toHex(b);
+        this.visualise(tower, colour, cost);
     }
 }

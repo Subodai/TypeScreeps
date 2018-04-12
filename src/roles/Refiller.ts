@@ -104,7 +104,9 @@ export class Refiller {
                     creep.state = STATE._INIT;
                     this.run(creep);
                 }
-
+                if (creep.deliverEnergy() === OK) {
+                    creep.log("Delivered some energy");
+                }
                 break;
             // default unknown state
             default:

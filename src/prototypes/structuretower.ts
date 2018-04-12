@@ -36,6 +36,24 @@ StructureTower.prototype.run = function(): number {
         return this.countCPU(start);
     }
 
+    // priority 4, repair ramparts and walls with hp of 1
+    if (this.energy >= 100 && (this.repairRamparts(1) || this.repairWalls(1))) {
+        return this.countCPU(start);
+    }
+
+    // priority 5, continers and roads
+    if (this.energy >= 400 && this.repairContainersAndRoads()) {
+        return this.countCPU(start);
+    }
+
+    // priority 6, rapair ramparts and roads upto current maxHP const
+    if (this.energy >= 600 &&
+        this.room.storage &&
+        this.room.storage.store[RESOURCE_ENERGY] >= 200000  &&
+        (this.repairRamparts(global.rampartMax) || this.repairWalls(global.wallMax))) {
+        return this.countCPU(start);
+    }
+
     // always return the CPU used
     return this.countCPU(start);
 };
@@ -83,15 +101,20 @@ StructureTower.prototype.repairRamparts = function(max?: number): boolean {
     if (max === undefined) {
         max = 10000;
     }
-    const values: number[] = [
-        1,
-        max / 10,
-        max / 5,
-        max / 4,
-        max / 3,
-        max / 2,
-        max
-    ];
+    let values: number[] = [1];
+    if (max > 1) {
+        values = [
+            1,
+            300,
+            max / 10,
+            max / 5,
+            max / 4,
+            max / 3,
+            max / 2,
+            max
+        ];
+    }
+
     for (const hp of values) {
         const target = this.findRampart(hp);
         if (target) {
@@ -104,32 +127,44 @@ StructureTower.prototype.repairRamparts = function(max?: number): boolean {
 };
 
 StructureTower.prototype.findRampart = function(hp: number): StructureRampart | void {
-    // Find a rampart with hp <= the number (hp 1 will always need a blap)
-    const rampart: AnyStructure | undefined = this.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: (s) => {
-            return s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my;
-        }
+    let targets = [];
+    targets = this.room.find(FIND_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my
     });
-    if (rampart instanceof StructureRampart) {
-        // send it back
-        return rampart;
+    if (targets.length > 0) {
+        const rampart = _.min(targets, (t) => t.hits);
+        if (rampart instanceof StructureRampart) {
+            return rampart;
+        }
     }
+    // // Find a rampart with hp <= the number (hp 1 will always need a blap)
+    // const rampart: AnyStructure | undefined = this.pos.findClosestByRange(FIND_STRUCTURES, {
+    //     filter: (s) => {
+    //         return s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my;
+    //     }
+    // });
+    // if (rampart instanceof StructureRampart) {
+    //     // send it back
+    //     return rampart;
+    // }
 };
 
 StructureTower.prototype.repairWalls = function(max?: number): boolean {
     if (max === undefined) {
         max = 100000;
     }
-    const values: number[] = [
-        1,
-        max / 20,
-        max / 10,
-        max / 5,
-        max / 4,
-        max / 3,
-        max / 2,
-        max
-    ];
+    let values: number[] = [1];
+    if (max > 1) {
+        values = [
+            1,
+            max / 10,
+            max / 5,
+            max / 4,
+            max / 3,
+            max / 2,
+            max
+        ];
+    }
     for (const hp of values) {
         const target = this.findWall(hp);
         if (target) {
@@ -142,36 +177,39 @@ StructureTower.prototype.repairWalls = function(max?: number): boolean {
 };
 
 StructureTower.prototype.findWall = function(hp: number): StructureWall | void {
-    // Find a rampart with hp <= the number (hp 1 will always need a blap)
-    const wall: AnyStructure | undefined = this.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: (s) => {
-            return s.structureType === STRUCTURE_WALL && s.hits <= hp;
-        }
+    let targets = [];
+    targets = this.room.find(FIND_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_WALL && s.hits <= hp
     });
-    if (wall instanceof StructureWall) {
-        // send it back
-        return wall;
+    if (targets.length > 0) {
+        const rampart = _.min(targets, (t) => t.hits);
+        if (rampart instanceof StructureWall) {
+            return rampart;
+        }
     }
+    // // Find a rampart with hp <= the number (hp 1 will always need a blap)
+    // const wall: AnyStructure | undefined = this.pos.findClosestByRange(FIND_STRUCTURES, {
+    //     filter: (s) => {
+    //         return s.structureType === STRUCTURE_WALL && s.hits <= hp;
+    //     }
+    // });
+    // if (wall instanceof StructureWall) {
+    //     // send it back
+    //     return wall;
+    // }
 };
 
-StructureTower.prototype.repairContainers = function(): boolean {
-    const target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+StructureTower.prototype.repairContainersAndRoads = function(): boolean {
+    let target = this.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: (s) => s.structureType === STRUCTURE_CONTAINER && s.hits < s.hitsMax
     });
-    if (target) {
-        this.log("Found container with hp <= max");
-        this.repair(target);
-        return true;
+    if (!target) {
+        target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax
+        });
     }
-    return false;
-};
-
-StructureTower.prototype.repairRoads = function(): boolean {
-    const target = this.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax
-    });
     if (target) {
-        this.log("Found road with hp <= max");
+        this.log("Found Container or Road with hp <= max");
         this.repair(target);
         return true;
     }

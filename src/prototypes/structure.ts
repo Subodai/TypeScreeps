@@ -1,10 +1,12 @@
 import { Debug } from "functions/debug";
+import { loadStructureLinkPrototypes } from "./structurelink";
 import { loadStructureSpawnPrototypes } from "./structurespawn";
 
 export function loadStructurePrototypes(): void {
     // Debug
     Debug.Load("Prototype: Structure");
     loadStructureSpawnPrototypes();
+    loadStructureLinkPrototypes();
 
     if (!Memory.structures) {
         Debug.Memory("Initialising Structure Memory");
