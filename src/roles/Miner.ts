@@ -29,12 +29,12 @@ export class Miner {
         [],
         BodyBuilder({ WORK: 3, MOVE: 1 }),
         BodyBuilder({ WORK: 5, MOVE: 1 }),
-        BodyBuilder({ WORK: 3, MOVE: 1 }),
-        BodyBuilder({ WORK: 3, MOVE: 1 }),
-        BodyBuilder({ WORK: 3, MOVE: 1 }),
-        BodyBuilder({ WORK: 3, MOVE: 1 }),
-        BodyBuilder({ WORK: 3, MOVE: 1 }),
-        BodyBuilder({ WORK: 3, MOVE: 1 })
+        BodyBuilder({ WORK: 5, MOVE: 1 }),
+        BodyBuilder({ WORK: 5, MOVE: 1 }),
+        BodyBuilder({ WORK: 5, MOVE: 1 }),
+        BodyBuilder({ WORK: 5, MOVE: 1 }),
+        BodyBuilder({ WORK: 5, MOVE: 1 }),
+        BodyBuilder({ WORK: 5, MOVE: 1 })
     ];
 
     /**
