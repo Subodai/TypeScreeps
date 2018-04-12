@@ -38,11 +38,17 @@ interface StructureTower {
      */
     healFriendlyCreeps(): boolean;
 
-    repairRamparts(percentage: number): boolean;
+    repairRamparts(max?: number): boolean;
 
-    repairWalls(percentage: number): boolean;
+    findRampart(hp: number): StructureRampart | void;
 
-    repairStructures(percentage: number): boolean;
+    repairWalls(max?: number): boolean;
+
+    findWall(hp: number): StructureWall | void;
+
+    repairContainers(): boolean;
+
+    repairStructures(): boolean;
 
     repairRoads(): boolean;
 
