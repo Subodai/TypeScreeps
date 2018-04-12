@@ -7,10 +7,11 @@ import { loadStructurePrototypes } from "./structure";
 import "./structuretower";
 
 export function loadPrototypes(): void {
-    Debug.Load("Prototype: Start[" + Game.cpu.getUsed() + "]");
+    const start = Game.cpu.getUsed();
+    Debug.Load("Prototype: Start [" + start.toFixed(2) + "]");
     loadRoomPrototypes();
     loadRoomPositionPrototypes();
     loadStructurePrototypes();
     loadSourcePrototypes();
-    Debug.Load("Prototype: Complete[" + Game.cpu.getUsed() + "]");
+    Debug.Load("Prototype: Complete [" + (Game.cpu.getUsed() - start).toFixed() + "]");
 }

@@ -4,7 +4,7 @@ import { Debug } from "functions/debug";
  * Load Structure Link Prototype Extensions
  */
 export function loadStructureLinkPrototypes(): void {
-    Debug.Log("Prototype: StructureLink");
+    Debug.Load("Prototype: StructureLink");
     /**
      * LinkType Property
      */
