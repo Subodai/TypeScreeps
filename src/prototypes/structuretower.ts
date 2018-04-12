@@ -153,3 +153,27 @@ StructureTower.prototype.findWall = function(hp: number): StructureWall | void {
         return wall;
     }
 };
+
+StructureTower.prototype.repairContainers = function(): boolean {
+    const target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_CONTAINER && s.hits < s.hitsMax
+    });
+    if (target) {
+        this.log("Found container with hp <= max");
+        this.repair(target);
+        return true;
+    }
+    return false;
+};
+
+StructureTower.prototype.repairRoads = function(): boolean {
+    const target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax
+    });
+    if (target) {
+        this.log("Found road with hp <= max");
+        this.repair(target);
+        return true;
+    }
+    return false;
+};
