@@ -40,9 +40,9 @@ export class Runner {
             // Run the towers
             const towerCost = this.towers(room);
             const storedEnergy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
-            room.visual.text("CPU : " + (Game.cpu.getUsed() - roomCPU), 1, 1, {
+            room.visual.text("CPU : " + (Game.cpu.getUsed() - roomCPU).toFixed(2), 1, 1, {
                 align : "left"
-            }).text("Towers : " + towerCost, 1, 2, {
+            }).text("Towers : " + towerCost.toFixed(2), 1, 2, {
                 align: "left"
             }).text("Energy : " + room.energyAvailable + "/" + room.energyCapacityAvailable,  1, 3, {
                 align: "left", color: this.percentToColour(room.energyAvailable / room.energyCapacityAvailable)
