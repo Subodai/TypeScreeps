@@ -11,6 +11,7 @@ export class Debug {
     private static memoryDebugEnabled: boolean = Memory.memoryDebug;
     private static spawnDebugEnabled: boolean = Memory.spawnDebug;
     private static towerDebugEnabled: boolean = Memory.towerDebug;
+    private static linkDebugEnabled: boolean = Memory.linkDebug;
     /**
      * Debug messages for creeps, will spit out room details and creep details
      *
@@ -91,6 +92,27 @@ export class Debug {
         }
         if (tower) {
             msg += "<span style='color:" + this.cBlue + ";'>[" + tower.id + "]</span> ";
+        }
+        msg += message;
+        console.log(msg);
+    }
+
+    /**
+     * Debug messages for links
+     *
+     * @param message {string}
+     * @param tower {StructureTower}
+     */
+    public static Link(message: string, link: StructureLink): void {
+        if (!this.linkDebugEnabled || !this.debugEnabled) { return; }
+        let msg: string = "";
+        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
+        const room: Room = link.room;
+        if (room) {
+            msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "]</span> ";
+        }
+        if (link) {
+            msg += "<span style='color:" + this.cBlue + ";'>[" + link.id + "]</span> ";
         }
         msg += message;
         console.log(msg);

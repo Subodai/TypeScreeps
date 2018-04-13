@@ -37,21 +37,8 @@ export class Runner {
         for (const name in Game.rooms) {
             const roomCPU = Game.cpu.getUsed();
             const room = Game.rooms[name];
-            room.log("Running Towers");
-            const towers = room.find(FIND_MY_STRUCTURES, {
-                filter: (s) => s.structureType === STRUCTURE_TOWER && s.energy > 0
-            });
-            let towerCost = 0;
-            if (towers.length > 0) {
-                for (const i in towers) {
-                    const tower: StructureTower = towers[i] as StructureTower;
-                    const cost = tower.run();
-                    this.visualiseTower(tower, cost);
-                    towerCost += cost;
-                }
-            }
-            room.log("Towers used " + towerCost + "CPU");
-
+            // Run the towers
+            const towerCost = this.towers(room);
             const storedEnergy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
             room.visual.text("CPU : " + (Game.cpu.getUsed() - roomCPU), 1, 1, {
                 align : "left"
@@ -64,6 +51,45 @@ export class Runner {
             });
         }
         Debug.Log("Rooms used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
+    }
+
+    private static towers(room: Room): number {
+        room.log("Running Towers");
+        const towers = room.find(FIND_MY_STRUCTURES, {
+            filter: (s) => s.structureType === STRUCTURE_TOWER && s.energy > 0
+        });
+        let towerCost = 0;
+        if (towers.length > 0) {
+            for (const i in towers) {
+                const tower: StructureTower = towers[i] as StructureTower;
+                const cost = tower.run();
+                this.visualiseTower(tower, cost);
+                towerCost += cost;
+            }
+        }
+        room.log("Towers used " + towerCost + " CPU");
+        return towerCost;
+    }
+
+    private static links(room: Room): number {
+        room.log("Running Links");
+        const links = room.find(FIND_MY_STRUCTURES, {
+            filter: (s) => s.structureType === STRUCTURE_LINK &&
+                           s.linkType === "receiver" &&
+                           s.energy <= (s.energyCapacity * 0.25)
+        });
+        let linkCost = 0;
+        if (links.length > 0) {
+            for (const i in links) {
+                // Grab the link
+                const link: StructureLink = links[i] as StructureLink;
+                const cost = link.runReceiver();
+                this.visualiseLink(link, cost);
+                linkCost += cost;
+            }
+        }
+        room.log("Links used " + linkCost + " CPU");
+        return linkCost;
     }
 
     private static role(role: string): boolean {
@@ -137,7 +163,7 @@ export class Runner {
         return true;
     }
 
-    private static visualise(item: Creep | StructureTower, colour: string, cost: number): void {
+    private static visualise(item: Creep | StructureTower | StructureLink, colour: string, cost: number): void {
         item.room.visual.circle(item.pos, {
             fill: colour,
             opacity: 0.1,
@@ -154,6 +180,11 @@ export class Runner {
     private static visualiseTower(tower: StructureTower, cost: number): void {
         const colour = this.percentToColour(tower.energy / tower.energyCapacity);
         this.visualise(tower, colour, cost);
+    }
+
+    private static visualiseLink(link: StructureLink, cost: number): void {
+        const colour = this.percentToColour(link.energy / link.energyCapacity);
+        this.visualise(link, colour, cost);
     }
 
     private static percentToColour(p: number): string {

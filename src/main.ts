@@ -32,7 +32,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
     Debug.Log(`Current game tick is ${Game.time}: Age:${Game.time - global.born}`);
     // Run Cleaner First
     Cleaner.run();
-    Counter.run();
-    Spawner.run();
-    Runner.run();
+    Counter.run(); // @todo make the counter count the things we need to run other things
+    Spawner.run(); // @todo make this put items into the spawn queue
+    Runner.run();  // @todo make this aware of the things the counter has counted so it won't run unnecessary items
 });
