@@ -9,6 +9,11 @@ interface Creep {
     clearTargets(): void;
     getNearbyEnergy(useStorage?: boolean, emergency?: boolean): ScreepsReturnCode;
     deliverEnergy(): ScreepsReturnCode;
+    fillLinks(): ScreepsReturnCode | false;
+    fillSpawns(): ScreepsReturnCode | false;
+    fillTowers(): ScreepsReturnCode | false;
+    pickStorageOrTerminal(): StructureStorage | StructureTerminal | null;
+    fillRoomStorageOrTerminal(): ScreepsReturnCode | false;
     getNearbyMinerals(storage: boolean): number;
     canWork(): boolean;
     canDo(bodyPart: BodyPartConstant): boolean;
