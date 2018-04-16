@@ -23,7 +23,7 @@ export class Builder {
         1,
         1
     ];
-
+    // Body structure
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 1 }),

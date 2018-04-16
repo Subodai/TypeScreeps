@@ -64,4 +64,6 @@ interface CreepMemory {
     lastSpaceCheck?: number;
     siteId?: string;
     targetRoom?: string;
+    reserveRoom?: string;
+    flagName?: string;
 }
