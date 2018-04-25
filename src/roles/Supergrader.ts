@@ -5,7 +5,7 @@ export class Supergrader {
 
     public static colour: string = "#ff6600";
 
-    public static roleName: string = "Supergrader";
+    public static roleName: string = "sUpgrade";
 
     public static roster: number[] = [
         0,

@@ -10,7 +10,7 @@ export class RemoteReserver {
     // The colour for visuals
     public static colour: string = "#660066";
     // Rolename
-    public static roleName: string = "RemoteReserver";
+    public static roleName: string = "rReserver";
     // Roster
     public static roster: number[] = [
         0,

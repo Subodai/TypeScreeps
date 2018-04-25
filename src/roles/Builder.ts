@@ -10,7 +10,7 @@ export class Builder {
     // the colour for visuals
     public static colour: string = "#99ccff";
     // Rolename
-    public static roleName: string = "Builder";
+    public static roleName: string = "build";
     // Roster
     public static roster: number[] = [
         0,

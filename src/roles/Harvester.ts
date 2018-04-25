@@ -13,7 +13,7 @@ export class Harvester {
     /**
      * The role's identifier
      */
-    public static roleName: string = "Harvester";
+    public static roleName: string = "harvest";
 
     /**
      * Multiplier used by this role

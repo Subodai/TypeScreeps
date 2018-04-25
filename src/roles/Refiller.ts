@@ -7,7 +7,7 @@ export class Refiller {
     // colour for visuals
     public static colour: string = "#888888";
     // role name
-    public static roleName: string = "Refiller";
+    public static roleName: string = "refil";
     // Roster
     public static roster: number[] = [
         0,

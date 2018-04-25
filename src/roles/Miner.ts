@@ -11,7 +11,7 @@ export class Miner {
 
     public static colour: string = "#996600";
 
-    public static roleName: string = "Miner";
+    public static roleName: string = "miner";
 
     public static roster: number[] = [
         0,
