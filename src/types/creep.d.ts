@@ -71,4 +71,5 @@ interface CreepMemory {
     targetRoom?: string;
     reserveRoom?: string;
     flagName?: string;
+    _home?: string;
 }

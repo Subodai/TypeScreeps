@@ -51,9 +51,49 @@ export class RemoteEnergyHauler {
         creep.deathCheck(this.ticksBeforeRenew);
         // run state as normal
         switch (creep.state) {
+            // SPAWN state
             case STATE._SPAWN:
-
+                creep.log("In spawn state");
+                // If we haven't saved our _home room
+                if (!creep.memory._home) {
+                    // set it
+                    creep.memory._home = creep.room.name;
+                }
+                if (!creep.isTired()) {
+                    creep.log("Done spawning setting to init");
+                    creep.state = STATE._INIT;
+                    this.run(creep);
+                }
                 break;
+            // INIT state
+            case STATE._INIT:
+                creep.log("Initiating Remote Energy Hauler");
+                // Make sure we can actually carry stuff first
+                if (!creep.canDo(CARRY)) {
+                    creep.log("Damaged seeking repair");
+                    return;
+                }
+                // Pick remote room to go to
+                // go into move state
+                break;
+            // MOVE State
+            case STATE._MOVE:
+                // Go to remote room
+                // set to arrived state once there
+                break;
+            // GATHER State
+            case STATE._GATHER:
+                // In remote room, gather resources
+                // set to return state
+                break;
+            // RETURN State
+            case STATE._RETURN:
+                // Returning to deliver room (home or otherwise)
+                // set to DELIVER state
+                break;
+            // DELIVER State
+
+
         }
     }
 }
