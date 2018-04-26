@@ -5,25 +5,10 @@ import { BodyBuilder } from "functions/tools";
  * Builders turn energy into structures
  */
 export class Builder {
-    // when to renew
     public static ticksBeforeRenew: number = 100;
-    // the colour for visuals
     public static colour: string = "#99ccff";
-    // Rolename
     public static roleName: string = "build";
-    // Roster
-    public static roster: number[] = [
-        0,
-        6,
-        6,
-        4,
-        4,
-        4,
-        4,
-        1,
-        1
-    ];
-    // Body structure
+    public static roster: number[] = [ 0, 6, 6, 4, 4, 4, 4, 1, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 1 }),
@@ -35,7 +20,7 @@ export class Builder {
         BodyBuilder({ WORK: 16, CARRY: 8, MOVE: 24 }),
         BodyBuilder({ WORK: 16, CARRY: 8, MOVE: 24 })
     ];
-
+    // is role enabled
     public static enabled(room: Room): boolean {
         // fetch all construction sites within 3 rooms of this one
         const sites: ConstructionSite[] = _.filter(Game.constructionSites, (s: ConstructionSite) =>
@@ -44,7 +29,7 @@ export class Builder {
         // enabled if there are any
         return (sites.length > 0);
     }
-
+    // Run this role
     public static run(creep: Creep): void {
         // if creep is tired, don't waste intents
         if (creep.isTired()) {

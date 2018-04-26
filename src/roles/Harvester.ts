@@ -6,28 +6,10 @@ import { BodyBuilder } from "functions/tools";
  */
 export class Harvester {
     public static ticksBeforeRenew: number = 100;
-    /**
-     * Colour for visuals
-     */
     public static colour: string = "#ffff00";
-    /**
-     * The role's identifier
-     */
     public static roleName: string = "harvest";
-
-    /**
-     * Multiplier used by this role
-     */
     private static multiplier: number = 2;
-
-    /**
-     * How many of this role to spawn at each RCL
-     */
     public static roster: number[] = [ 0, 4, 3, 2, 2, 2, 2, 2, 2 ];
-
-    /**
-     * The body make up of the creep at each RCL
-     */
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 1, CARRY: 2, MOVE: 2 }),
@@ -39,11 +21,7 @@ export class Harvester {
         BodyBuilder({ CARRY: 18, MOVE: 18 }),
         BodyBuilder({ CARRY: 18, MOVE: 18 })
     ];
-
-    /**
-     * Is the Harvester role enabled for a room?
-     * @param room {Room}
-     */
+    // is role enabled
     public static enabled(room: Room): boolean {
         if (room.controller && room.memory.minersNeeded && room.memory.minersNeeded > 0) {
             const list = room.activeCreepsInRole(this);
@@ -53,11 +31,7 @@ export class Harvester {
         }
         return false;
     }
-
-    /**
-     * Runtime script for Harvester creep
-     * @param creep {Creep}
-     */
+    // run the role
     public static run(creep: Creep): void {
         // if creep is tired don't waste intents
         if (creep.isTired()) {

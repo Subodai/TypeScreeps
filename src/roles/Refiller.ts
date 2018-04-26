@@ -2,37 +2,11 @@ import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
 
 export class Refiller {
-    // when to renew
     public static ticksBeforeRenew: number = 100;
-    // colour for visuals
     public static colour: string = "#888888";
-    // role name
     public static roleName: string = "refil";
-    // Roster
-    public static roster: number[] = [
-        0,
-        0,
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1
-    ];
-    // Roster
-    public static rosterLinks: number[] = [
-        0,
-        0,
-        0,
-        0,
-        1,
-        2,
-        2,
-        2,
-        1
-    ];
-    // Body Structure
+    public static roster: number[]      = [ 0, 0, 0, 0, 1, 1, 1, 1, 1 ];
+    public static rosterLinks: number[] = [ 0, 0, 0, 0, 1, 2, 2, 2, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         [],

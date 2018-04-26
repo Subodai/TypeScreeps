@@ -2,38 +2,15 @@ import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
 import { Supergrader } from "./Supergrader";
 
+/**
+ * Upgrader
+ */
 export class Upgrader {
-
     public static ticksBeforeRenew: number = 100;
-
     public static colour: string = "#009900";
-
     public static roleName: string = "upgrade";
-
-    public static roster: number[] = [
-        0,
-        4,
-        8,
-        8,
-        6,
-        3,
-        2,
-        2,
-        1
-    ];
-
-    public static rosterLinks: number[] = [
-        0,
-        4,
-        8,
-        8,
-        6,
-        3,
-        8,
-        4,
-        1
-    ];
-
+    public static roster: number[]      = [ 0, 4, 8, 8, 6, 3, 2, 2, 1 ];
+    public static rosterLinks: number[] = [ 0, 4, 8, 8, 6, 3, 8, 4, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 2, CARRY: 1, MOVE: 1}),
@@ -45,7 +22,6 @@ export class Upgrader {
         BodyBuilder({ WORK: 6, CARRY: 2, MOVE: 8 }),
         BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 2 })
     ];
-
     public static bodyStructureLinks: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 2, CARRY: 1, MOVE: 1 }),

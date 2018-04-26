@@ -5,25 +5,10 @@ import { BodyBuilder } from "functions/tools";
  * Remote room reserver
  */
 export class RemoteReserver {
-    // when to renew
     public static ticksBeforeRenew: number = 100;
-    // The colour for visuals
     public static colour: string = "#660066";
-    // Rolename
     public static roleName: string = "rReserver";
-    // Roster
-    public static roster: number[] = [
-        0,
-        0,
-        0,
-        0,
-        2,
-        2,
-        2,
-        2,
-        2
-    ];
-    // Body structure
+    public static roster: number[] = [ 0, 0, 0, 0, 2, 2, 2, 2, 2 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         [],

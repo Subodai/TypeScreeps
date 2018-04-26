@@ -5,17 +5,11 @@ import { BodyBuilder } from "functions/tools";
  * Remote room energy hauler
  */
 export class RemoteEnergyHauler {
-    // when to renew
     public static ticksBeforeRenew: number = 100;
-    // the colour for visuals
     public static color: string = "#006600";
-    // the rolename
     public static roleName: string = "rEHaul";
-    // multiplier for the number required per flag
     private static multiplier: number = 2;
-    // the roster
     public static roster: number[] = [ 0, 0, 0, 3, 3, 3, 3, 4, 3 ];
-    // the body construction
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ CARRY: 2, MOVE: 2}),

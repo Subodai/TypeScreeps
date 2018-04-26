@@ -6,25 +6,10 @@ import "prototypes/creep/mineralActions";
  * Miners go to sources in a room and mine them
  */
 export class Miner {
-
     public static ticksBeforeRenew: number = 100;
-
     public static colour: string = "#996600";
-
     public static roleName: string = "miner";
-
-    public static roster: number[] = [
-        0,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4,
-        4
-    ];
-
+    public static roster: number[] = [ 0, 4, 4, 4, 4, 4, 4, 4, 4 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 3, MOVE: 1 }),
@@ -36,11 +21,7 @@ export class Miner {
         BodyBuilder({ WORK: 5, MOVE: 1 }),
         BodyBuilder({ WORK: 5, MOVE: 1 })
     ];
-
-    /**
-     * Is this role enabled?
-     * @param room {Room}
-     */
+    // Is this role enabled?
     public static enabled(room: Room): boolean {
         if (room.controller && room.controller.level > 1 && room.memory.minersNeeded && room.memory.minersNeeded > 0) {
             const list = room.activeCreepsInRole(this);
@@ -50,7 +31,7 @@ export class Miner {
         }
         return false;
     }
-
+    // role runner
     public static run(creep: Creep): void {
         // if creep is tired don't waste intents
         if (creep.isTired()) {
