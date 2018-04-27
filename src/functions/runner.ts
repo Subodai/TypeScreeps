@@ -48,7 +48,8 @@ export class Runner {
                 align: "left", color: this.percentToColour(room.energyAvailable / room.energyCapacityAvailable)
             }).text("Stored : " + storedEnergy, 1, 4, {
                 align: "left", color: this.percentToColour(storedEnergy / 1000000)
-            });
+            }).text("Collectable : " + room.collectableEnergy(), 1, 5, {
+                align: "left", color: "#00FFFF"});
         }
         Debug.Log("Rooms used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
     }
