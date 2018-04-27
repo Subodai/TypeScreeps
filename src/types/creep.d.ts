@@ -45,6 +45,9 @@ interface Creep {
     findNearestConstructionSite(my?: boolean): void;
     goToAndBuild(siteId: string): ScreepsReturnCode;
     deSpawn(): void;
+    chooseRemoteRoom(): void;
+    goToRoom(roomName: string): void;
+    chooseHomeRoom(): void;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
 }
 
@@ -72,4 +75,5 @@ interface CreepMemory {
     reserveRoom?: string;
     flagName?: string;
     _home?: string;
+    remoteRoom?: string;
 }

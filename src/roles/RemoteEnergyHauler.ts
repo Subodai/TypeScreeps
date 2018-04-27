@@ -68,26 +68,110 @@ export class RemoteEnergyHauler {
                     return;
                 }
                 // Pick remote room to go to
+                creep.chooseRemoteRoom();
+                if (creep.memory.remoteRoom) {
+                    creep.state = STATE._MOVE;
+                    this.run(creep);
+                }
                 // go into move state
                 break;
             // MOVE State
             case STATE._MOVE:
-                // Go to remote room
-                // set to arrived state once there
+                creep.log("In move state");
+                // Have we arrived in remote room?
+                if (creep.room.name === creep.memory.remoteRoom) {
+                    creep.state = STATE._GATHER;
+                    this.run(creep);
+                    break;
+                }
+                // not yet lets move to it
+                creep.goToRoom(creep.memory.remoteRoom!);
                 break;
             // GATHER State
             case STATE._GATHER:
-                // In remote room, gather resources
-                // set to return state
+                creep.log("In gather state");
+                if (creep.getNearbyEnergy() === ERR_FULL) {
+                    creep.log("Got some energy");
+                    creep.state = STATE._RETURN;
+                    this.run(creep);
+                }
                 break;
             // RETURN State
             case STATE._RETURN:
+                if (creep.memory.roomName) {
+                    creep.chooseHomeRoom();
+                }
+                if (creep.atHome()) {
+                    creep.state = STATE._DELIVER;
+                    this.run(creep);
+                }
                 // Returning to deliver room (home or otherwise)
                 // set to DELIVER state
                 break;
-            // DELIVER State
-
-
+            // DELIVER state
+            case STATE._DELIVER:
+                creep.log("Delivering energy");
+                if (creep.empty()) {
+                    creep.state = STATE._INIT;
+                    // this.run(creep);
+                }
+                if (creep.deliverEnergy() === OK) {
+                    creep.log("Delivered some energy");
+                    if (Memory.settings.fillLowest) {
+                        delete creep.memory.roomName;
+                    }
+                }
+                break;
+            default:
+                creep.log("Creep in unknown state");
+                creep.state = STATE._INIT;
+                break;
         }
     }
 }
+
+Creep.prototype.chooseRemoteRoom = function(): void {
+    if (Memory.settings.fetchHighest) {
+        this.memory.remoteRoom = Memory.settings.remoteRoom;
+        return;
+    }
+
+    const flags = _.filter(Game.flags, (f: Flag) => f.color === global.flagColor.haul && Game.rooms[f.pos.roomName]);
+    if (flags.length === 0) {
+        this.memory.remoteRoom = Memory.settings.remoteRoom;
+    }
+    flags.sort((a, b) =>
+        Game.rooms[a.pos.roomName].collectableEnergy() -
+        Game.rooms[b.pos.roomName].collectableEnergy());
+    flags.reverse();
+    for (const i in flags) {
+        const flag: Flag = flags[i];
+        const distance = Game.map.getRoomLinearDistance(this.room.name, flag.pos.roomName);
+        if (distance > 2) {
+            continue;
+        }
+        const room = Game.rooms[flag.pos.roomName];
+        if (room) {
+            if (room.collectableEnergy() <= 500 || room.hostiles() > 0) {
+                continue;
+            }
+            this.memory.remoteRoom = flag.pos.roomName;
+            return;
+        }
+    }
+};
+
+Creep.prototype.goToRoom = function(roomName: string): void {
+    const pos = new RoomPosition(25, 25, roomName);
+    this.travelTo(pos, {
+        ensurePath: true
+    });
+};
+
+Creep.prototype.chooseHomeRoom = function(): void {
+    if (Memory.settings.fillLowest) {
+        this.memory.roomName = Memory.settings.myRoom;
+        return;
+    }
+    this.memory.roomName = this.memory._home;
+};
