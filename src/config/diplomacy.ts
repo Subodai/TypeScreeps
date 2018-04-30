@@ -32,6 +32,7 @@ export const ALLIES = [
     "omnomwombat",
     "Parthon",
     "Plemenit",
+    "Publiccert",
     "poppahorse",
     "Regnare",
     "Source Keeper",

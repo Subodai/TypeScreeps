@@ -47,7 +47,15 @@ declare class Upgrader extends Role {}
 declare class Supergrader extends Role {}
 declare class Builder extends Role {}
 declare class Refiller extends Role {}
+declare class RemoteEnergyHauler extends Role {}
 /**
  * Defines what a creep does during it's lifespan
  */
-type CreepRole = Role | Miner | Harvester | Upgrader | Supergrader | Builder | Refiller;
+type CreepRole = Role
+                | Miner
+                | Harvester
+                | Upgrader
+                | Supergrader
+                | Builder
+                | Refiller
+                | RemoteEnergyHauler;

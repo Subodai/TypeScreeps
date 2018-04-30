@@ -6,7 +6,7 @@ import { BodyBuilder } from "functions/tools";
  */
 export class RemoteEnergyHauler {
     public static ticksBeforeRenew: number = 100;
-    public static color: string = "#006600";
+    public static colour: string = "#006600";
     public static roleName: string = "rEHaul";
     private static multiplier: number = 2;
     public static roster: number[] = [ 0, 0, 0, 3, 3, 3, 3, 4, 3 ];

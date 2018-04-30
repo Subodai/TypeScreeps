@@ -3,6 +3,7 @@ import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Refiller } from "roles/Refiller";
+import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { Upgrader } from "roles/Upgrader";
 
 export const ROLES: string[] = [
@@ -11,8 +12,9 @@ export const ROLES: string[] = [
     Refiller.roleName,
     Harvester.roleName,
     Upgrader.roleName,
-    Builder.roleName
+    Builder.roleName,
 
+    RemoteEnergyHauler.roleName
     // "refill",       // Always pulls from storage
     // "Harvester",    // Sources and containers always, fill spawns until 4, then only storage
     // "Upgrader",     // Sources until 4, storage after
