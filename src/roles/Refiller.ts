@@ -12,7 +12,7 @@ export class Refiller {
         [],
         [],
         [],
-        BodyBuilder({ CARRY: 5, MOVE: 5}),
+        BodyBuilder({ CARRY: 5, MOVE: 5 }),
         BodyBuilder({ CARRY: 10, MOVE: 10 }),
         BodyBuilder({ CARRY: 10, MOVE: 10 }),
         BodyBuilder({ CARRY: 25, MOVE: 25 }),

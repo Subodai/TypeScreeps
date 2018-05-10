@@ -12,7 +12,7 @@ export class RemoteEnergyHauler {
     public static roster: number[] = [ 0, 0, 0, 3, 3, 3, 3, 4, 3 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
-        BodyBuilder({ CARRY: 2, MOVE: 2}),
+        BodyBuilder({ CARRY: 2, MOVE: 2 }),
         BodyBuilder({ CARRY: 3, MOVE: 3 }),
         BodyBuilder({ CARRY: 5, MOVE: 5 }),
         BodyBuilder({ CARRY: 10, MOVE: 10 }),

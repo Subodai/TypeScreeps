@@ -13,7 +13,7 @@ export class Upgrader {
     public static rosterLinks: number[] = [ 0, 4, 8, 8, 6, 3, 8, 4, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
-        BodyBuilder({ WORK: 2, CARRY: 1, MOVE: 1}),
+        BodyBuilder({ WORK: 2, CARRY: 1, MOVE: 1 }),
         BodyBuilder({ WORK: 3, CARRY: 2, MOVE: 3 }),
         BodyBuilder({ WORK: 4, CARRY: 2, MOVE: 6 }),
         BodyBuilder({ WORK: 6, CARRY: 2, MOVE: 5 }),
