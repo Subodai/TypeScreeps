@@ -79,6 +79,7 @@ export class RemoteReserver {
                     creep.log("Damaged seeking repair");
                     return;
                 }
+                creep.log("Choosing remote reserve room");
                 creep.chooseReserveRoom();
                 if (creep.memory.flagName) {
                     creep.state = STATE._MOVE;
@@ -96,13 +97,25 @@ export class RemoteReserver {
                 creep.goToRoom(creep.memory.reserveRoom!);
                 break;
             // ARRIVED state
+            case STATE._ARRIVED:
+                creep.log("Creep has arrived");
+                // have we somehow changed room?
+                if (creep.memory.reserveRoom !== creep.room.name) {
+                    // Back into move state
+                    creep.state = STATE._MOVE;
+                    this.run(creep);
+                    break;
+                }
+                // Reserve the remote room
+                creep.reserveRemoteRoom();
+                break;
 
         }
     }
 }
 
 Creep.prototype.chooseReserveRoom = function(): void {
-    if (this.memory.flagName) {
+    if (!this.memory.flagName) {
         this.log("No flag in memory");
         // @todo perhaps add distance to the filter
         const flags = _.filter(Game.flags, (f: Flag) =>
@@ -134,5 +147,23 @@ Creep.prototype.chooseReserveRoom = function(): void {
             this.memory.reserveRoom = flag.pos.roomName;
             flag.assignedCreep = this;
         }
+    }
+};
+
+Creep.prototype.reserveRemoteRoom = function(): void {
+    // make sure this room has a controller before we go on
+    if (this.room.controller) {
+        // are we in range?
+        if (this.pos.inRangeTo(this.room.controller, 1)) {
+            this.log("Target should be in range, attempting reserve");
+            if (this.reserveController(this.room.controller) === ERR_NOT_IN_RANGE) {
+                this.log("Reserve Failed out of range");
+            } else {
+                this.signController(this.room.controller, "Room Reserve by Subodai - [Ypsilon Pact]");
+                return;
+            }
+        }
+        this.travelTo(this.room.controller, {ensurePath : true});
+        this.roadCheck();
     }
 };

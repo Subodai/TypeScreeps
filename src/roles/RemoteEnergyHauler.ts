@@ -131,6 +131,12 @@ export class RemoteEnergyHauler {
 }
 
 Creep.prototype.chooseRemoteRoom = function(): void {
+    if (!Memory.settings) {
+        Memory.settings = {};
+    }
+    if (!Memory.settings.fetchHighest) {
+        Memory.settings.fetchHighest = false;
+    }
     if (Memory.settings.fetchHighest) {
         this.memory.remoteRoom = Memory.settings.remoteRoom;
         return;

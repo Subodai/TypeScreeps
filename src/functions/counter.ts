@@ -43,7 +43,7 @@ export class Counter {
                     minMiners = 1;
                 }
                 list = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
-                    i.role !== "hauler" && i.role !== "guard");
+                    i.role !== "hauler" && i.role !== "guard"); // TODO replace with hauler and guard rolenames
                 miners = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
                     (i.role === Miner.roleName || i.role === "linkminer")); // TODO replace with linkMiner rolename?
                 if (!Room.storage) {

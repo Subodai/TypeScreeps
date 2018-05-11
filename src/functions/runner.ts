@@ -5,6 +5,7 @@ import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
+import { RemoteReserver } from "roles/RemoteReserver";
 import { Supergrader } from "roles/Supergrader";
 import { Upgrader } from "roles/Upgrader";
 import { toHex } from "./tools";
@@ -40,16 +41,20 @@ export class Runner {
             const room = Game.rooms[name];
             // Run the towers
             const towerCost = this.towers(room);
+            // Run the links
+            const linkCost = this.links(room);
             const storedEnergy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
             room.visual.text("CPU : " + (Game.cpu.getUsed() - roomCPU).toFixed(2), 1, 1, {
                 align : "left"
             }).text("Towers : " + towerCost.toFixed(2), 1, 2, {
                 align: "left"
-            }).text("Energy : " + room.energyAvailable + "/" + room.energyCapacityAvailable,  1, 3, {
+            }).text("Links : " + linkCost.toFixed(2), 1, 3, {
+                align: "left"
+            }).text("Energy : " + room.energyAvailable + "/" + room.energyCapacityAvailable,  1, 4, {
                 align: "left", color: this.percentToColour(room.energyAvailable / room.energyCapacityAvailable)
-            }).text("Stored : " + storedEnergy, 1, 4, {
+            }).text("Stored : " + storedEnergy, 1, 5, {
                 align: "left", color: this.percentToColour(storedEnergy / 1000000)
-            }).text("Collectable : " + room.collectableEnergy(), 1, 5, {
+            }).text("Collectable : " + room.collectableEnergy(), 1, 6, {
                 align: "left", color: "#00FFFF"});
         }
         Debug.Log("Rooms used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
@@ -75,6 +80,10 @@ export class Runner {
 
     private static links(room: Room): number {
         room.log("Running Links");
+        if (!room.memory.links) {
+            room.log("Links disabled");
+            return 0;
+        }
         const links = room.find(FIND_MY_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_LINK &&
                            s.linkType === "receiver" &&
@@ -160,6 +169,15 @@ export class Runner {
                     RemoteEnergyHauler.run(creep);
                     const cost = Game.cpu.getUsed() - a;
                     this.visualise(creep, RemoteEnergyHauler.colour, cost);
+                }
+                break;
+            // Remote Reserver
+            case RemoteReserver.roleName:
+                for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
+                    RemoteReserver.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.visualise(creep, RemoteReserver.colour, cost);
                 }
                 break;
             default:

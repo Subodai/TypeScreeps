@@ -1,4 +1,7 @@
+import { Builder } from "roles/Builder";
 import { Refiller } from "roles/Refiller";
+import { Supergrader } from "roles/Supergrader";
+import { Upgrader } from "roles/Upgrader";
 
 /**
  * Find and collect nearby energy
@@ -18,7 +21,10 @@ Creep.prototype.getNearbyEnergy = function(
     }
     /* Are we near a link with memory of receiver limit to only upgraders or supergraders,
     otherwise refillers become.. interesting*/
-    if (!this.memory.energyPickup && (this.memory.role === "upgrader" || this.memory.role === "supergrader")) {
+    if (!this.memory.energyPickup &&
+        (this.memory.role === Upgrader.roleName ||
+         this.memory.role === Supergrader.roleName)
+    ) {
         this.log("Checking for links");
         // If we're in our own room, with our own controller, above level 5 (should have links)
         if (this.room.controller && this.room.controller.my && this.room.controller.level >= 5) {
@@ -110,11 +116,12 @@ Creep.prototype.getNearbyEnergy = function(
             this.log("Stored container " + container.id + " in memory");
             this.memory.energyPickup = container.id;
         }
-        if (this.memory.role === "builder" || this.memory.level <= 2) {
+        if (this.memory.role === Builder.roleName || this.memory.level <= 2) {
+            this.log("is a builder or room level is low");
             // Nothing found? lets try finding available sources
             if (!this.memory.energyPickup) {
                 // Can this creep work?
-                if (this.canWork() && this.memory.role !== "refiller") {
+                if (this.canWork() && this.memory.role !== Refiller.roleName) {
                     this.log("Can work, finding sources");
                     const source = this.pos.findClosestByRange(FIND_SOURCES_ACTIVE, {
                         filter: (i) => {

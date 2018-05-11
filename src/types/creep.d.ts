@@ -49,6 +49,7 @@ interface Creep {
     goToRoom(roomName: string): void;
     chooseHomeRoom(): void;
     chooseReserveRoom(): void;
+    reserveRemoteRoom(): void;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
 }
 
