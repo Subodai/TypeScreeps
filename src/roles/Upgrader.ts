@@ -14,7 +14,7 @@ export class Upgrader {
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 2, CARRY: 1, MOVE: 1 }),
-        BodyBuilder({ WORK: 3, CARRY: 2, MOVE: 3 }),
+        BodyBuilder({ WORK: 2, CARRY: 2, MOVE: 4 }),
         BodyBuilder({ WORK: 4, CARRY: 2, MOVE: 6 }),
         BodyBuilder({ WORK: 6, CARRY: 2, MOVE: 5 }),
         BodyBuilder({ WORK: 6, CARRY: 2, MOVE: 8 }),
