@@ -50,6 +50,8 @@ interface Creep {
     chooseHomeRoom(): void;
     chooseReserveRoom(): void;
     reserveRemoteRoom(): void;
+    chooseRemoteMinerRoom(): void;
+    remoteMine(): void;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
 }
 

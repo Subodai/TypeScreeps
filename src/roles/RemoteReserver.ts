@@ -39,10 +39,11 @@ export class RemoteReserver {
         for (const i in flags) {
             // grab the flag
             const flag = flags[i];
-            const creeps = _.filter(Game.creeps, (c) =>
+            const creeps = _.filter(Game.creeps, (c: Creep) =>
+                c.memory.role === this.roleName &&
                 c.memory.reserveRoom === flag.pos.roomName &&
                 c.memory.flagName === flag.name &&
-                !c.memory.dying);
+               !c.memory.dying);
             // does this flag have an assigned creep?
             if (creeps.length === 0) {
                 // no lets make a new one
