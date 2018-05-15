@@ -1,5 +1,6 @@
 import { Builder } from "roles/Builder";
 import { Refiller } from "roles/Refiller";
+import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { Supergrader } from "roles/Supergrader";
 import { Upgrader } from "roles/Upgrader";
 
@@ -485,6 +486,10 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     let fillSpawns = false;
     if (this.role === Refiller.roleName || this.room.energyAvailable < this.room.energyCapacityAvailable * 0.85) {
         fillSpawns = true;
+    }
+
+    if (this.role === RemoteEnergyHauler.roleName) {
+        fillSpawns = false;
     }
 
     // if we're a refiller prioritise links
