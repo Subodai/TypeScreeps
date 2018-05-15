@@ -6,6 +6,7 @@ import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
+import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
 import { Supergrader } from "roles/Supergrader";
 import { Upgrader } from "roles/Upgrader";
@@ -241,8 +242,8 @@ export function loadRoomPrototypes(): void {
         const sources: Source[] = this.find(FIND_SOURCES);
         // get the miners in this room
         const creeps: Creep[] = _.filter(Game.creeps, (c: Creep) =>
-            c.role === Miner.roleName &&
-            c.memory.roomName === this.name &&
+            ((c.role === Miner.roleName && c.memory.roomName === this.name) ||
+            (c.role === RemoteEnergyMiner.roleName && c.memory.remoteRoom === this.name)) &&
             !c.memory.dying);
         // set the number of minersNeeded to the length of sources
         this.memory.minersNeeded = sources.length;
@@ -358,6 +359,10 @@ export function loadRoomPrototypes(): void {
                 // Reservers
                 case RemoteReserver.roleName:
                     this.memory.roles[roleName] = RemoteReserver.enabled(this);
+                    break;
+                // Remote Energy Miners
+                case RemoteEnergyMiner.roleName:
+                    this.memory.roles[roleName] = RemoteEnergyMiner.enabled(this);
                     break;
                 // Haulers
                 case RemoteEnergyHauler.roleName:

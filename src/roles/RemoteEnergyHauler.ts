@@ -73,6 +73,7 @@ export class RemoteEnergyHauler {
                     creep.state = STATE._MOVE;
                     this.run(creep);
                 }
+                creep.log("No rooms to haul from");
                 // go into move state
                 break;
             // MOVE State
@@ -165,13 +166,6 @@ Creep.prototype.chooseRemoteRoom = function(): void {
             return;
         }
     }
-};
-
-Creep.prototype.goToRoom = function(roomName: string): void {
-    const pos = new RoomPosition(25, 25, roomName);
-    this.travelTo(pos, {
-        ensurePath: true
-    });
 };
 
 Creep.prototype.chooseHomeRoom = function(): void {

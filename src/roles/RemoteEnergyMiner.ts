@@ -7,7 +7,7 @@ import { BodyBuilder } from "functions/tools";
 export class RemoteEnergyMiner {
     public static ticksBeforeRenew: number = 200;
     public static colour: string = "#ff66ff";
-    public static roleName: string = "rRes";
+    public static roleName: string = "rEMiner";
     public static roster: number[] = [ 0, 0, 0, 2, 4, 4, 4, 4, 4 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
@@ -104,40 +104,94 @@ export class RemoteEnergyMiner {
             // MOVE state
             case STATE._MOVE:
                 creep.log("In move state");
-                if (creep.room.name === creep.memory.reserveRoom) {
+                if (creep.room.name === creep.memory.remoteRoom) {
                     creep.state = STATE._ARRIVED;
                     this.run(creep);
                     break;
                 }
                 // lets move it
-                creep.goToRoom(creep.memory.reserveRoom!);
+                creep.goToRoom(creep.memory.remoteRoom!);
+                creep.roadCheck(creep.canDo(WORK));
                 break;
             // ARRIVED state
             case STATE._ARRIVED:
                 creep.log("Creep has arrived");
                 // have we somehow changed room?
-                if (creep.memory.reserveRoom !== creep.room.name) {
+                if (creep.memory.remoteRoom !== creep.room.name) {
                     // Back into move state
                     creep.state = STATE._MOVE;
                     this.run(creep);
                     break;
                 }
-                // Reserve the remote room
-                creep.reserveRemoteRoom();
+                // If we can pick a source, move on to next state
+                if (creep.pickSource()) {
+                    creep.log("Source Chosen, transitioning to gather");
+                    creep.state = STATE._GATHER;
+                }
                 break;
+            // GATHER state
+            case STATE._GATHER:
+                creep.log("Moving to remote source");
+                if (creep.moveToSource() === OK) {
+                    creep.state = STATE._MINE;
+                    this.run(creep);
+                }
+                creep.roadCheck(creep.canDo(WORK));
+                break;
+            // MINE state
+            case STATE._MINE:
+                creep.log("Mining Remote Source");
+                if (creep.containerCheck()) {
+                    return;
+                }
+                creep.mineSource();
+                break;
+            // default catcher
+            default:
+                creep.log("Creep in unknown state");
+                creep.state = STATE._INIT;
+                this.run(creep);
 
         }
     }
 }
 
 Creep.prototype.chooseRemoteMinerRoom = function(): void {
-
-}
-
-Creep.prototype.remoteMine = function(): void {
-
-}
-
-Creep.prototype.containerCheck = function(): boolean {
-
-}
+    if (!this.memory.flagName) {
+        this.log("No flag in memory");
+        // check for flags
+        const flags = _.filter(Game.flags, (f: Flag) =>
+            f.color === global.flagColor.remote);
+        if (flags.length === 0) {
+            this.log("No Remote flags found, must be an issue");
+        }
+        for (const i in flags) {
+            const flag: Flag = flags[i];
+            this.log("Considering " + flag.name);
+            const distance = Game.map.getRoomLinearDistance(this.room.name, flag.pos.roomName);
+            if (distance > 2) {
+                this.log("Distance " + distance + " too far");
+                continue;
+            }
+            const room = Game.rooms[flag.pos.roomName];
+            let useFlag = true;
+            // do we have a room?
+            if (room) {
+                if (room.memory.minersNeeded && room.memory.minersNeeded > 0) {
+                    const creeps = _.filter(Game.creeps, (c: Creep) =>
+                        c.role === RemoteEnergyMiner.roleName &&
+                        c.memory.remoteRoom === flag.pos.roomName &&
+                       !c.memory.dying);
+                    if (creeps.length >= room.memory.minersNeeded) {
+                        useFlag = false;
+                    }
+                }
+            }
+            if (useFlag) {
+                this.memory.flagName = flag.name;
+                this.memory.remoteRoom = flag.pos.roomName;
+                return;
+            }
+        }
+    }
+};

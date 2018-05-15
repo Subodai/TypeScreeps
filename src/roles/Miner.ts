@@ -129,6 +129,7 @@ Creep.prototype.moveToSource = function(): ScreepsReturnCode {
         return ERR_TIRED;
     }
     const source: Source | null = Game.getObjectById(this.memory.assignedSource);
+    this.log("Attemping to move to source: " + this.memory.assignedSource);
     if (source) {
         if (this.pos.getRangeTo(source.pos) === 1) {
             return OK;

@@ -82,7 +82,7 @@ export class RemoteReserver {
                 }
                 creep.log("Choosing remote reserve room");
                 creep.chooseReserveRoom();
-                if (creep.memory.flagName) {
+                if (creep.memory.flagName && creep.memory.reserveRoom) {
                     creep.state = STATE._MOVE;
                 }
                 break;
@@ -90,11 +90,17 @@ export class RemoteReserver {
             case STATE._MOVE:
                 creep.log("In move state");
                 if (creep.room.name === creep.memory.reserveRoom) {
+                    creep.log("appears to have arrived");
                     creep.state = STATE._ARRIVED;
                     this.run(creep);
                     break;
                 }
+                creep.log("Has not arrived");
                 // lets move it
+                if (creep.memory.reserveRoom === undefined) {
+                    creep.log("No reserve room set");
+                    creep.state = STATE._INIT;
+                }
                 creep.goToRoom(creep.memory.reserveRoom!);
                 break;
             // ARRIVED state
@@ -116,8 +122,8 @@ export class RemoteReserver {
 }
 
 Creep.prototype.chooseReserveRoom = function(): void {
-    if (!this.memory.flagName) {
-        this.log("No flag in memory");
+    if (!this.memory.flagName &&  !this.memory.reserveRoom) {
+        this.log("No flag in memory or reserve in memory");
         // @todo perhaps add distance to the filter
         const flags = _.filter(Game.flags, (f: Flag) =>
             f.color === global.flagColor.reserve &&
@@ -135,6 +141,7 @@ Creep.prototype.chooseReserveRoom = function(): void {
             }
             // check for other creeps that are assigned to this flag
             const creeps = _.filter(Game.creeps, (c: Creep) =>
+                c.role === RemoteReserver.roleName &&
                 c.memory.reserveRoom === flag.pos.roomName &&
                 c.memory.flagName === flag.name &&
                 c.name !== this.name &&

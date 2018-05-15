@@ -161,3 +161,11 @@ Creep.prototype.deSpawn = function(): void {
         spawn.recycleCreep(this);
     }
 };
+
+Creep.prototype.goToRoom = function(roomName: string): void {
+    this.log("Attempting to go to 25, 25, " + roomName);
+    const pos = new RoomPosition(25, 25, roomName);
+    this.travelTo(pos, {
+        ensurePath: true
+    });
+};

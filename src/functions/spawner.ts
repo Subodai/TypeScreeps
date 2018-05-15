@@ -5,6 +5,7 @@ import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
+import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
 import { Supergrader } from "roles/Supergrader";
 import { Upgrader } from "roles/Upgrader";
@@ -86,6 +87,12 @@ export class Spawner {
                     case RemoteReserver.roleName:
                         Spawn.log("Role found, running spawn route");
                         spawned = this.spawnRoutine(RemoteReserver, Spawn);
+                        break;
+
+                    // Remote Energy Miner
+                    case RemoteEnergyMiner.roleName:
+                        Spawn.log("Role found, running spawn route");
+                        spawned = this.spawnRoutine(RemoteEnergyMiner, Spawn);
                         break;
 
                     // Remote Energy Hauler

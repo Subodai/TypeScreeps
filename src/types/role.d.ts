@@ -49,6 +49,7 @@ declare class Builder extends Role {}
 declare class Refiller extends Role {}
 declare class RemoteEnergyHauler extends Role {}
 declare class RemoteReserver extends Role {}
+declare class RemoteEnergyMiner extends Role {}
 /**
  * Defines what a creep does during it's lifespan
  */
@@ -60,4 +61,5 @@ type CreepRole = Role
                 | Builder
                 | Refiller
                 | RemoteEnergyHauler
-                | RemoteReserver;
+                | RemoteReserver
+                | RemoteEnergyMiner;
