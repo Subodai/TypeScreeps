@@ -20,22 +20,24 @@ export class Runner {
         if (Game.time % this.runEvery === 0) {
             Debug.Log("Runner Start");
             const cpu: number = Game.cpu.getUsed();
-            this.creeps();
-            this.rooms();
+            const creepsCPU = this.creeps();
+            this.rooms(creepsCPU);
             Debug.Log("Runner Finished used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
         }
     }
 
-    private static creeps(): void {
+    private static creeps(): number {
         Debug.Log("Running Creeps");
         const cpu: number = Game.cpu.getUsed();
         for (const i in ROLES) {
             this.role(ROLES[i]);
         }
-        Debug.Log("Creeps used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
+        const total = Game.cpu.getUsed() - cpu;
+        Debug.Log("Creeps used " + total.toFixed(3) + " CPU");
+        return total;
     }
 
-    private static rooms(): void {
+    private static rooms(creepsCPU: number): void {
         Debug.Log("Running Rooms");
         const cpu: number = Game.cpu.getUsed();
         for (const name in Game.rooms) {
@@ -46,7 +48,9 @@ export class Runner {
             // Run the links
             const linkCost = this.links(room);
             const storedEnergy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
-            room.visual.text("CPU : " + (Game.cpu.getUsed() - roomCPU).toFixed(2), 1, 1, {
+            room.visual.text(
+                "Room CPU : " + (Game.cpu.getUsed() - roomCPU).toFixed(2) +
+                " Global Creeps: " + creepsCPU.toFixed(2), 1, 1, {
                 align : "left"
             }).text("Towers : " + towerCost.toFixed(2), 1, 2, {
                 align: "left"
