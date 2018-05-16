@@ -3,6 +3,7 @@ import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Refiller } from "roles/Refiller";
+import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
@@ -15,7 +16,7 @@ export const ROLES: string[] = [
     Harvester.roleName,
     Upgrader.roleName,
     Builder.roleName,
-
+    RemoteClaimer.roleName,
     RemoteEnergyMiner.roleName,
     RemoteReserver.roleName,
     RemoteEnergyHauler.roleName

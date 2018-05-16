@@ -131,11 +131,16 @@ Creep.prototype.moveToSource = function(): ScreepsReturnCode {
     const source: Source | null = Game.getObjectById(this.memory.assignedSource);
     this.log("Attemping to move to source: " + this.memory.assignedSource);
     if (source) {
+        this.log("Source selected, checking range");
         if (this.pos.getRangeTo(source.pos) === 1) {
+            this.log("Source in range");
             return OK;
         }
+        this.log("Source not in range");
         this.travelTo(source);
         return ERR_NOT_IN_RANGE;
+    } else {
+        this.log(JSON.stringify(source));
     }
     this.log("Issue with source, resetting memory, and putting in init");
     this.clearTargets();

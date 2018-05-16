@@ -7,7 +7,7 @@ import { Upgrader } from "./Upgrader";
  */
 export class RemoteClaimer {
     public static ticksBeforeRenew: number = 0;
-    public static color: string = "#ffffff";
+    public static colour: string = "#ffffff";
     public static roleName: string = "rClaim";
     public static roster: number[] = [ 0, 0, 0, 1, 1, 1, 1, 1, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [

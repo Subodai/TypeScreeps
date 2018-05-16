@@ -4,6 +4,7 @@ import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Refiller } from "roles/Refiller";
+import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
@@ -49,56 +50,62 @@ export class Spawner {
                 switch (roleName) {
                     // Miners
                     case Miner.roleName:
-                        Spawn.log("Role found, running spawn routine");
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
                         spawned = this.spawnRoutine(Miner, Spawn);
                         break;
 
                     // Harvesters
                     case Harvester.roleName:
-                        Spawn.log("Role found, running spawn routine");
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
                         spawned = this.spawnRoutine(Harvester, Spawn);
                         break;
 
                     // Upgraders
                     case Upgrader.roleName:
-                        Spawn.log("Role found, running spawn routine");
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
                         spawned = this.spawnRoutine(Upgrader, Spawn);
                         break;
 
                     // Supergraders
                     case Supergrader.roleName:
-                        Spawn.log("Role found, runnning spawn routine");
+                        Spawn.log("Role " + roleName + " found runnning spawn routine");
                         spawned = this.spawnRoutine(Supergrader, Spawn);
                         break;
 
                     // Builders
                     case Builder.roleName:
-                        Spawn.log("Role found, running spawn routine");
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
                         spawned = this.spawnRoutine(Builder, Spawn);
                         break;
 
                     // Refillers
                     case Refiller.roleName:
-                        Spawn.log("Role found, running spawn routine");
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
                         spawned = this.spawnRoutine(Refiller, Spawn);
                         break;
 
                     // Remote Reserver
                     case RemoteReserver.roleName:
-                        Spawn.log("Role found, running spawn route");
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
                         spawned = this.spawnRoutine(RemoteReserver, Spawn);
                         break;
 
                     // Remote Energy Miner
                     case RemoteEnergyMiner.roleName:
-                        Spawn.log("Role found, running spawn route");
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
                         spawned = this.spawnRoutine(RemoteEnergyMiner, Spawn);
                         break;
 
                     // Remote Energy Hauler
                     case RemoteEnergyHauler.roleName:
-                        Spawn.log("Role found, running spawn route");
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
                         spawned = this.spawnRoutine(RemoteEnergyHauler, Spawn);
+                        break;
+
+                    // Remote Claimer
+                    case RemoteClaimer.roleName:
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
+                        spawned = this.spawnRoutine(RemoteClaimer, Spawn);
                         break;
 
                     default:

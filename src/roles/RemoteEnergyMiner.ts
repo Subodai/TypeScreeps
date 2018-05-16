@@ -8,7 +8,7 @@ export class RemoteEnergyMiner {
     public static ticksBeforeRenew: number = 200;
     public static colour: string = "#ff66ff";
     public static roleName: string = "rEMiner";
-    public static roster: number[] = [ 0, 0, 0, 2, 4, 4, 4, 4, 4 ];
+    public static roster: number[] = [ 0, 0, 0, 4, 4, 4, 4, 4, 4 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         [],
@@ -127,6 +127,7 @@ export class RemoteEnergyMiner {
                 if (creep.pickSource()) {
                     creep.log("Source Chosen, transitioning to gather");
                     creep.state = STATE._GATHER;
+                    this.run(creep);
                 }
                 break;
             // GATHER state

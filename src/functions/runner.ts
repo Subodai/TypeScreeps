@@ -4,6 +4,7 @@ import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Refiller } from "roles/Refiller";
+import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
@@ -188,6 +189,15 @@ export class Runner {
                     RemoteReserver.run(creep);
                     const cost = Game.cpu.getUsed() - a;
                     this.visualise(creep, RemoteReserver.colour, cost);
+                }
+                break;
+            // Remote Claimer
+            case RemoteClaimer.roleName:
+                for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
+                    RemoteClaimer.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.visualise(creep, RemoteClaimer.colour, cost);
                 }
                 break;
             default:
