@@ -9,6 +9,7 @@ export class Cleaner {
             const cpu: number = Game.cpu.getUsed();
             this.creeps();
             this.rooms();
+            this.flags();
             Debug.Memory("Cleaner used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
         }
     }
@@ -35,6 +36,19 @@ export class Cleaner {
             if (!(room in Game.rooms) && !Memory.rooms[room].avoid && !Memory.rooms[room].keep) {
                 Debug.Memory("Cleaning [" + room + "]");
                 delete Memory.rooms[room];
+            }
+        }
+    }
+
+    /**
+     * Clean flag memory
+     */
+    private static flags(): void {
+        Debug.Memory("Cleaning flags");
+        for (const flag in Memory.flags) {
+            if (!(flag in Game.flags)) {
+                Debug.Memory("Cleaning [" + flag + "]");
+                delete Memory.flags[flag];
             }
         }
     }

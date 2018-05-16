@@ -51,6 +51,8 @@ interface Creep {
     chooseReserveRoom(): void;
     reserveRemoteRoom(): void;
     chooseRemoteMinerRoom(): void;
+    chooseClaimRoom(): void;
+    claimRemoteRoom(): void;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
 }
 
@@ -79,4 +81,5 @@ interface CreepMemory {
     flagName?: string;
     _home?: string;
     remoteRoom?: string;
+    claimRoom?: string;
 }
