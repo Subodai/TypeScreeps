@@ -1,10 +1,10 @@
 import { Debug } from "functions/debug";
 import "./creep";
+import { loadFlagPrototypes } from "./flag";
 import { loadRoomPrototypes } from "./room";
 import { loadRoomPositionPrototypes } from "./roomPosition";
 import { loadSourcePrototypes } from "./sources";
 import { loadStructurePrototypes } from "./structure";
-import "./structuretower";
 
 export function loadPrototypes(): void {
     const start = Game.cpu.getUsed();
@@ -13,5 +13,6 @@ export function loadPrototypes(): void {
     loadRoomPositionPrototypes();
     loadStructurePrototypes();
     loadSourcePrototypes();
+    loadFlagPrototypes();
     Debug.Load("Prototype: Complete [" + (Game.cpu.getUsed() - start).toFixed() + "]");
 }

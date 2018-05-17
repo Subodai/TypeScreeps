@@ -186,6 +186,7 @@ Creep.prototype.claimRemoteRoom = function(): void {
                 this.log("Reserve Failed out of range");
             } else {
                 this.signController(this.room.controller, "Room Claimed by Subodai - [Ypsilon Pact]");
+                delete Memory.rooms[this.room.name];
                 return;
             }
         }

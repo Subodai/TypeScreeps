@@ -5,6 +5,7 @@ import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
 import { Refiller } from "roles/Refiller";
+import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
@@ -367,6 +368,10 @@ export function loadRoomPrototypes(): void {
                 // Haulers
                 case RemoteEnergyHauler.roleName:
                     this.memory.roles[roleName] = RemoteEnergyHauler.enabled(this);
+                    break;
+                // Claimers
+                case RemoteClaimer.roleName:
+                    this.memory.roles[roleName] = RemoteClaimer.enabled(this);
                     break;
                 // default
                 default:

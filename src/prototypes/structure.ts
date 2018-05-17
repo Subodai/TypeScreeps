@@ -26,5 +26,6 @@ export function loadStructurePrototypes(): void {
     });
 }
 
-import "./structurelink";
-import "./structurespawn";
+import "./structureLink";
+import "./structureSpawn";
+import "./structureTower";

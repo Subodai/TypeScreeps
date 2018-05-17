@@ -6,5 +6,5 @@ interface Flag {
 }
 
 interface FlagMemory {
-    assignedCreep: string;
+    assignedCreep?: string;
 }
