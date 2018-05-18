@@ -1,3 +1,166 @@
+import * as STATE from "config/states";
+import { BodyBuilder } from "functions/tools";
 /**
  * Mineral Extractor
  */
+export class MineralExtractor {
+    public static ticksBeforeRenew: number = 200;
+    public static colour: string = "#663300";
+    public static roleName: string = "mMiner";
+    public static roster: number[] = [ 0, 0, 0, 0, 0, 0, 1, 1, 1 ];
+    public static bodyStructure: BodyPartConstant[][] = [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        BodyBuilder({ WORK: 20, MOVE: 6 }),
+        BodyBuilder({ WORK: 45, MOVE: 5 }),
+        BodyBuilder({ WORK: 45, MOVE: 5 })
+    ];
+    // is this role enabled?
+    public static enabled(room: Room): boolean {
+        // no controller?
+        if (!room.controller) {
+            return false;
+        } else {
+            // controller < 6
+            if (room.controller.level < 6) {
+                return false;
+            }
+        }
+        // minerals in the room?
+        const mineral = room.find(FIND_MINERALS)[0];
+        if (mineral.mineralAmount > 0 || mineral.ticksToRegeneration <= ((50 * 3) + this.ticksBeforeRenew)) {
+            const extractors = room.find(FIND_STRUCTURES, {
+                filter: (s: AnyStructure) => s.structureType === STRUCTURE_EXTRACTOR
+            });
+            if (extractors.length > 0) { return true; }
+        }
+        return false;
+    }
+    // role runner
+    public static run(creep: Creep): void {
+        // check tired
+        if (creep.isTired()) {
+            creep.log("Tired");
+            return;
+        }
+        // if creep is dying, make sure it gets renewed
+        creep.deathCheck(this.ticksBeforeRenew);
+        // run
+        switch (creep.state) {
+            // SPAWN state
+            case STATE._SPAWN:
+                creep.log("In Spawn State");
+                if (!creep.isTired()) {
+                    creep.log("Done spawning, transitioning to init");
+                    creep.state = STATE._INIT;
+                    this.run(creep);
+                }
+                break;
+            // INIT state
+            case STATE._INIT:
+                creep.log("Initiating Mineral Extractor");
+                if (creep.pickMineral()) {
+                    creep.log("Mineral Source chosen, transitioning to move");
+                    creep.state = STATE._MOVE;
+                    this.run(creep);
+                }
+                break;
+            // MOVE state
+            case STATE._MOVE:
+                creep.log("Moving to minerals");
+                if (creep.moveToMineral() === OK) {
+                    creep.state = STATE._MINE;
+                    this.run(creep);
+                }
+                break;
+            // MINE state
+            case STATE._MINE:
+                creep.log("Mining mineral");
+                creep.mineMineral();
+                break;
+            // default catcher
+            default:
+                creep.log("Creep in unknown state");
+                creep.state = STATE._INIT;
+                this.run(creep);
+                break;
+        }
+    }
+}
+
+Creep.prototype.pickMineral = function(): boolean {
+    // does it have a mineral
+    if (this.memory.assignedMineral) {
+        return true;
+    }
+    // Make sure the room has cleaned it's minerals if necessary
+    this.room.mineralSetup();
+    // get all the mineral sources in a room
+    const minerals: Mineral[] = this.room.find(FIND_MINERALS);
+    // get the room's opinion on what's assigned
+    const roomMinerals: { [key: string]: string | null } = this.room.memory.assignedMinerals!;
+    // loop
+    for (const i in minerals) {
+        // get the mineral
+        const mineral: Mineral = minerals[i];
+        // is this item null in the rooms memoryy
+        if (roomMinerals[mineral.id] === null) {
+            // assign this creep to the source
+            this.room.memory.assignedMinerals![mineral.id] = this.id;
+            // assign the mineral to the creep
+            this.memory.assignedMineral = mineral.id;
+            // success!
+            return true;
+        }
+    }
+    // didn't work
+    return false;
+};
+
+/**
+ * Move to the source we have stored in memory
+ * @returns {ScreepsReturnCode}
+ */
+Creep.prototype.moveToMineral = function(): ScreepsReturnCode {
+    if (this.isTired()) {
+        return ERR_TIRED;
+    }
+    const mineral: Mineral | null = Game.getObjectById(this.memory.assignedMineral);
+    this.log("Attemping to move to mineral: " + this.memory.assignedMineral);
+    if (mineral) {
+        this.log("mineral selected, checking range");
+        if (this.pos.getRangeTo(mineral.pos) === 1) {
+            this.log("mineral in range");
+            return OK;
+        }
+        this.log("mineral not in range");
+        this.travelTo(mineral);
+        return ERR_NOT_IN_RANGE;
+    } else {
+        this.log(JSON.stringify(mineral));
+    }
+    this.log("Issue with mineral, resetting memory, and putting in init");
+    this.clearTargets();
+    this.state = STATE._INIT;
+    return ERR_INVALID_TARGET;
+};
+
+Creep.prototype.mineMineral = function(): ScreepsReturnCode {
+    if (!this.memory.dying && this.ticksToLive! <= MineralExtractor.ticksBeforeRenew) {
+        this.memory.dying = true;
+        this.room.memory.assignedMinerals![this.memory.assignedMineral!] = null;
+    }
+    if (this.memory.assignedMineral) {
+        const mineral: Mineral | null = Game.getObjectById(this.memory.assignedMineral);
+        if (mineral) {
+            return this.harvest(mineral);
+        }
+    }
+    this.clearTargets();
+    this.state = STATE._INIT;
+    return ERR_INVALID_TARGET;
+};

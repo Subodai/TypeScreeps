@@ -8,7 +8,7 @@ import "prototypes/creep/mineralActions";
 export class Miner {
     public static ticksBeforeRenew: number = 100;
     public static colour: string = "#996600";
-    public static roleName: string = "miner";
+    public static roleName: string = "eMiner";
     public static roster: number[] = [ 0, 4, 4, 4, 4, 4, 4, 4, 4 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
@@ -53,7 +53,7 @@ export class Miner {
                 break;
             // INIT state
             case STATE._INIT:
-                creep.log("Intitating Miner");
+                creep.log("Initiating Miner");
                 if (creep.pickSource()) {
                     creep.log("Source Chosen, transitioning to move");
                     creep.state = STATE._MOVE;
@@ -153,7 +153,7 @@ Creep.prototype.moveToSource = function(): ScreepsReturnCode {
  * @returns {ScreepsReturnCode}
  */
 Creep.prototype.mineSource = function(): ScreepsReturnCode {
-    if (!this.memory.dying && this.ticksToLive! <= 150) {
+    if (!this.memory.dying && this.ticksToLive! <= Miner.ticksBeforeRenew) {
         this.memory.dying = true;
         this.room.memory.assignedSources![this.memory.assignedSource!] = null;
     }
