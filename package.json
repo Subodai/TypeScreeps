@@ -1,7 +1,7 @@
 {
-  "name": "screeps-typescript-starter",
+  "name": "subodai-typescreeps",
   "version": "3.0.0",
-  "description": "",
+  "description": "This project is an excercise in learning TypeScript and for converting my existing JS codebase over to it and improving on it.",
   "main": "index.js",
   "//": "If you add or change the names of destinations in screeps.json, make sure you update these scripts to reflect the changes",
   "scripts": {
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/screepers/screeps-typescript-starter.git"
+    "url": "git+https://github.com/Subodai/TypeScreeps.git"
   },
-  "author": "",
+  "author": "Mark Thompson",
   "license": "Unlicense",
   "bugs": {
     "url": "https://github.com/screepers/screeps-typescript-starter/issues"
   },
-  "homepage": "https://github.com/screepers/screeps-typescript-starter#readme",
+  "homepage": "https://github.com/Subodai/TypeScreeps#readme",
   "devDependencies": {
     "@types/lodash": "^3.10.1",
     "@types/screeps": "^2.3.0",
@@ -37,7 +37,7 @@
     "typescript": "^2.8.3"
   },
   "dependencies": {
-    "npm": "^5.8.0",
+    "npm": "^5.10.0",
     "source-map": "~0.6.1",
     "traveler": "^0.1.0"
   }
