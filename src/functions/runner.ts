@@ -3,6 +3,7 @@ import { Debug } from "functions/debug";
 import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
+import { MineralExtractor } from "roles/MineralExtractor";
 import { Refiller } from "roles/Refiller";
 import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
@@ -204,7 +205,20 @@ export class Runner {
                     this.visualise(creep, RemoteClaimer.colour, cost);
                 }
                 break;
+            // Mineral Extractor
+            case MineralExtractor.roleName:
+                for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
+                    MineralExtractor.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.visualise(creep, MineralExtractor.colour, cost);
+                }
+                break;
             default:
+                // Way to catch "lost" creeps that need migrating
+                if (role === "miner") {
+                    this.migrateCreepsToRole(Miner.roleName, creeps);
+                }
                 break;
         }
         // for (const name in Game.creeps) {
@@ -214,6 +228,14 @@ export class Runner {
         //     }
         // }
         return true;
+    }
+
+    private static migrateCreepsToRole(roleName: string, creeps: Creep[]): void {
+        for (const creep of creeps) {
+            creep.memory._legacyRole = creep.role;
+            creep.role = roleName;
+            creep.clearTargets();
+        }
     }
 
     private static visualise(item: Creep | StructureTower | StructureLink, colour: string, cost: number): void {

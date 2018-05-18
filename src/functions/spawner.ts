@@ -3,6 +3,7 @@ import * as STATE from "config/states";
 import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
+import { MineralExtractor } from "roles/MineralExtractor";
 import { Refiller } from "roles/Refiller";
 import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
@@ -108,6 +109,10 @@ export class Spawner {
                         spawned = this.spawnRoutine(RemoteClaimer, Spawn);
                         break;
 
+                    // Mineral Extractor
+                    case MineralExtractor.roleName:
+
+                        break;
                     default:
                         break;
                 }

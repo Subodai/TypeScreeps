@@ -4,6 +4,7 @@ import { Debug } from "functions/debug";
 import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
 import { Miner } from "roles/Miner";
+import { MineralExtractor } from "roles/MineralExtractor";
 import { Refiller } from "roles/Refiller";
 import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
@@ -249,7 +250,7 @@ export function loadRoomPrototypes(): void {
         // set the number of minersNeeded to the length of sources
         this.memory.minersNeeded = sources.length;
         // make an empty array
-        const roomSources: {[key: string]: string | null} = {};
+        const roomSources: { [key: string]: string | null } = {};
         // loop through the sources
         for (const i in sources) {
             this.log("Clearing source association for " + sources[i].id);
@@ -286,13 +287,13 @@ export function loadRoomPrototypes(): void {
         });
         // get the mineral extracters in this room
         const creeps = _.filter(Game.creeps, (c: Creep) =>
-            c.role === "Extractor" &&
-            c.memory.roomName === this.name &&
+            c.role === MineralExtractor.roleName && c.memory.roomName === this.name &&
+            // @todo Remote Mineral Extractor role name?
             !c.memory.dying);
         // set the number of mineralsNeeded to thelength of active mineral sites
         this.memory.mineralsNeeded = minerals.length;
         // make an empty array
-        const roomMinerals: any = {};
+        const roomMinerals: { [key: string]: string | null } = {};
         // loop through the minerals
         for (const i in minerals) {
             this.log("Clearing mineral association for " + minerals[i].id);
@@ -372,6 +373,10 @@ export function loadRoomPrototypes(): void {
                 // Claimers
                 case RemoteClaimer.roleName:
                     this.memory.roles[roleName] = RemoteClaimer.enabled(this);
+                    break;
+                // Mineral Extractor
+                case MineralExtractor.roleName:
+                    this.memory.roles[roleName] = MineralExtractor.enabled(this);
                     break;
                 // default
                 default:

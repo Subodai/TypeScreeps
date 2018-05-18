@@ -39,6 +39,9 @@ interface Creep {
     pickSource(): boolean;
     moveToSource(): ScreepsReturnCode;
     mineSource(): ScreepsReturnCode;
+    pickMineral(): boolean;
+    moveToMineral(): ScreepsReturnCode;
+    mineMineral(): ScreepsReturnCode;
     deathCheck(ticks: number): void;
     buildNearestSite(): ScreepsReturnCode | void;
     checkSiteInMemory(): void;
@@ -82,4 +85,5 @@ interface CreepMemory {
     _home?: string;
     remoteRoom?: string;
     claimRoom?: string;
+    _legacyRole?: string;
 }
