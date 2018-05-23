@@ -178,6 +178,7 @@ Creep.prototype.claimRemoteRoom = function(): void {
             // clear target and switch to upgrader
             this.clearTargets();
             this.role = Upgrader.roleName;
+            this.memory.level = 2; // if you don't do this it won't mine energy
         }
         // are we in range?
         if (this.pos.inRangeTo(this.room.controller, 1)) {

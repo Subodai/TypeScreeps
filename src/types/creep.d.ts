@@ -86,4 +86,5 @@ interface CreepMemory {
     remoteRoom?: string;
     claimRoom?: string;
     _legacyRole?: string;
+    signed?: boolean;
 }
