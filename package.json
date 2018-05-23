@@ -1,6 +1,6 @@
 {
   "name": "subodai-typescreeps",
-  "version": "3.0.0",
+  "version": "0.0.1",
   "description": "This project is an excercise in learning TypeScript and for converting my existing JS codebase over to it and improving on it.",
   "main": "index.js",
   "//": "If you add or change the names of destinations in screeps.json, make sure you update these scripts to reflect the changes",
