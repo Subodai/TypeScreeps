@@ -178,6 +178,8 @@ Creep.prototype.claimRemoteRoom = function(): void {
             // clear target and switch to upgrader
             this.clearTargets();
             this.role = Upgrader.roleName;
+            this.memory.level = 1;
+            this.memory.roomName = this.pos.roomName;
         }
         // are we in range?
         if (this.pos.inRangeTo(this.room.controller, 1)) {
