@@ -15,6 +15,7 @@ interface OwnedStructure {
 
 interface StructureSpawn {
     log(msg: string): void;
+    memory: { [k: string]: any };
 }
 
 interface Source {

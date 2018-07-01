@@ -19,7 +19,11 @@ export class Debug {
      * @param creep {Creep}
      */
     public static creep(message: string, creep: Creep): void {
-        if (!this.creepDebugEnabled || !this.debugEnabled) { return; }
+        if (!creep.memory.debug) {
+            if (!this.creepDebugEnabled || !this.debugEnabled) {
+                return;
+            }
+        }
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "] </span>";
         const room: Room = creep.room;
@@ -43,7 +47,11 @@ export class Debug {
      * @param room {Room}
      */
     public static Room(message: string, room: Room): void {
-        if (!this.roomDebugEnabled || !this.debugEnabled) { return; }
+        if (!room.memory.debug) {
+            if (!this.roomDebugEnabled || !this.debugEnabled) {
+                return;
+            }
+        }
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
         if (room) {
@@ -62,7 +70,11 @@ export class Debug {
      * @param spawn {StructureSpawn}
      */
     public static Spawn(message: string, spawn: StructureSpawn): void {
-        if (!this.spawnDebugEnabled || !this.debugEnabled) { return; }
+        if (!spawn.memory.debug) {
+            if (!this.spawnDebugEnabled || !this.debugEnabled) {
+                return;
+            }
+        }
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
         const room: Room = spawn.room;
@@ -83,7 +95,12 @@ export class Debug {
      * @param tower {StructureTower}
      */
     public static Tower(message: string, tower: StructureTower): void {
-        if (!this.towerDebugEnabled || !this.debugEnabled) { return; }
+        if (!tower.memory.debug) {
+            if (!this.towerDebugEnabled || !this.debugEnabled) {
+                return;
+            }
+        }
+
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
         const room: Room = tower.room;
@@ -104,7 +121,11 @@ export class Debug {
      * @param tower {StructureTower}
      */
     public static Link(message: string, link: StructureLink): void {
-        if (!this.linkDebugEnabled || !this.debugEnabled) { return; }
+        if (!link.memory.debug) {
+            if (!this.linkDebugEnabled || !this.debugEnabled) {
+                return;
+             }
+        }
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
         const room: Room = link.room;
