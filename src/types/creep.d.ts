@@ -57,6 +57,10 @@ interface Creep {
     chooseClaimRoom(): void;
     claimRemoteRoom(): void;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
+    findNearbyEnergyTarget(): void;
+    findTombstoneEnergy(): Tombstone | null;
+    findDroppedEnergy(): Resource | null;
+    findContainerEnergy(): Structure | null;
 }
 
 interface CreepMemory {
@@ -86,4 +90,5 @@ interface CreepMemory {
     remoteRoom?: string;
     claimRoom?: string;
     _legacyRole?: string;
+    debug?: boolean;
 }
