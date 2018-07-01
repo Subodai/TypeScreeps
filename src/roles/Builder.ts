@@ -38,6 +38,10 @@ export class Builder {
         }
         // if creep is dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
+        if (!creep.canDo(WORK)) {
+            creep.log("Damaged seeking repair");
+            return;
+        }
         // run as normal
         switch (creep.state) {
             // SPAWN state
@@ -58,11 +62,29 @@ export class Builder {
             // GATHER state
             case STATE._GATHER:
                 creep.log("In gather state");
-                if (creep.getNearbyEnergy(true) === ERR_FULL) {
+                const gatherResult = creep.getNearbyEnergy(true);
+                if (gatherResult === ERR_FULL) {
                     creep.log("Got some energy");
                     creep.clearTargets();
                     creep.state = STATE._CONSTRUCT;
                     this.run(creep);
+                }
+                if (gatherResult === ERR_NOT_FOUND) {
+                    creep.state = STATE._RETURN;
+                    this.run(creep);
+                }
+                break;
+            case STATE._RETURN:
+                creep.log("Builder returning to find other resources");
+                if (creep.atHome()) {
+                    creep.log("at home ready to collect");
+                    creep.state = STATE._GATHER;
+                    this.run(creep);
+                }
+                const test = creep.getNearbyEnergy(true);
+                if (test !== ERR_NOT_FOUND) {
+                    creep.log("Found room with resource");
+                    creep.state = STATE._GATHER;
                 }
                 break;
             // CONSTRUCT state

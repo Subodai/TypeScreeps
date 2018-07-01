@@ -43,6 +43,11 @@ export class RemoteEnergyHauler {
         }
         // if creep is dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
+        // Make sure we can actually carry stuff first
+        if (!creep.canDo(CARRY)) {
+            creep.log("Damaged seeking repair");
+            return;
+        }
         // run state as normal
         switch (creep.state) {
             // SPAWN state
@@ -62,11 +67,6 @@ export class RemoteEnergyHauler {
             // INIT state
             case STATE._INIT:
                 creep.log("Initiating Remote Energy Hauler");
-                // Make sure we can actually carry stuff first
-                if (!creep.canDo(CARRY)) {
-                    creep.log("Damaged seeking repair");
-                    return;
-                }
                 // Pick remote room to go to
                 creep.chooseRemoteRoom();
                 if (creep.memory.remoteRoom) {

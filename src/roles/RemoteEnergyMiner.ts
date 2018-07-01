@@ -76,6 +76,10 @@ export class RemoteEnergyMiner {
         }
         // if creep dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
+        if (!creep.canDo(WORK)) {
+            creep.log("Damaged seeking repair");
+            return;
+        }
         // run state
         switch (creep.state) {
             // SPAWN state
@@ -91,10 +95,6 @@ export class RemoteEnergyMiner {
             case STATE._INIT:
                 creep.log("Initiating Remote Miner");
                 // Make sure we can catually WORK
-                if (!creep.canDo(WORK)) {
-                    creep.log("Damaged seeking repair");
-                    return;
-                }
                 creep.log("Choosing remote mining room");
                 creep.chooseRemoteMinerRoom();
                 if (creep.memory.flagName) {
