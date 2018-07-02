@@ -49,10 +49,11 @@ export class Runner {
             const towerCost = this.towers(room);
             // Run the links
             const linkCost = this.links(room);
+            const avg = creepsCPU / Object.keys(Game.creeps).length;
             const storedEnergy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
             room.visual.text(
                 "Room CPU : " + (Game.cpu.getUsed() - roomCPU).toFixed(2) +
-                " Global Creeps: " + creepsCPU.toFixed(2), 1, 1, {
+                " All Creeps: " + creepsCPU.toFixed(2) + " Per Creep: " + avg.toFixed(2), 1, 1, {
                 align : "left"
             }).text("Towers : " + towerCost.toFixed(2), 1, 2, {
                 align: "left"

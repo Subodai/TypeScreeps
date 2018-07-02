@@ -170,7 +170,10 @@ Creep.prototype.reserveRemoteRoom = function(): void {
             if (this.reserveController(this.room.controller) === ERR_NOT_IN_RANGE) {
                 this.log("Reserve Failed out of range");
             } else {
-                this.signController(this.room.controller, "Room Reserved by Subodai - [Ypsilon Pact]");
+                if (!this.memory.signed && this.room.controller.sign === null) {
+                    this.memory.signed = true;
+                    this.signController(this.room.controller, "Room Reserved by Subodai - [Ypsilon Pact]");
+                }
                 return;
             }
         }
