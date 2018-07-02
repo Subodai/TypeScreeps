@@ -47,7 +47,8 @@ StructureTower.prototype.run = function(): number {
     }
 
     // priority 6, rapair ramparts and roads upto current maxHP const
-    if (this.energy >= 600 &&
+    if (global.towerRepair &&
+        this.energy >= 600 &&
         this.room.storage &&
         this.room.storage.store[RESOURCE_ENERGY] >= 200000  &&
         (this.repairRamparts(global.rampartMax) || this.repairWalls(global.wallMax))) {
@@ -182,9 +183,9 @@ StructureTower.prototype.findWall = function(hp: number): StructureWall | void {
         filter: (s) => s.structureType === STRUCTURE_WALL && s.hits <= hp
     });
     if (targets.length > 0) {
-        const rampart = _.min(targets, (t) => t.hits);
-        if (rampart instanceof StructureWall) {
-            return rampart;
+        const wall = _.min(targets, (t) => t.hits);
+        if (wall instanceof StructureWall) {
+            return wall;
         }
     }
     // // Find a rampart with hp <= the number (hp 1 will always need a blap)

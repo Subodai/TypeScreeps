@@ -3,6 +3,7 @@ import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
 import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
+import { Janitor } from "roles/Janitor";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
 import { Refiller } from "roles/Refiller";
@@ -378,8 +379,13 @@ export function loadRoomPrototypes(): void {
                 case MineralExtractor.roleName:
                     this.memory.roles[roleName] = MineralExtractor.enabled(this);
                     break;
+                // Janitor
+                case Janitor.roleName:
+                    this.memory.roles[roleName] = Janitor.enabled(this);
+                    break;
                 // default
                 default:
+                    this.log(roleName + " Not found in room check have you included it in room.ts?");
                     this.memory.roles[roleName] = false;
                     break;
             }

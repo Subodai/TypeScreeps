@@ -2,6 +2,7 @@ import { ROLES } from "config/constants";
 import { Debug } from "functions/debug";
 import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
+import { Janitor } from "roles/Janitor";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
 import { Refiller } from "roles/Refiller";
@@ -212,6 +213,15 @@ export class Runner {
                     MineralExtractor.run(creep);
                     const cost = Game.cpu.getUsed() - a;
                     this.visualise(creep, MineralExtractor.colour, cost);
+                }
+                break;
+            // Janitor
+            case Janitor.roleName:
+                for (const creep of creeps) {
+                    const a = Game.cpu.getUsed();
+                    Janitor.run(creep);
+                    const cost = Game.cpu.getUsed() - a;
+                    this.visualise(creep, Janitor.colour, cost);
                 }
                 break;
             default:
