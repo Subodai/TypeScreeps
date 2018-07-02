@@ -251,13 +251,92 @@ Creep.prototype.containerCheck = function(): void | boolean {
     }
 };
 
+Creep.prototype.findDamagedDefences = function(): void {
+    if (!this.memory.repairTarget) {
+        this.log("looking for damaged wall");
+        this.findDamagedWall();
+    }
+    if (!this.memory.repairTarget) {
+        this.log("looking for damaged rampart");
+        this.findDamagedRampart();
+    }
+};
+
+Creep.prototype.findDamagedWall = function(): void {
+    const max = global.wallMax;
+    let values: number[] = [1];
+    if (max > 1) {
+        values = [
+            1,
+            max / 10,
+            max / 5,
+            max / 4,
+            max / 3,
+            max / 2,
+            max
+        ];
+    }
+    for (const hp of values) {
+        this.findWall(hp);
+    }
+};
+
+Creep.prototype.findDamagedRampart = function(): void {
+    const max = global.rampartMax;
+    let values: number[] = [1];
+    if (max > 1) {
+        values = [
+            1,
+            max / 10,
+            max / 5,
+            max / 4,
+            max / 3,
+            max / 2,
+            max
+        ];
+    }
+    for (const hp of values) {
+        this.findRampart(hp);
+    }
+};
+
+Creep.prototype.findWall = function(hp: number): void {
+    let targets = [];
+    targets = this.room.find(FIND_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_WALL && s.hits <= hp
+    });
+    if (targets.length > 0) {
+        const wall = _.min(targets, (t) => t.hits);
+        if (wall instanceof StructureWall) {
+            this.memory.repairTarget = wall.id;
+            this.memory.targetMaxHP = hp;
+            return;
+        }
+    }
+};
+
+Creep.prototype.findRampart = function(hp: number): void {
+    let targets = [];
+    targets = this.room.find(FIND_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my
+    });
+    if (targets.length > 0) {
+        const rampart = _.min(targets, (t) => t.hits);
+        if (rampart instanceof StructureRampart) {
+            this.memory.repairTarget = rampart.id;
+            this.memory.targetMaxHP = hp;
+            return;
+        }
+    }
+};
+
 Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = false, s: boolean = false): number {
     // First are we empty?
     if (this.carry.energy === 0) {
         this.log("Empty cannot repair anything");
         // Clear repair target
-        delete this.memory.repairTarget;
-        delete this.memory.targetMaxHP;
+        // delete this.memory.repairTarget;
+        // delete this.memory.targetMaxHP;
         return ERR_NOT_ENOUGH_ENERGY;
     }
     // Is their an item in memory, with full health already?
@@ -323,7 +402,7 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
     // Next find Damaged defence items (wall, rampart)
     if (!this.memory.repairTarget && d) {
         this.log("Has no repair target, looking for damaged defences");
-        // this.findDamagedDefences();
+        this.findDamagedDefences();
     }
     // Do we have something to repair?
     if (this.memory.repairTarget) {
@@ -341,16 +420,19 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
                 delete this.memory.targetMaxHP;
                 return ERR_FULL;
             }
-            if (this.pos.inRangeTo(target, 3)) {
+            if (this.pos.inRangeTo(target.pos, 3)) {
                 this.log("Target in range, attempting repair");
                 // attempt repair
                 if (this.repair(target) === ERR_NOT_IN_RANGE) {
                     this.log("Repair Failed");
+                    return ERR_NOT_IN_RANGE;
+                } else {
+                    return OK;
                 }
             } else {
                 this.log("Travelling to target");
                 this.travelTo(target);
-                return OK;
+                return ERR_NOT_IN_RANGE;
             }
         }
     } else {

@@ -34,6 +34,11 @@ interface Creep {
     containerCheck(): void | boolean;
     repairStructures(roads?: boolean, defences?: boolean, structures?: boolean): number;
     findDamagedStructures(): void;
+    findDamagedDefences(): void;
+    findDamagedWall(): void;
+    findWall(hp: number): void;
+    findRampart(hp: number): void;
+    findDamagedRampart(): void;
     state: CreepState;
     role: string;
     upgradeHomeRoom(): ScreepsReturnCode;
