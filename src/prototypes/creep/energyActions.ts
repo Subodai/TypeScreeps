@@ -75,52 +75,12 @@ Creep.prototype.getNearbyEnergy = function(
         if (emergency) {
             // TODO EMPTY TERMINAL AND STORAGE HERE PLEASE
         }
-        // Get dropped resources in the room
-        const resources: Resource[] = this.room.find(FIND_DROPPED_RESOURCES, {
-            filter: (i) => i.resourceType === RESOURCE_ENERGY &&
-                i.amount > (this.carryCapacity - _.sum(this.carry)) / 4
-        });
-        // Get Containers in the room
-        const containers: Structure[] = this.room.find(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
-                i.store[RESOURCE_ENERGY] > (this.carryCapacity - _.sum(this.carry)) / 4
-        });
-        // False some things
-        let resource: Resource | boolean = false;
-        let container: Structure | boolean = false;
         const thisCreep: Creep = this;
-        // If we have resources
-        if (resources.length > 0) {
-            this.log("Found " + resources.length + " resource piles");
-            resource = _.max(resources, (r) => r.amount / thisCreep.pos.getRangeTo(r));
-        }
-        // if we have containers
-        if (containers.length > 0) {
-            this.log(" Found " + containers.length + " containers");
-            container = _.max(containers, (c: StructureContainer) =>
-                c.store[RESOURCE_ENERGY] / thisCreep.pos.getRangeTo(c));
-        }
-        // If we have both we need to pick the closest one
-        if (resource && container) {
-            // If the resource is closer
-            if (this.pos.getRangeTo(resource) < this.pos.getRangeTo(container)) {
-                this.log("Stored resource pile " + resource.id + " in memory");
-                this.memory.energyPickup = resource.id;
-            } else {
-                this.log("Stored container " + container.id + " in memory");
-                this.memory.energyPickup = container.id;
-            }
-        } else if (resource) {
-            this.log("Stored resource pile " + resource.id + " in memory");
-            this.memory.energyPickup = resource.id;
-        } else if (container) {
-            this.log("Stored container " + container.id + " in memory");
-            this.memory.energyPickup = container.id;
-        }
-        if (this.memory.role === Builder.roleName || this.memory.level <= 2) {
-            this.log("is a builder or room level is low");
-            // Nothing found? lets try finding available sources
-            if (!this.memory.energyPickup) {
+        const id = this.findNearbyEnergyTarget();
+
+        if (!this.memory.energyPickup) {
+            if (this.memory.role === Builder.roleName || this.memory.level <= 2) {
+                this.log("is a builder or room level is low");
                 // Can this creep work?
                 if (this.canWork() && this.memory.role !== Refiller.roleName) {
                     this.log("Can work, finding sources");
@@ -176,8 +136,10 @@ Creep.prototype.getNearbyEnergy = function(
             }
         } else if (target instanceof StructureContainer ||
             target instanceof StructureStorage ||
-            target instanceof StructureTerminal) { // Container, Storage, Terminal
-            this.log("Target is Container, Storage or Terminal");
+            target instanceof StructureTerminal ||
+            target instanceof Tombstone
+        ) { // Container, Storage, Terminal
+            this.log("Target is Container, Storage, Terminal or Tombestone");
             // Check the container still has the energy
             if (target.store[RESOURCE_ENERGY] <= 0 /* (this.carryCapacity - _.sum(this.carry))/4*/) {
                 this.log("Target no longer has enough energy, clearing memory");
@@ -278,7 +240,8 @@ Creep.prototype.getNearbyEnergy = function(
             return OK;
         }
     }
-    return ERR_BUSY;
+    this.log("No energy to collect");
+    return ERR_NOT_FOUND;
 };
 
 Creep.prototype.fillLinks = function(): ScreepsReturnCode | false {
@@ -482,6 +445,39 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
     return target;
 };
 
+/**
+ * Fill Nuker with energy
+ */
+Creep.prototype.fillNukeEnergy = function(): ScreepsReturnCode | false {
+    let nuker: StructureNuker | null = null;
+    // Let's try to fill our nuker
+    const nukers = this.room.find(FIND_MY_STRUCTURES, {
+        filter: (i: AnyStructure) => i.structureType === STRUCTURE_NUKER && i.energy < i.energyCapacity
+    }) as StructureNuker[];
+
+    if (nukers.length > 0) {
+        nuker = nukers[0];
+    }
+    // So did we find one?
+    if (nuker) {
+        this.log("found a nuker");
+        // Attempt transfer, unless out of range
+        if (this.transfer(nuker, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+            // Let's go to the tower
+            this.travelTo(nuker);
+            return ERR_NOT_IN_RANGE;
+        } else {
+            this.log("transfered to a nuker");
+            // Succesful drop off
+            return OK;
+        }
+    }
+    return false;
+};
+
+/**
+ * Delivery Energy Wrapper
+ */
 Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     let fillSpawns = false;
     if (this.role === Refiller.roleName || this.room.energyAvailable < this.room.energyCapacityAvailable * 0.85) {
@@ -518,6 +514,14 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         }
     }
 
+    // if we have a nuke charge set, we need to fill nukers!
+    if (this.room.memory.chargeNuke) {
+        const nukeResult = this.fillNukeEnergy();
+        if (nukeResult !== false) {
+            return nukeResult;
+        }
+    }
+
     // try and fill storage
     const storageResult = this.fillRoomStorageOrTerminal();
     // if it failed we need to go into idle
@@ -547,4 +551,71 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     }
     this.log("Got to end of deliver method with no return");
     return ERR_NOT_FOUND;
+};
+
+/**
+ * Try and fine a nearby energy target
+ */
+Creep.prototype.findNearbyEnergyTarget = function(): void {
+    let target = null;
+    if (target === null) { target = this.findTombstoneEnergy(); }
+    if (target === null) { target = this.findDroppedEnergy();   }
+    if (target === null) { target = this.findContainerEnergy(); }
+    if (target !== null) {
+        this.memory.energyPickup = target.id;
+    }
+};
+
+/**
+ * Find Tombestone energy
+ */
+Creep.prototype.findTombstoneEnergy = function(): Tombstone | null {
+    this.log("Checking for tombstones");
+    // find Tombstones in the room
+    const tombstones: Tombstone[] = this.room.find(FIND_TOMBSTONES, {
+        filter: (t: Tombstone) => t.store.energy > 0
+    });
+    // If we found a tombstone with energy
+    if (tombstones.length > 0) {
+        // return the one with the most energy
+        return _.max(tombstones, (t: Tombstone) => t.store.energy);
+    }
+    // nothing here, return null
+    return null;
+};
+
+/**
+ * Find dropped resource piles
+ */
+Creep.prototype.findDroppedEnergy = function(): Resource | null {
+    this.log("Looking for dropped energy");
+    const _creep: Creep = this;
+    const resources: Resource[] = this.room.find(FIND_DROPPED_RESOURCES, {
+        filter: (i) => i.resourceType === RESOURCE_ENERGY &&
+        i.amount > (this.carryCapacity - _.sum(this.carry)) / 4
+    });
+    // if we found some resources
+    if (resources.length > 0) {
+        // return the one that is most efficient
+        return _.max(resources, (r) => r.amount / _creep.pos.getRangeTo(r));
+    }
+    return null;
+};
+
+/**
+ * Find energy in containers
+ */
+Creep.prototype.findContainerEnergy = function(): Structure | null {
+    this.log("Looking for energy containers");
+    const _creep: Creep = this;
+    const containers: Structure[] = this.room.find(FIND_STRUCTURES, {
+        filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
+        i.store[RESOURCE_ENERGY] > (this.carryCapacity - _.sum(this.carry)) / 4
+    });
+    // did we find a suitable container
+    if (containers.length > 0) {
+        return _.max(containers, (c: StructureContainer) =>
+            c.store[RESOURCE_ENERGY] / _creep.pos.getRangeTo(c));
+    }
+    return null;
 };

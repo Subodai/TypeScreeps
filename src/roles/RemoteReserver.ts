@@ -61,6 +61,10 @@ export class RemoteReserver {
         }
         // if creep dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
+        if (!creep.canDo(CLAIM)) {
+            creep.log("Damaged seeking repair");
+            return;
+        }
         // run state
         switch (creep.state) {
             // SPAWN state
@@ -76,10 +80,6 @@ export class RemoteReserver {
             case STATE._INIT:
                 creep.log("Initiating Remote Reserver");
                 // Make sure we can actually claim
-                if (!creep.canDo(CLAIM)) {
-                    creep.log("Damaged seeking repair");
-                    return;
-                }
                 creep.log("Choosing remote reserve room");
                 creep.chooseReserveRoom();
                 if (creep.memory.flagName && creep.memory.reserveRoom) {

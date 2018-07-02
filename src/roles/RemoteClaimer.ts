@@ -61,6 +61,11 @@ export class RemoteClaimer {
             return;
         }
         creep.deathCheck(this.ticksBeforeRenew);
+        // Make sure we can claim
+        if (!creep.canDo(CLAIM)) {
+            creep.log("Damaged, seeking repair");
+            return;
+        }
         // run state
         switch (creep.state) {
             // Spawn state
@@ -75,11 +80,6 @@ export class RemoteClaimer {
             // INIT state
             case STATE._INIT:
                 creep.log("Initiating Remote Claimer");
-                // Make sure we can claim
-                if (!creep.canDo(CLAIM)) {
-                    creep.log("Damaged, seeking repair");
-                    return;
-                }
                 creep.log("Choosing remote claim room");
                 creep.chooseClaimRoom();
                 if (creep.memory.flagName && creep.memory.claimRoom) {
@@ -178,7 +178,8 @@ Creep.prototype.claimRemoteRoom = function(): void {
             // clear target and switch to upgrader
             this.clearTargets();
             this.role = Upgrader.roleName;
-            this.memory.level = 2; // if you don't do this it won't mine energy
+            this.memory.level = 1;
+            this.memory.roomName = this.pos.roomName;
         }
         // are we in range?
         if (this.pos.inRangeTo(this.room.controller, 1)) {

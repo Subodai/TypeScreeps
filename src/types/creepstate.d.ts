@@ -12,6 +12,7 @@ declare const _UPGRADE   = 7;
 declare const _GATHER    = 8;
 declare const _CONSTRUCT = 9;
 declare const _RETURN    = 10;
+declare const _CHARGE    = 11;
 
 /**
  * State types
@@ -27,6 +28,7 @@ type _UPGRADE   = 7;
 type _GATHER    = 8;
 type _CONSTRUCT = 9;
 type _RETURN    = 10;
+type _CHARGE    = 11;
 
 /**
  * CreepStates
@@ -42,4 +44,5 @@ type CreepState =
     | _UPGRADE
     | _GATHER
     | _CONSTRUCT
-    | _RETURN;
+    | _RETURN
+    | _CHARGE;

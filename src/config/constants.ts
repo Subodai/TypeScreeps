@@ -1,6 +1,7 @@
 import { Debug } from "functions/debug";
 import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
+import { Janitor } from "roles/Janitor";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
 import { Refiller } from "roles/Refiller";
@@ -19,6 +20,7 @@ export const ROLES: string[] = [
     Builder.roleName,
 
     // mid priority roles
+    Janitor.roleName,
     MineralExtractor.roleName,
 
     // Remote roles
@@ -67,7 +69,7 @@ export function loadConstants(): void {
     global.cpuDesired = 5000;
     global.rampartMax = 100000;
     global.wallMax = 700000;
-    global.towerRepair = true;
+    global.towerRepair = false;
     global.linkLimit = 980000;
     global.chargeLimit = 980000;
 

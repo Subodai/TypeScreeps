@@ -80,4 +80,6 @@ interface RoomMemory {
     mineralsNeeded?: number;
     assignedSources?: { [key: string]: string | null };
     assignedMinerals?: { [key: string]: string | null };
+    debug?: boolean;
+    chargeNuke?: boolean;
 }

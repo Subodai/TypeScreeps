@@ -12,6 +12,8 @@ interface Creep {
     fillLinks(): ScreepsReturnCode | false;
     fillSpawns(): ScreepsReturnCode | false;
     fillTowers(): ScreepsReturnCode | false;
+    fillNukeEnergy(): ScreepsReturnCode | false;
+    fillNukeGhodium(): ScreepsReturnCode | false;
     pickStorageOrTerminal(): StructureStorage | StructureTerminal | null;
     fillRoomStorageOrTerminal(): ScreepsReturnCode | false;
     getNearbyMinerals(storage: boolean): number;
@@ -32,6 +34,11 @@ interface Creep {
     containerCheck(): void | boolean;
     repairStructures(roads?: boolean, defences?: boolean, structures?: boolean): number;
     findDamagedStructures(): void;
+    findDamagedDefences(): void;
+    findDamagedWall(): void;
+    findWall(hp: number): void;
+    findRampart(hp: number): void;
+    findDamagedRampart(): void;
     state: CreepState;
     role: string;
     upgradeHomeRoom(): ScreepsReturnCode;
@@ -57,6 +64,10 @@ interface Creep {
     chooseClaimRoom(): void;
     claimRemoteRoom(): void;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
+    findNearbyEnergyTarget(): void;
+    findTombstoneEnergy(): Tombstone | null;
+    findDroppedEnergy(): Resource | null;
+    findContainerEnergy(): Structure | null;
 }
 
 interface CreepMemory {
@@ -86,5 +97,6 @@ interface CreepMemory {
     remoteRoom?: string;
     claimRoom?: string;
     _legacyRole?: string;
+    debug?: boolean;
     signed?: boolean;
 }

@@ -12,10 +12,22 @@ export function CalcBodyCost(body: BodyPartConstant[]): number {
     }
     return sum;
 }
+
+/**
+ * Converts a 0 - 100 number to an RGB colour
+ * @param p number
+ */
+export function percentToColour(p: number): string {
+    const r = Math.round(255 - (255 * p));
+    const g = Math.round(255 * p);
+    const b = 0;
+    const colour = "#" + toHex(r) + toHex(g) + toHex(b);
+    return colour;
+}
 /**
  * Converts a decimal (0-255) to a hex for use in colours, applies leading 0 padding
- * @param dec
- * @param padding
+ * @param dec number
+ * @param padding number
  * @returns string
  */
 export function toHex(dec: number, padding?: number): string {

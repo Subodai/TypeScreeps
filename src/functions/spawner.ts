@@ -2,6 +2,7 @@ import { ROLES } from "config/constants";
 import * as STATE from "config/states";
 import { Builder } from "roles/Builder";
 import { Harvester } from "roles/Harvester";
+import { Janitor } from "roles/Janitor";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
 import { Refiller } from "roles/Refiller";
@@ -113,6 +114,13 @@ export class Spawner {
                     case MineralExtractor.roleName:
 
                         break;
+
+                    // Janitor
+                    case Janitor.roleName:
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
+                        spawned = this.spawnRoutine(Janitor, Spawn);
+                        break;
+
                     default:
                         break;
                 }
