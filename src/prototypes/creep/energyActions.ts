@@ -445,6 +445,39 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
     return target;
 };
 
+/**
+ * Fill Nuker with energy
+ */
+Creep.prototype.fillNukeEnergy = function(): ScreepsReturnCode | false {
+    let nuker: StructureNuker | null = null;
+    // Let's try to fill our nuker
+    const nukers = this.room.find(FIND_MY_STRUCTURES, {
+        filter: (i: AnyStructure) => i.structureType === STRUCTURE_NUKER && i.energy < i.energyCapacity
+    }) as StructureNuker[];
+
+    if (nukers.length > 0) {
+        nuker = nukers[0];
+    }
+    // So did we find one?
+    if (nuker) {
+        this.log("found a nuker");
+        // Attempt transfer, unless out of range
+        if (this.transfer(nuker, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+            // Let's go to the tower
+            this.travelTo(nuker);
+            return ERR_NOT_IN_RANGE;
+        } else {
+            this.log("transfered to a nuker");
+            // Succesful drop off
+            return OK;
+        }
+    }
+    return false;
+};
+
+/**
+ * Delivery Energy Wrapper
+ */
 Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     let fillSpawns = false;
     if (this.role === Refiller.roleName || this.room.energyAvailable < this.room.energyCapacityAvailable * 0.85) {
@@ -478,6 +511,14 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         // If it worked, return the code
         if (towerResult !== false) {
             return towerResult;
+        }
+    }
+
+    // if we have a nuke charge set, we need to fill nukers!
+    if (this.room.memory.chargeNuke) {
+        const nukeResult = this.fillNukeEnergy();
+        if (nukeResult !== false) {
+            return nukeResult;
         }
     }
 

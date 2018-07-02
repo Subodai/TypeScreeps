@@ -34,7 +34,7 @@ export class Janitor {
                                 s.structureType !== STRUCTURE_RAMPART &&
                                 s.structureType !== STRUCTURE_ROAD
                             ) &&
-                            // with less than 100hp
+                            // with less than 100% hp
                             s.hits < s.hitsMax
                         )
                 });

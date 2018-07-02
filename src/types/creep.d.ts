@@ -12,6 +12,8 @@ interface Creep {
     fillLinks(): ScreepsReturnCode | false;
     fillSpawns(): ScreepsReturnCode | false;
     fillTowers(): ScreepsReturnCode | false;
+    fillNukeEnergy(): ScreepsReturnCode | false;
+    fillNukeGhodium(): ScreepsReturnCode | false;
     pickStorageOrTerminal(): StructureStorage | StructureTerminal | null;
     fillRoomStorageOrTerminal(): ScreepsReturnCode | false;
     getNearbyMinerals(storage: boolean): number;

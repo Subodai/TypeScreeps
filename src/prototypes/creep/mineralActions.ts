@@ -167,3 +167,33 @@ Creep.prototype.moveToAndPickupMinerals = function(): number {
     // We've probably moved return ok
     return OK;
 };
+
+/**
+ * Fill Nuker with Ghodium
+ */
+Creep.prototype.fillNukeGhodium = function(): ScreepsReturnCode | false {
+    let nuker: StructureNuker | null = null;
+    // Let's try to fill our nuker
+    const nukers = this.room.find(FIND_MY_STRUCTURES, {
+        filter: (i: AnyStructure) => i.structureType === STRUCTURE_NUKER && i.energy < i.energyCapacity
+    }) as StructureNuker[];
+
+    if (nukers.length > 0) {
+        nuker = nukers[0];
+    }
+    // So did we find one?
+    if (nuker) {
+        this.log("found a nuker");
+        // Attempt transfer, unless out of range
+        if (this.transfer(nuker, RESOURCE_GHODIUM) === ERR_NOT_IN_RANGE) {
+            // Let's go to the tower
+            this.travelTo(nuker);
+            return ERR_NOT_IN_RANGE;
+        } else {
+            this.log("transfered to a nuker");
+            // Succesful drop off
+            return OK;
+        }
+    }
+    return false;
+};
