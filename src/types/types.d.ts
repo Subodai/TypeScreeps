@@ -15,7 +15,11 @@ interface OwnedStructure {
 
 interface StructureSpawn {
     log(msg: string): void;
-    memory: { [k: string]: any };
+    // memory: { [k: string]: any };
+}
+
+interface SpawnMemory {
+    debug?: boolean;
 }
 
 interface Source {
@@ -23,3 +27,7 @@ interface Source {
 }
 
 /// <reference types="typed-screeps" />
+
+interface StoreDefinition {
+    [resource: string]: number;
+}
