@@ -1,5 +1,6 @@
 import * as STATE from "config/states";
 import { Debug } from "functions/debug";
+import { visualiseDamage } from "functions/tools";
 import "roles/Builder";
 import "roles/Miner";
 import "roles/Upgrader";
@@ -306,6 +307,7 @@ Creep.prototype.findWall = function(hp: number): void {
         filter: (s) => s.structureType === STRUCTURE_WALL && s.hits <= hp
     });
     if (targets.length > 0) {
+        visualiseDamage(targets, this.room);
         const wall = _.min(targets, (t) => t.hits);
         if (wall instanceof StructureWall) {
             this.memory.repairTarget = wall.id;
@@ -321,6 +323,7 @@ Creep.prototype.findRampart = function(hp: number): void {
         filter: (s) => s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my
     });
     if (targets.length > 0) {
+        visualiseDamage(targets, this.room);
         const rampart = _.min(targets, (t) => t.hits);
         if (rampart instanceof StructureRampart) {
             this.memory.repairTarget = rampart.id;
@@ -368,6 +371,7 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
         });
 
         if (targets.length > 0) {
+            visualiseDamage(targets, this.room);
             this.log("Found a 1 hp item, setting target");
             this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
             this.memory.targetMaxHP = 10;
@@ -382,6 +386,7 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
                             && i.hits <= 600 && i.room === this.room
         });
         if (targets.length > 0) {
+            visualiseDamage(targets, this.room);
             this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
             this.memory.targetMaxHP = 600;
         }
@@ -420,6 +425,7 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
                 delete this.memory.targetMaxHP;
                 return ERR_FULL;
             }
+            visualiseDamage([ target ], this.room);
             if (this.pos.inRangeTo(target.pos, 3)) {
                 this.log("Target in range, attempting repair");
                 // attempt repair

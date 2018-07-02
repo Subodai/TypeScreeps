@@ -128,32 +128,4 @@ export class Janitor {
                 break;
         }
     }
-
-    private static visualiseDamage(structures: AnyStructure[], room: Room): void {
-        for (const i in structures) {
-            const structure: AnyStructure = structures[i];
-            let percent = 100;
-            if (structure.structureType === STRUCTURE_RAMPART) {
-                percent = (structure.hits / global.rampartMax) * 100;
-            } else if (structure.structureType === STRUCTURE_WALL) {
-                percent = (structure.hits / global.wallMax) * 100;
-            } else {
-                percent = (structure.hits / structure.hitsMax) * 100;
-            }
-            const colour = percentToColour(percent);
-            room.visual.circle(structure.pos, {
-                fill: colour,
-                opacity: 0.05,
-                radius: 0.35,
-                stroke: colour
-            }).text(percent.toFixed(2) + "%", structure.pos, {
-                align: "left",
-                color: colour,
-                font: 0.5,
-                opacity: 0.6,
-                stroke: "rgba(0,0,0,0.5)"
-            });
-        }
-        return;
-    }
 }

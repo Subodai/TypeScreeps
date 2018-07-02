@@ -18,6 +18,7 @@ export function CalcBodyCost(body: BodyPartConstant[]): number {
  * @param p number
  */
 export function percentToColour(p: number): string {
+    if (p > 1) { p /= 100; }
     const r = Math.round(255 - (255 * p));
     const g = Math.round(255 * p);
     const b = 0;
@@ -35,6 +36,40 @@ export function toHex(dec: number, padding?: number): string {
     padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
     while (hex.length < padding) { hex = "0" + hex; }
     return hex;
+}
+
+/**
+ * Visualise the health of a bunch of structures in a room
+ * @param structures
+ * @param room
+ */
+export function visualiseDamage(structures: Structure[], room: Room): void {
+    for (const i in structures) {
+        const structure: Structure = structures[i];
+        let percent = 1;
+        if (structure.structureType === STRUCTURE_RAMPART) {
+            percent = (structure.hits / global.rampartMax);
+        } else if (structure.structureType === STRUCTURE_WALL) {
+            percent = (structure.hits / global.wallMax);
+        } else {
+            percent = (structure.hits / structure.hitsMax);
+        }
+        const colour = percentToColour(percent);
+        Debug.Log(percent.toFixed(2) + ":" + colour);
+        room.visual.circle(structure.pos, {
+            fill: colour,
+            opacity: 0.3,
+            radius: 0.40,
+            stroke: colour
+        }).text((percent * 100).toFixed(2) + "%", structure.pos, {
+            align: "center",
+            color: colour,
+            font: 0.5,
+            opacity: 0.6,
+            stroke: "rgba(0,0,0,0.5)"
+        });
+    }
+    return;
 }
 
 export function loadTools(): void {
