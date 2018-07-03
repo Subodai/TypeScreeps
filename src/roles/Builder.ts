@@ -46,71 +46,91 @@ export class Builder {
         switch (creep.state) {
             // SPAWN state
             case STATE._SPAWN:
-                creep.log("In spawn state");
-                if (!creep.isTired()) {
-                    creep.log("Done spawning, transitioning to init");
-                    creep.state = STATE._INIT;
-                    this.run(creep);
-                }
+                this.runSpawnState(creep);
                 break;
             // INIT state
             case STATE._INIT:
-                creep.log("Initiating Builder");
-                creep.state = STATE._GATHER;
-                this.run(creep);
+                this.runInitState(creep);
                 break;
             // GATHER state
             case STATE._GATHER:
-                creep.log("In gather state");
-                const gatherResult = creep.getNearbyEnergy(true);
-                if (gatherResult === ERR_FULL) {
-                    creep.log("Got some energy");
-                    creep.clearTargets();
-                    creep.state = STATE._CONSTRUCT;
-                    this.run(creep);
-                }
-                if (gatherResult === ERR_NOT_FOUND) {
-                    creep.state = STATE._RETURN;
-                    this.run(creep);
-                }
+                this.runGatherState(creep);
                 break;
             case STATE._RETURN:
-                creep.log("Builder returning to find other resources");
-                if (creep.atHome()) {
-                    creep.log("at home ready to collect");
-                    creep.state = STATE._GATHER;
-                    this.run(creep);
-                }
-                const test = creep.getNearbyEnergy(true);
-                if (test !== ERR_NOT_FOUND) {
-                    creep.log("Found room with resource");
-                    creep.state = STATE._GATHER;
-                }
+                this.runReturnState(creep);
                 break;
             // CONSTRUCT state
             case STATE._CONSTRUCT:
-                creep.log("In construct state");
-                const result = creep.buildNearestSite();
-                if (result === OK) {
-                    creep.log("Built Site");
-                }
-                if (result === ERR_NOT_ENOUGH_RESOURCES) {
-                    creep.log("Out of energy");
-                    creep.clearTargets();
-                    creep.state = STATE._GATHER;
-                    // this.run(creep);
-                }
-                if (result === ERR_INVALID_TARGET) {
-                    creep.log("Invalid Site Resetting Memory");
-                    creep.clearTargets();
-                    // this.run(creep);
-                }
+                this.runConstructState(creep);
                 break;
             // default fallback
             default:
                 creep.log("Creep in unknown state");
                 creep.state = STATE._INIT;
                 break;
+        }
+    }
+
+    private static runSpawnState(creep: Creep): void {
+        creep.log("In spawn state");
+        if (!creep.isTired()) {
+            creep.log("Done spawning, transitioning to init");
+            creep.state = STATE._INIT;
+            this.run(creep);
+        }
+    }
+
+    private static runInitState(creep: Creep): void {
+        creep.log("Initiating Builder");
+        creep.state = STATE._GATHER;
+        this.run(creep);
+    }
+
+    private static runGatherState(creep: Creep): void {
+        creep.log("In gather state");
+        const gatherResult = creep.getNearbyEnergy(true);
+        if (gatherResult === ERR_FULL) {
+            creep.log("Got some energy");
+            creep.clearTargets();
+            creep.state = STATE._CONSTRUCT;
+            this.run(creep);
+        }
+        if (gatherResult === ERR_NOT_FOUND) {
+            creep.state = STATE._RETURN;
+            this.run(creep);
+        }
+    }
+
+    private static runReturnState(creep: Creep): void {
+        creep.log("Builder returning to find other resources");
+        if (creep.atHome()) {
+            creep.log("at home ready to collect");
+            creep.state = STATE._GATHER;
+            this.run(creep);
+        }
+        const test = creep.getNearbyEnergy(true);
+        if (test !== ERR_NOT_FOUND) {
+            creep.log("Found room with resource");
+            creep.state = STATE._GATHER;
+        }
+    }
+
+    private static runConstructState(creep: Creep): void {
+        creep.log("In construct state");
+        const result = creep.buildNearestSite();
+        if (result === OK) {
+            creep.log("Built Site");
+        }
+        if (result === ERR_NOT_ENOUGH_RESOURCES) {
+            creep.log("Out of energy");
+            creep.clearTargets();
+            creep.state = STATE._GATHER;
+            // this.run(creep);
+        }
+        if (result === ERR_INVALID_TARGET) {
+            creep.log("Invalid Site Resetting Memory");
+            creep.clearTargets();
+            // this.run(creep);
         }
     }
 }

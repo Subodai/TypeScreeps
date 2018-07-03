@@ -43,46 +43,62 @@ export class Harvester {
         // run as normal
         switch (creep.state) {
             case STATE._SPAWN:
-                creep.log("In spawn state");
-                if (!creep.isTired()) {
-                    creep.log("Done spawning setting to init");
-                    creep.state = STATE._INIT;
-                    this.run(creep);
-                }
+                this.runSpawnState(creep);
                 break;
             // fall through
             case STATE._INIT:
-                creep.log("Initiating Harvester");
-                if (creep.atHome()) {
-                    creep.log("at home ready to collect");
-                    creep.state = STATE._GATHER;
-                    this.run(creep);
-                }
+                this.runInitState(creep);
                 break;
             // GATHER state
             case STATE._GATHER:
-                creep.log("In gather state");
-                if (creep.getNearbyEnergy() === ERR_FULL) {
-                    creep.log("Got some energy");
-                    creep.state = STATE._DELIVER;
-                    this.run(creep);
-                }
+                this.runGatherState(creep);
                 break;
             // DELIVER state
             case STATE._DELIVER:
-                creep.log("Delivering energy");
-                if (creep.empty()) {
-                    creep.state = STATE._INIT;
-                    // this.run(creep);
-                }
-                if (creep.deliverEnergy() === OK) {
-                    creep.log("Delivered some energy");
-                }
+                this.runDeliverState(creep);
                 break;
             default:
                 creep.log("Creep in unknown state");
                 creep.state = STATE._INIT;
                 break;
+        }
+    }
+
+    private static runSpawnState(creep: Creep): void {
+        creep.log("In spawn state");
+        if (!creep.isTired()) {
+            creep.log("Done spawning setting to init");
+            creep.state = STATE._INIT;
+            this.run(creep);
+        }
+    }
+
+    private static runInitState(creep: Creep): void {
+        creep.log("Initiating Harvester");
+        if (creep.atHome()) {
+            creep.log("at home ready to collect");
+            creep.state = STATE._GATHER;
+            this.run(creep);
+        }
+    }
+
+    private static runGatherState(creep: Creep): void {
+        creep.log("In gather state");
+        if (creep.getNearbyEnergy() === ERR_FULL) {
+            creep.log("Got some energy");
+            creep.state = STATE._DELIVER;
+            this.run(creep);
+        }
+    }
+
+    private static runDeliverState(creep: Creep): void {
+        creep.log("Delivering energy");
+        if (creep.empty()) {
+            creep.state = STATE._INIT;
+            // this.run(creep);
+        }
+        if (creep.deliverEnergy() === OK) {
+            creep.log("Delivered some energy");
         }
     }
 }
