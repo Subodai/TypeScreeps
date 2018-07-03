@@ -32,10 +32,10 @@ export class Janitor {
                 // get all walls and ramparts below their max hp
                 const items: Structure[] = room.find(FIND_STRUCTURES, {
                     filter: (s: AnyStructure) =>
-                        // ramparts below max
-                        (s.structureType === STRUCTURE_RAMPART && s.hits < global.rampartMax) ||
-                        // walls below max
-                        (s.structureType === STRUCTURE_WALL && s.hits < global.wallMax) ||
+                        // ramparts below max * 0.75 (no point spawning all the time to keep going away after)
+                        (s.structureType === STRUCTURE_RAMPART && s.hits < (global.rampartMax * 0.75)) ||
+                        // walls below max * 0.9 (no point spawning all the time to keep going away after)
+                        (s.structureType === STRUCTURE_WALL && s.hits < (global.wallMax * 0.9)) ||
                         // anything else
                         (
                             // not a wall, rampart or road
@@ -73,58 +73,75 @@ export class Janitor {
         switch (creep.state) {
             // SPAWN state
             case STATE._SPAWN:
-                creep.log("In Spawn State");
-                if (!creep.isTired()) {
-                    creep.log("Done Spawning, transitioning to init");
-                    creep.state = STATE._INIT;
-                    this.run(creep);
-                }
+                this.runSpawnState(creep);
                 break;
             // INIT state
             case STATE._INIT:
-                creep.log("Initiating Janitor");
-                // Make sure we're in our home room
-                if (creep.atHome()) {
-                    creep.log("At home ready to gather");
-                    creep.state = STATE._GATHER;
-                    this.run(creep);
-                }
+                this.runInitState(creep);
                 break;
             // GATHER state
             case STATE._GATHER:
-                creep.log("In gather state");
-                if (creep.getNearbyEnergy(true) === ERR_FULL) {
-                    creep.log("Got some energy");
-                    creep.state = STATE._CHARGE;
-                    this.run(creep);
-                }
+                this.runGatherState(creep);
                 break;
             // CHARGE state
             case STATE._CHARGE:
-                creep.log("In Charge state");
-                const result = creep.repairStructures(false, true, false);
+                this.runChargeState(creep);
+                break;
+            // Unknown state
+            default:
+                creep.state = STATE._INIT;
+                break;
+        }
+    }
 
-                if (result === ERR_NOT_IN_RANGE) {
-                    creep.log("Moved closer to target");
-                }
+    private static runSpawnState(creep: Creep): void {
+        creep.log("In Spawn State");
+        if (!creep.isTired()) {
+            creep.log("Done Spawning, transitioning to init");
+            creep.state = STATE._INIT;
+            this.run(creep);
+        }
+    }
 
-                // Okay
-                if (result === OK) {
-                    creep.log("Repaired target");
-                }
+    private static runInitState(creep: Creep): void {
+        creep.log("Initiating Janitor");
+        // Make sure we're in our home room
+        if (creep.atHome()) {
+            creep.log("At home ready to gather");
+            creep.state = STATE._GATHER;
+            this.run(creep);
+        }
+    }
 
-                // When out of energy
-                if (result === ERR_NOT_ENOUGH_ENERGY) {
-                    creep.log("Ran out of energy");
-                    creep.state = STATE._GATHER;
-                    this.run(creep);
-                }
+    private static runGatherState(creep: Creep): void {
+        creep.log("In gather state");
+        if (creep.getNearbyEnergy(true) === ERR_FULL) {
+            creep.log("Got some energy");
+            creep.state = STATE._CHARGE;
+            this.run(creep);
+        }
+    }
 
-                // Invalid target
-                if (result === ERR_INVALID_TARGET) {
-                    creep.log("Nothing to repair");
-                }
-
+    private static runChargeState(creep: Creep): void {
+        creep.log("In Charge state");
+        const result = creep.repairStructures(false, true, false);
+        switch (result) {
+            case ERR_NOT_IN_RANGE:
+                creep.log("Moved closer to target");
+                break;
+            case ERR_NOT_ENOUGH_ENERGY:
+                creep.log("Ran out of energy");
+                creep.state = STATE._GATHER;
+                this.run(creep);
+                break;
+            case ERR_INVALID_TARGET:
+                creep.log("Nothing to repair");
+                break;
+            case OK:
+                creep.log("Repaired target");
+                break;
+            default:
+                creep.log("UnHandled Result: " + JSON.stringify(result));
                 break;
         }
     }
