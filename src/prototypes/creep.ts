@@ -361,6 +361,7 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
             delete this.memory.targetMaxHP;
         }
     }
+
     // Do we have a repairTarget in memory?
     if (!this.memory.repairTarget && d) {
         this.log("Has no repair target, looking for 1 hp ramparts and walls");
@@ -375,6 +376,23 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
             this.log("Found a 1 hp item, setting target");
             this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
             this.memory.targetMaxHP = 10;
+        }
+    }
+
+    // Do we have a repairTarget in memory?
+    if (!this.memory.repairTarget && d) {
+        this.log("Has no repair target, looking for containers");
+        // Check for walls or ramparts with 1 hit first
+        const targets = this.room.find(FIND_STRUCTURES, {
+            filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
+                i.hits < i.hitsMax
+        });
+
+        if (targets.length > 0) {
+            visualiseDamage(targets, this.room);
+            this.log("Found a container item, setting target");
+            this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
+            this.memory.targetMaxHP = _.min(targets, (t) => t.hits).hitsMax;
         }
     }
 

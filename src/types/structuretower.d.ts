@@ -46,7 +46,9 @@ interface StructureTower {
 
     findWall(hp: number): StructureWall | void;
 
-    repairContainersAndRoads(): boolean;
+    repairContainers(): boolean;
+
+    repairRoads(): boolean;
 
     repairStructures(): boolean;
 }

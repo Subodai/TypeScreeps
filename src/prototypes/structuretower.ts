@@ -41,17 +41,22 @@ StructureTower.prototype.run = function(): number {
         return this.countCPU(start);
     }
 
-    // priority 5, continers and roads
-    if (this.energy >= 400 && this.repairContainersAndRoads()) {
+    // priority 5, roads
+    if (this.energy >= 400 && this.repairRoads()) {
         return this.countCPU(start);
     }
 
-    // priority 6, rapair ramparts and roads upto current maxHP const
+    // priority 6, rapair ramparts walls and containers
     if (global.towerRepair &&
         this.energy >= 600 &&
         this.room.storage &&
         this.room.storage.store[RESOURCE_ENERGY] >= 200000  &&
-        (this.repairRamparts(global.rampartMax) || this.repairWalls(global.wallMax))) {
+        (
+            this.repairRamparts(global.rampartMax) ||
+            this.repairWalls(global.wallMax) ||
+            this.repairContainers()
+        )
+    ) {
         return this.countCPU(start);
     }
 
@@ -200,17 +205,24 @@ StructureTower.prototype.findWall = function(hp: number): StructureWall | void {
     // }
 };
 
-StructureTower.prototype.repairContainersAndRoads = function(): boolean {
-    let target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+StructureTower.prototype.repairContainers = function(): boolean {
+    const target = this.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: (s) => s.structureType === STRUCTURE_CONTAINER && s.hits < s.hitsMax
     });
-    if (!target) {
-        target = this.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax
-        });
-    }
     if (target) {
-        this.log("Found Container or Road with hp <= max");
+        this.log("Found Container with hp <= max");
+        this.repair(target);
+        return true;
+    }
+    return false;
+};
+
+StructureTower.prototype.repairRoads = function(): boolean {
+    const target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax
+    });
+    if (target) {
+        this.log("Found Road with hp <= max");
         this.repair(target);
         return true;
     }
