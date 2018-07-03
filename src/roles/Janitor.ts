@@ -24,35 +24,35 @@ export class Janitor {
             room.log("Tower Repair enabled, so janitor disabled");
             return false;
         }
-        if (room.controller) {
-            room.log("Room has controller");
-            if (room.controller.level >= 7 && room.storage) {
-                room.log("Room is of sufficient level and has storage");
-                // @todo move to own method
-                // get all walls and ramparts below their max hp
-                const items: Structure[] = room.find(FIND_STRUCTURES, {
-                    filter: (s: AnyStructure) =>
-                        // ramparts below max * 0.75 (no point spawning all the time to keep going away after)
-                        (s.structureType === STRUCTURE_RAMPART && s.hits < (global.rampartMax * 0.75)) ||
-                        // walls below max * 0.9 (no point spawning all the time to keep going away after)
-                        (s.structureType === STRUCTURE_WALL && s.hits < (global.wallMax * 0.9)) ||
-                        // anything else
-                        (
-                            // not a wall, rampart or road
-                            (
-                                s.structureType !== STRUCTURE_WALL &&
-                                s.structureType !== STRUCTURE_RAMPART &&
-                                s.structureType !== STRUCTURE_ROAD
-                            ) &&
-                            // with less than 100% hp
-                            s.hits < s.hitsMax
-                        )
-                });
-                if (items.length > 0) {
-                    room.log("Items found to repair");
-                    return true;
-                }
-            }
+        if (!room.controller) { return false; }
+        room.log("Room has controller");
+        if (room.controller.level < 7) { return false; }
+        room.log("Room Controller level high enough");
+        if (!room.storage) { return false; }
+        room.log("Room has storage");
+        // @todo move to own method
+        // get all walls and ramparts below their max hp
+        const items: Structure[] = room.find(FIND_STRUCTURES, {
+            filter: (s: AnyStructure) =>
+                // ramparts below max * 0.75 (no point spawning all the time to keep going away after)
+                (s.structureType === STRUCTURE_RAMPART && s.hits < (global.rampartMax * 0.75)) ||
+                // walls below max * 0.9 (no point spawning all the time to keep going away after)
+                (s.structureType === STRUCTURE_WALL && s.hits < (global.wallMax * 0.9)) ||
+                // anything else
+                (
+                    // not a wall, rampart or road
+                    (
+                        s.structureType !== STRUCTURE_WALL &&
+                        s.structureType !== STRUCTURE_RAMPART &&
+                        s.structureType !== STRUCTURE_ROAD
+                    ) &&
+                    // with less than 100% hp
+                    s.hits < s.hitsMax
+                )
+        });
+        if (items.length > 0) {
+            room.log("Items found to repair");
+            return true;
         }
         room.log("No items found, Janitors disabled");
         return false;
