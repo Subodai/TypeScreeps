@@ -28,7 +28,7 @@ export class Janitor {
         }
         if (!room.controller) { return false; }
         room.log("Room has controller");
-        if (room.controller.level < 7) { return false; }
+        if (room.controller.level < 5) { return false; }
         room.log("Room Controller level high enough");
         if (!room.storage) { return false; }
         room.log("Room has storage");
