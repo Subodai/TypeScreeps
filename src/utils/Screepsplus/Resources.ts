@@ -10,32 +10,31 @@ export class Resources {
         if (global.resourcesTimeStamp === now) {
             return global.resources;
         }
-
         const retval: { [k: string]: any } = {};
         const minerals: { [k: string]: number } = {};
-
-        for (const name in Game.rooms) {
-            const room = Game.rooms[name];
-            let summary = null;
-            if (null === room) {
-                summary = null;
-            }
-
-            // if this is a remote room
-            if (!room.controller || !room.controller.my) {
-                summary = this.SummarizeRemoteRoom(room);
-                retval[name + "_remote"] = summary;
-            } else {
-                summary = this.SummarizeMyRoom(room);
-                retval[name] = summary;
-                this.AddStorageMinerals(room, minerals);
-                this.AddTerminalMinerals(room, minerals);
-            }
-        }
+        this.SummarizeRooms(retval, minerals);
         global.resourcesTimeStamp = now;
         global.roomSummary = retval;
         global.minerals = minerals;
         return retval;
+    }
+    /**
+     * Summarize our rooms
+     * @param {[k: string]: any} retval
+     * @param {[k: string]: number} minerals
+     */
+    private static SummarizeRooms(retval: {[k: string]: any}, minerals: {[k: string]: number}): void {
+        for (const name in Game.rooms) {
+            const room = Game.rooms[name];
+            // if this is a remote room
+            if (!room.controller || !room.controller.my) {
+                retval[name + "_remote"] = this.SummarizeRemoteRoom(room);
+            } else {
+                retval[name] = this.SummarizeMyRoom(room);
+                this.AddStorageMinerals(room, minerals);
+                this.AddTerminalMinerals(room, minerals);
+            }
+        }
     }
     /**
      * Summarize down a remote room's stats into an object for memory
