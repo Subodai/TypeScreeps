@@ -190,7 +190,7 @@ export function debugEnablers(): void {
         }
     };
 
-    global.ToggleCreepDebug = function ToggleCreepDebug(): string {
+    global.ToggleCreepDebug = (): string => {
         if (!Memory.creepDebug) {
             Memory.creepDebug = true;
             return "Creep Debug Enabled";
@@ -200,7 +200,7 @@ export function debugEnablers(): void {
         }
     };
 
-    global.ToggleRoomDebug = function ToggleRoomDebug(): string {
+    global.ToggleRoomDebug = (): string => {
         if (!Memory.roomDebug) {
             Memory.roomDebug = true;
             return "Room Debug Enabled";
@@ -210,7 +210,7 @@ export function debugEnablers(): void {
         }
     };
 
-    global.ToggleMemoryDebug = function ToggleMemorydebug(): string {
+    global.ToggleMemoryDebug = (): string => {
         if (!Memory.memoryDebug) {
             Memory.memoryDebug = true;
             return "Memory Debug Enabled";
@@ -220,7 +220,7 @@ export function debugEnablers(): void {
         }
     };
 
-    global.ToggleSpawnDebug = function ToggleSpawnDebug(): string {
+    global.ToggleSpawnDebug = (): string => {
         if (!Memory.spawnDebug) {
             Memory.spawnDebug = true;
             return "Spawn Debug Enabled";
@@ -230,7 +230,7 @@ export function debugEnablers(): void {
         }
     };
 
-    global.ToggleTowerDebug = function ToggleTowerDebug(): string {
+    global.ToggleTowerDebug = (): string => {
         if (!Memory.towerDebug) {
             Memory.towerDebug = true;
             return "Tower Debug Enabled";
