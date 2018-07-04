@@ -224,13 +224,12 @@ export class Resources {
      * @param {Object} minerals
      */
     private static AddStorageMinerals(room: Room, minerals: { [k: string]: number }): void {
-        if (room.storage) {
-            for (const i in room.storage.store) {
-                if (minerals[i] === undefined) {
-                    minerals[i] = 0;
-                }
-                minerals[i] += room.storage.store[i];
+        if (!room.storage) { return; }
+        for (const i in room.storage.store) {
+            if (minerals[i] === undefined) {
+                minerals[i] = 0;
             }
+            minerals[i] += room.storage.store[i];
         }
     }
 
@@ -241,13 +240,12 @@ export class Resources {
      * @param {Object} minerals
      */
     private static AddTerminalMinerals(room: Room, minerals: { [k: string]: number }): void {
-        if (room.terminal) {
-            for (const i in room.terminal.store) {
-                if (minerals[i] === undefined) {
-                    minerals[i] = 0;
-                }
-                minerals[i] += room.terminal.store[i];
+        if (!room.terminal) { return; }
+        for (const i in room.terminal.store) {
+            if (minerals[i] === undefined) {
+                minerals[i] = 0;
             }
+            minerals[i] += room.terminal.store[i];
         }
     }
 
