@@ -23,7 +23,10 @@ export class Resources {
      * @param {[k: string]: any} retval
      * @param {[k: string]: number} minerals
      */
-    private static SummarizeRooms(retval: {[k: string]: any}, minerals: {[k: string]: number}): void {
+    private static SummarizeRooms(
+        retval: {[k: string]: any; },
+        minerals: {[k: string]: number; }
+    ): void {
         for (const name in Game.rooms) {
             const room = Game.rooms[name];
             // if this is a remote room
