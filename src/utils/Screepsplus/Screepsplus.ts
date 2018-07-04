@@ -1,12 +1,34 @@
+import { Debug } from "functions/debug";
 import { Economy } from "./Economy";
 import { Resources } from "./Resources";
 
+/**
+ * Screepsplus data collector
+ */
 export class Screepsplus {
+    /**
+     * Run Every n ticks
+     */
+    private static runEvery: number = 1;
+
+    /**
+     * Run the Screepsplus data collector
+     */
+    public static run(): string {
+        this.SetupMemory();
+        if (global.statsEnabled && Game.time % this.runEvery === 0) {
+            Debug.Log("Stats Start");
+            const cpu: number = Game.cpu.getUsed();
+            this.CollectStats();
+            Debug.Log("Stats Finished used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
+        }
+        return this.HeapStats() + this.CPUStats();
+    }
+
     /**
      * Collect Stats
      */
-    public static CollectStats(): void {
-        this.SetupMemory();
+    private static CollectStats(): void {
         if (Game.time % 2 === 0) {
             this.SummarizeEconomy();
         }
@@ -46,7 +68,7 @@ export class Screepsplus {
      * SummarizeRooms
      */
     private static SummarizeRooms(): void {
-        Memory.stats.roomSummary = Resources.getRooms();
+        Memory.stats.roomSummary = Resources.get();
         Memory.stats.empireMinerals = global.minerals;
     }
 
@@ -55,5 +77,44 @@ export class Screepsplus {
      */
     private static SummarizeEconomy(): void {
         Memory.stats.economy = Economy.get();
+    }
+
+    /**
+     * Write our CPU usage to memory, and return the used amount
+     */
+    private static CPUStats(): string {
+        return ":CPU: [" + (Memory.stats.cpu.used = Game.cpu.getUsed()).toFixed(3) + "]";
+    }
+
+    /**
+     * Fetch our heapStats to memory and return a string for the console
+     */
+    private static HeapStats(): string {
+        let msg = "";
+        if (typeof Game.cpu.getHeapStatistics === "function") {
+            // Traveler.structureMatrixCache = {};
+            // Traveler.creepMatrixCache = {};
+            const heapStats = Game.cpu.getHeapStatistics();
+            const heapPercent = Math.round(
+                ((heapStats.total_heap_size + heapStats.externally_allocated_size) / heapStats.heap_size_limit)
+                    * 100);
+            if (heapPercent >= 80) {
+                // console.log('Running GC'); gc();
+            }
+            const heapTotal = Math.round((heapStats.total_heap_size) / 1048576);
+            const heapAlloc = Math.round((heapStats.externally_allocated_size) / 1048576);
+            const heapLimit = Math.round(heapStats.heap_size_limit / 1048576);
+            msg += ":HEAP: [" + heapTotal + "MB +" + heapAlloc + "MB of " + heapLimit + "MB (" + heapPercent + "%)]";
+            const heap = {
+                percent: heapPercent,
+                total: heapStats.total_heap_size,
+                // tslint:disable-next-line:object-literal-sort-keys
+                allocated: heapStats.externally_allocated_size,
+                total_d: heapTotal,
+                alloc_d: heapAlloc
+            };
+            Memory.stats.mem = heap;
+        }
+        return msg;
     }
 }

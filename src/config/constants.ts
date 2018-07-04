@@ -91,4 +91,6 @@ export function loadConstants(): void {
         // Energy!
         RESOURCE_ENERGY
     ];
+
+    global.statsEnabled = false;
 }

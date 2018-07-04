@@ -38,5 +38,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
     Counter.run(); // @todo make the counter count the things we need to run other things
     Spawner.run(); // @todo make this put items into the spawn queue
     Runner.run();  // @todo make this aware of the things the counter has counted so it won't run unnecessary items
-    Screepsplus.CollectStats();
+    const message = Screepsplus.run(); // Collect Stats
+    Debug.Log(message);
 });
