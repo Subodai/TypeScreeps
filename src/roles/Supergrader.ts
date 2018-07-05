@@ -8,7 +8,7 @@ export class Supergrader {
     public static colour: string = "#ff6600";
     public static roleName: string = "sUpgrade";
     public static roster: number[]      = [ 0, 4, 8, 8, 6, 3, 2, 2, 1 ];
-    public static rosterLinks: number[] = [ 0, 4, 8, 8, 6, 3, 8, 4, 1 ];
+    public static rosterLinks: number[] = [ 0, 4, 8, 8, 8, 8, 8, 8, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 2, CARRY: 1, MOVE: 1 }),
@@ -43,7 +43,7 @@ export class Supergrader {
         if (!room.storage) { return false; }
         if (room.controller && room.controller.level <= 3) { return false; }
         if (room.memory.charging) { return false; }
-        return true;
+        return false;
     }
 
     public static run(creep: Creep): void {

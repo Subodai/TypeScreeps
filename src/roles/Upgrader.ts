@@ -24,14 +24,14 @@ export class Upgrader {
     ];
     public static bodyStructureLinks: BodyPartConstant[][] = [
         [],
-        BodyBuilder({ WORK: 2, CARRY: 1, MOVE: 1 }),
-        BodyBuilder({ WORK: 3, CARRY: 2, MOVE: 3 }),
-        BodyBuilder({ WORK: 4, CARRY: 2, MOVE: 6 }),
-        BodyBuilder({ WORK: 6, CARRY: 3, MOVE: 5 }),
-        BodyBuilder({ WORK: 10, CARRY: 2, MOVE: 4 }),
-        BodyBuilder({ WORK: 15, CARRY: 9, MOVE: 5 }),
-        BodyBuilder({ WORK: 30, CARRY: 9, MOVE: 5 }),
-        BodyBuilder({ WORK: 15, CARRY: 9, MOVE: 5 })
+        BodyBuilder({ WORK: 2, CARRY:   1, MOVE: 1  }),
+        BodyBuilder({ WORK: 3, CARRY:   2, MOVE: 3  }),
+        BodyBuilder({ WORK: 4, CARRY:   2, MOVE: 6  }),
+        BodyBuilder({ WORK: 6, CARRY:   3, MOVE: 5  }),
+        BodyBuilder({ WORK: 10, CARRY:  5, MOVE: 5  }),
+        BodyBuilder({ WORK: 16, CARRY:  5, MOVE: 8  }),
+        BodyBuilder({ WORK: 30, CARRY:  5, MOVE: 15 }),
+        BodyBuilder({ WORK: 15, CARRY:  5, MOVE: 8  })
     ];
 
     /**
@@ -40,9 +40,6 @@ export class Upgrader {
      * @returns {boolean}
      */
     public static enabled(room: Room): boolean {
-        if (room.memory.roles[Supergrader.roleName] === true) {
-            return false;
-        }
         return true;
     }
 
@@ -54,6 +51,11 @@ export class Upgrader {
         }
         // if creep is dying make sure it get's renewed
         creep.deathCheck(this.ticksBeforeRenew);
+        if (creep.room.memory.links) {
+            this.colour = "#ff6600";
+        } else {
+            this.colour = "#009900";
+        }
         // run as normal
         switch (creep.state) {
             // SPAWN state
@@ -68,12 +70,6 @@ export class Upgrader {
             // INIT state
             case STATE._INIT:
                 creep.log("Initiating Upgrader");
-                if (creep.room.memory.roles[Supergrader.roleName] === true) {
-                    creep.log("Changing to supergrader");
-                    creep.memory.role = Supergrader.roleName;
-                    // Supergrader.run(creep);
-                    return;
-                }
                 creep.log("Changing to gather state");
                 creep.state = STATE._GATHER;
                 break;

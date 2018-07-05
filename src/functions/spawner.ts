@@ -68,12 +68,6 @@ export class Spawner {
                         spawned = this.spawnRoutine(Upgrader, Spawn);
                         break;
 
-                    // Supergraders
-                    case Supergrader.roleName:
-                        Spawn.log("Role " + roleName + " found runnning spawn routine");
-                        spawned = this.spawnRoutine(Supergrader, Spawn);
-                        break;
-
                     // Builders
                     case Builder.roleName:
                         Spawn.log("Role " + roleName + " found, running spawn routine");

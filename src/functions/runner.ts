@@ -144,15 +144,6 @@ export class Runner {
                     this.visualise(creep, Upgrader.colour, cost);
                 }
                 break;
-            // Supergraders
-            case Supergrader.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    Supergrader.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, Supergrader.colour, cost);
-                }
-                break;
             // Builders
             case Builder.roleName:
                 for (const creep of creeps) {

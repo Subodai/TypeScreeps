@@ -347,10 +347,6 @@ export function loadRoomPrototypes(): void {
                 case Upgrader.roleName:
                     this.memory.roles[roleName] = Upgrader.enabled(this);
                     break;
-                // Supergraders
-                case Supergrader.roleName:
-                    this.memory.roles[roleName] = Supergrader.enabled(this);
-                    break;
                 // Builders
                 case Builder.roleName:
                     this.memory.roles[roleName] = Builder.enabled(this);
