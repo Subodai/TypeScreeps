@@ -17,9 +17,9 @@ export class Upgrader {
         BodyBuilder({ WORK: 2, CARRY: 2, MOVE: 4 }),
         BodyBuilder({ WORK: 4, CARRY: 2, MOVE: 6 }),
         BodyBuilder({ WORK: 6, CARRY: 2, MOVE: 5 }),
-        BodyBuilder({ WORK: 6, CARRY: 2, MOVE: 8 }),
-        BodyBuilder({ WORK: 6, CARRY: 2, MOVE: 8 }),
-        BodyBuilder({ WORK: 6, CARRY: 2, MOVE: 8 }),
+        BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 2 }),
+        BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 2 }),
+        BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 2 }),
         BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 2 })
     ];
     public static bodyStructureLinks: BodyPartConstant[][] = [
@@ -29,7 +29,7 @@ export class Upgrader {
         BodyBuilder({ WORK: 4, CARRY:   2, MOVE: 6  }),
         BodyBuilder({ WORK: 6, CARRY:   3, MOVE: 5  }),
         BodyBuilder({ WORK: 10, CARRY:  5, MOVE: 5  }),
-        BodyBuilder({ WORK: 16, CARRY:  5, MOVE: 8  }),
+        BodyBuilder({ WORK: 16, CARRY:  6, MOVE: 8  }),
         BodyBuilder({ WORK: 30, CARRY:  5, MOVE: 15 }),
         BodyBuilder({ WORK: 15, CARRY:  5, MOVE: 8  })
     ];
