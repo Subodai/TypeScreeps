@@ -146,6 +146,17 @@ Creep.prototype.mineMineral = function(): ScreepsReturnCode {
     if (this.memory.assignedMineral) {
         const mineral: Mineral | null = Game.getObjectById(this.memory.assignedMineral);
         if (mineral) {
+            if (mineral.mineralAmount === 0) {
+                const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
+                    filter: (i) => i.structureType === STRUCTURE_SPAWN
+                }) as StructureSpawn;
+                if (spawn) {
+                    if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
+                        this.travelTo(spawn);
+                    }
+                }
+                return ERR_INVALID_TARGET;
+            }
             return this.harvest(mineral);
         }
     }
