@@ -359,6 +359,7 @@ Creep.prototype.fillTowers = function(): ScreepsReturnCode | false {
 };
 
 Creep.prototype.fillRoomStorageOrTerminal = function(): ScreepsReturnCode | false {
+    this.log("attempting to fill storage or terminal");
     const target = this.pickStorageOrTerminal();
     if (target) {
         this.log("found storage or terminal");
@@ -366,8 +367,10 @@ Creep.prototype.fillRoomStorageOrTerminal = function(): ScreepsReturnCode | fals
         this.memory.idle = 0;
         // Loop through our resources
         for (const res in this.carry) {
+            this.log(res);
+            this.log(JSON.stringify(target));
             // Attempt to transfer them
-            if (this.carry.hasOwnProperty(res)) {
+            if (this.carry.hasOwnProperty(res) && this.carry[res] > 0) {
                 if (this.transfer(target, res as ResourceConstant) === ERR_NOT_IN_RANGE) {
                     this.travelTo(target);
                     return ERR_NOT_IN_RANGE;
@@ -499,7 +502,9 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     // only refill spawns and other things if room level below 4 after 4 we just fill storage
     // after 5 we fill storage and terminal
     // unless emergency, then we fill spawns too
-    if (fillSpawns || this.room.controller!.level < 4 || this.room.memory.emergency || !this.room.storage) {
+    if (this.carry.energy > 0 && (
+        fillSpawns || this.room.controller!.level < 4 || this.room.memory.emergency || !this.room.storage)
+     ) {
         // Attempt to fill spawns
         const spawnsResult = this.fillSpawns();
         // If it worked, return the code
@@ -525,6 +530,9 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     // try and fill storage
     const storageResult = this.fillRoomStorageOrTerminal();
     // if it failed we need to go into idle
+    if (storageResult === OK) {
+        return storageResult;
+    }
     if (storageResult !== false) {
         return storageResult;
     }

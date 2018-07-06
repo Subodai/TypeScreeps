@@ -106,7 +106,8 @@ export class Spawner {
 
                     // Mineral Extractor
                     case MineralExtractor.roleName:
-
+                        Spawn.log("Role " + roleName + " found, running spawn routine");
+                        spawned = this.spawnRoutine(MineralExtractor, Spawn);
                         break;
 
                     // Janitor

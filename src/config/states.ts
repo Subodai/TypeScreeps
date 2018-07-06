@@ -10,3 +10,4 @@ export const _GATHER: CreepState = 8;
 export const _CONSTRUCT: CreepState = 9;
 export const _RETURN: CreepState = 10;
 export const _CHARGE: CreepState = 11;
+export const _GATHERM: CreepState = 12;

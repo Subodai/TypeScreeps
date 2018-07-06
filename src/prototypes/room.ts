@@ -284,7 +284,9 @@ export function loadRoomPrototypes(): void {
         delete this.memory.assignedMinerals;
         // get the extractors
         const minerals = this.find(FIND_MINERALS, {
-            filter: (i: Mineral) => i.mineralAmount > 0
+            filter: (i: Mineral) => (
+                i.mineralAmount > 0 || i.ticksToRegeneration <= ((50 * 3) + MineralExtractor.ticksBeforeRenew)
+            )
         });
         // get the mineral extracters in this room
         const creeps = _.filter(Game.creeps, (c: Creep) =>

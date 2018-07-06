@@ -5,16 +5,19 @@
 /**
  * Get Nearby minerals to pickup
  */
-Creep.prototype.getNearbyMinerals = function(storage: boolean = false): number {
+Creep.prototype.getNearbyMinerals = function(storage: boolean = false): ScreepsReturnCode {
     // First are we full?
     if (this.full()) {
         this.log("Creep full cannot get nearby minerals");
         // Clear the pickup target
         this.invalidateMineralTarget(true);
+        return ERR_FULL;
     }
     if (!this.memory.mineralPickup && storage) { this.findStorageMinerals(); }
     // Start with ground minerals
     if (!this.memory.mineralPickup) { this.findGroundMinerals(); }
+    // Next Tombstone Minerals
+    if (!this.memory.mineralPickup) { this.findTombstoneMinerals(); }
     // Next Container Minerals
     if (!this.memory.mineralPickup) { this.findContainerMinerals(); }
     // Do we have a target?
@@ -26,7 +29,7 @@ Creep.prototype.getNearbyMinerals = function(storage: boolean = false): number {
 /**
  * Invalidate mineral storage in creep memory
  */
-Creep.prototype.invalidateMineralTarget = function(full: boolean = false): number {
+Creep.prototype.invalidateMineralTarget = function(full: boolean = false): ScreepsReturnCode {
     delete this.memory.mineralPickup;
     if (full) { return ERR_FULL; }
     return ERR_INVALID_TARGET;
@@ -75,6 +78,27 @@ Creep.prototype.findGroundMinerals = function(): void {
 };
 
 /**
+ * Find minerals in tombstones
+ */
+Creep.prototype.findTombstoneMinerals = function(): void {
+    let tombstone: boolean | Tombstone = false;
+    const thisCreep = this;
+    this.log("Creep searfhing for mineral tombstones");
+    // get tombstones
+    const tombstones: Tombstone[] = this.room.find(FIND_TOMBSTONES, {
+        filter: (t: Tombstone) => (_.sum(t.store) - t.store[RESOURCE_ENERGY]) > 0
+    });
+    if (tombstones.length > 0) {
+        this.log("Found some mineral tombstones");
+        tombstone = _.max(tombstones, (t: Tombstone) =>
+            (_.sum(t.store) - t.store[RESOURCE_ENERGY]) / thisCreep.pos.getRangeTo(t));
+        if (tombstone) {
+            this.memory.mineralPickup = tombstone.id;
+        }
+    }
+};
+
+/**
  * Find minerals on containers
  */
 Creep.prototype.findContainerMinerals = function(): void {
@@ -102,7 +126,7 @@ Creep.prototype.findContainerMinerals = function(): void {
 /**
  * Move to and pickup minerals
  */
-Creep.prototype.moveToAndPickupMinerals = function(): number {
+Creep.prototype.moveToAndPickupMinerals = function(): ScreepsReturnCode {
     this.log("Found minerals in memory");
     const target: Resource | StructureContainer | StructureStorage | null =
         Game.getObjectById(this.memory.mineralPickup);
@@ -197,3 +221,10 @@ Creep.prototype.fillNukeGhodium = function(): ScreepsReturnCode | false {
     }
     return false;
 };
+
+// Creep.prototype.deliverMinerals = function(): ScreepsReturnCode {
+//     // if (this.fillRoomStorageOrTerminal() !== false) {
+//     //     return OK;
+//     // }
+//     return OK;
+// };

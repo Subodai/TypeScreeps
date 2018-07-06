@@ -49,9 +49,13 @@ export class Harvester {
             case STATE._INIT:
                 this.runInitState(creep);
                 break;
+            // GATHER Minerals state
+            case STATE._GATHERM:
+                this.runGatherMineralsState(creep);
+                break;
             // GATHER state
             case STATE._GATHER:
-                this.runGatherState(creep);
+                this.runGatherEnergyState(creep);
                 break;
             // DELIVER state
             case STATE._DELIVER:
@@ -77,13 +81,39 @@ export class Harvester {
         creep.log("Initiating Harvester");
         if (creep.atHome()) {
             creep.log("at home ready to collect");
-            creep.state = STATE._GATHER;
+            creep.state = STATE._GATHERM;
             this.run(creep);
         }
     }
 
-    private static runGatherState(creep: Creep): void {
-        creep.log("In gather state");
+    private static runGatherMineralsState(creep: Creep): void {
+        creep.log("In gather Minerals state");
+        // Attempt to gather minerals?
+        const result = creep.getNearbyMinerals(true);
+        switch  (result) {
+            // not found, just gather energy
+            case ERR_NOT_FOUND:
+                creep.state = STATE._DELIVER;
+                this.run(creep);
+                break;
+            // Full, just put into deliver state
+            case ERR_FULL:
+                creep.log("Creep is full moving to deliver state");
+                creep.state = STATE._DELIVER;
+                this.run(creep);
+                break;
+            case OK:
+                creep.log("Travelling to minerals");
+                break;
+            default:
+                creep.state = STATE._GATHER;
+                this.run(creep);
+                break;
+        }
+    }
+
+    private static runGatherEnergyState(creep: Creep): void {
+        creep.log("In gather Energy State");
         if (creep.getNearbyEnergy() === ERR_FULL) {
             creep.log("Got some energy");
             creep.state = STATE._DELIVER;

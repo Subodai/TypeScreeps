@@ -80,7 +80,10 @@ export class MineralExtractor {
             // MINE state
             case STATE._MINE:
                 creep.log("Mining mineral");
-                creep.mineMineral();
+                if (OK === creep.mineMineral()) {
+                    creep.log("Mineral Mined!");
+                    creep.memory.sleepUntil = Game.time + 1 + EXTRACTOR_COOLDOWN;
+                }
                 break;
             // default catcher
             default:

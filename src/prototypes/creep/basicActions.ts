@@ -7,6 +7,12 @@
  * @returns {boolean}
  */
 Creep.prototype.isTired = function(): boolean {
+    if (this.memory.sleepUntil) {
+        if (this.memory.sleepUntil > Game.time) {
+            return true;
+        }
+        delete this.memory.sleepUntil;
+    }
     return this.spawning || this.fatigue > 0;
 };
 
@@ -31,6 +37,10 @@ Creep.prototype.full = function() {
  */
 Creep.prototype.empty = function() {
     return _.sum(this.carry) === 0;
+};
+
+Creep.prototype.moveEfficiency = () => {
+    return 1;
 };
 
 /**

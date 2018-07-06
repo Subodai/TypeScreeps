@@ -9,6 +9,7 @@ interface Creep {
     clearTargets(): void;
     getNearbyEnergy(useStorage?: boolean, emergency?: boolean): ScreepsReturnCode;
     deliverEnergy(): ScreepsReturnCode;
+    deliverMinerals(): ScreepsReturnCode;
     fillLinks(): ScreepsReturnCode | false;
     fillSpawns(): ScreepsReturnCode | false;
     fillTowers(): ScreepsReturnCode | false;
@@ -16,17 +17,18 @@ interface Creep {
     fillNukeGhodium(): ScreepsReturnCode | false;
     pickStorageOrTerminal(): StructureStorage | StructureTerminal | null;
     fillRoomStorageOrTerminal(): ScreepsReturnCode | false;
-    getNearbyMinerals(storage: boolean): number;
+    getNearbyMinerals(storage: boolean): ScreepsReturnCode;
     canWork(): boolean;
     canDo(bodyPart: BodyPartConstant): boolean;
     log(msg: string): void;
     travelTo(destination: HasPos | RoomPosition, options?: TravelToOptions): number;
-    invalidateMineralTarget(full?: boolean): number;
+    invalidateMineralTarget(full?: boolean): ScreepsReturnCode;
     findStorageMinerals(): void;
     findGroundMinerals(): void;
     moveEfficiency(): number;
     findContainerMinerals(): void;
-    moveToAndPickupMinerals(): number;
+    findTombstoneMinerals(): void;
+    moveToAndPickupMinerals(): ScreepsReturnCode;
     canPickup(target: RoomObject, range?: number): boolean;
     full(): boolean;
     empty(): boolean;
@@ -99,4 +101,5 @@ interface CreepMemory {
     _legacyRole?: string;
     debug?: boolean;
     signed?: boolean;
+    sleepUntil?: number;
 }
