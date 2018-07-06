@@ -66,7 +66,7 @@ Creep.prototype.findGroundMinerals = function(): void {
     });
     // Did we find resources?
     if (resources.length > 0) {
-        this.log("Found some minerals picking the clostest");
+        this.log("Found some minerals picking the closest");
         // get the closest resource
         resource = _.min(resources, (r) => thisCreep.pos.getRangeTo(r));
         // Did we find some resources?
@@ -83,7 +83,7 @@ Creep.prototype.findGroundMinerals = function(): void {
 Creep.prototype.findTombstoneMinerals = function(): void {
     let tombstone: boolean | Tombstone = false;
     const thisCreep = this;
-    this.log("Creep searfhing for mineral tombstones");
+    this.log("Creep searching for mineral tombstones");
     // get tombstones
     const tombstones: Tombstone[] = this.room.find(FIND_TOMBSTONES, {
         filter: (t: Tombstone) => (_.sum(t.store) - t.store[RESOURCE_ENERGY]) > 0

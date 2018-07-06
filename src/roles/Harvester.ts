@@ -91,11 +91,6 @@ export class Harvester {
         // Attempt to gather minerals?
         const result = creep.getNearbyMinerals(true);
         switch  (result) {
-            // not found, just gather energy
-            case ERR_NOT_FOUND:
-                creep.state = STATE._DELIVER;
-                this.run(creep);
-                break;
             // Full, just put into deliver state
             case ERR_FULL:
                 creep.log("Creep is full moving to deliver state");
@@ -105,7 +100,10 @@ export class Harvester {
             case OK:
                 creep.log("Travelling to minerals");
                 break;
+            // not found, just gather energy
+            case ERR_NOT_FOUND:
             default:
+                creep.log("No Minerals attempting energy instead");
                 creep.state = STATE._GATHER;
                 this.run(creep);
                 break;
