@@ -10,7 +10,7 @@ RoomPosition.prototype.isRoomEdge = function(): boolean {
     return false;
 };
 
-RoomPosition.prototype.getSpacesAround = function(creep?: Creep): RoomPosition[] {
+RoomPosition.prototype.getSpacesAround = function(creep?: Creep, ignore?: boolean): RoomPosition[] {
     const positions: RoomPosition[] = [];
     const  n = new RoomPosition(this.x, (this.y - 1), this.roomName);
     const ne = new RoomPosition((this.x + 1), (this.y - 1), this.roomName);
@@ -20,39 +20,43 @@ RoomPosition.prototype.getSpacesAround = function(creep?: Creep): RoomPosition[]
     const sw = new RoomPosition((this.x - 1), (this.y + 1), this.roomName);
     const  w = new RoomPosition((this.x - 1), this.y, this.roomName);
     const nw = new RoomPosition((this.x - 1), (this.y - 1), this.roomName);
-    if (n.isStandable(creep)) {  positions.push(n); }
-    if (ne.isStandable(creep)) { positions.push(ne); }
-    if (e.isStandable(creep)) {  positions.push(e); }
-    if (se.isStandable(creep)) { positions.push(se); }
-    if (s.isStandable(creep)) {  positions.push(s); }
-    if (sw.isStandable(creep)) { positions.push(sw); }
-    if (w.isStandable(creep)) {  positions.push(w); }
-    if (nw.isStandable(creep)) { positions.push(nw); }
+    if (n.isStandable(creep, ignore)) {  positions.push(n); }
+    if (ne.isStandable(creep, ignore)) { positions.push(ne); }
+    if (e.isStandable(creep, ignore)) {  positions.push(e); }
+    if (se.isStandable(creep, ignore)) { positions.push(se); }
+    if (s.isStandable(creep, ignore)) {  positions.push(s); }
+    if (sw.isStandable(creep, ignore)) { positions.push(sw); }
+    if (w.isStandable(creep, ignore)) {  positions.push(w); }
+    if (nw.isStandable(creep, ignore)) { positions.push(nw); }
     return positions;
 };
 
-RoomPosition.prototype.numSpacesAround = function(creep?: Creep): number {
-    return Object.keys(this.getSpacesAround()).length;
+RoomPosition.prototype.numSpacesAround = function(creep?: Creep, ignore?: boolean): number {
+    return Object.keys(this.getSpacesAround(creep, ignore)).length;
 };
 
-RoomPosition.prototype.isStandable = function(creep?: Creep): boolean {
+RoomPosition.prototype.isStandable = function(creep?: Creep, ignore?: boolean): boolean {
     // if it has a wall, then false
     if (this.hasWall()) {
-        console.log("found wall");
+        // console.log("found wall");
         return false;
+    }
+    if (ignore) {
+        // console.log("ignoring creeps and no wall showing a space!");
+        return true;
     }
     const space = this.hasCreep();
     // if the space has no creep, true
     if (false === space) {
-        console.log("no creep");
+        // console.log("no creep");
         return true;
     }
     // if the space is our creep, return true (we're already there)
     if ((creep !== undefined) && creep === space) {
-        console.log("current creep");
+        // console.log("current creep");
         return true;
     }
-    console.log("creep found");
+    // console.log("creep found");
     // no space
     return false;
 };

@@ -7,7 +7,7 @@ export class MineralExtractor {
     public static ticksBeforeRenew: number = 200;
     public static colour: string = "#663300";
     public static roleName: string = "mMiner";
-    public static roster: number[] = [ 0, 0, 0, 0, 0, 0, 1, 1, 1 ];
+    public static roster: number[] = [ 0, 0, 0, 0, 0, 0, 8, 8, 8 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         [],
@@ -30,13 +30,8 @@ export class MineralExtractor {
                 return false;
             }
         }
-        // minerals in the room?
-        const mineral = room.find(FIND_MINERALS)[0];
-        if (mineral.mineralAmount > 0 || mineral.ticksToRegeneration <= ((50 * 3) + this.ticksBeforeRenew)) {
-            const extractors = room.find(FIND_STRUCTURES, {
-                filter: (s: AnyStructure) => s.structureType === STRUCTURE_EXTRACTOR
-            });
-            if (extractors.length > 0) { return true; }
+        if (room.memory.mineralsNeeded && room.memory.mineralsNeeded > 0) {
+            return true;
         }
         return false;
     }
@@ -102,26 +97,18 @@ Creep.prototype.pickMineral = function(): boolean {
     }
     // Make sure the room has cleaned it's minerals if necessary
     this.room.mineralSetup();
-    // get all the mineral sources in a room
-    const minerals: Mineral[] = this.room.find(FIND_MINERALS);
-    // get the room's opinion on what's assigned
-    const roomMinerals: { [key: string]: string | null } = this.room.memory.assignedMinerals!;
-    // loop
-    for (const i in minerals) {
-        // get the mineral
-        const mineral: Mineral = minerals[i];
-        // is this item null in the rooms memoryy
-        if (roomMinerals[mineral.id] === null) {
-            // assign this creep to the source
-            this.room.memory.assignedMinerals![mineral.id] = this.id;
-            // assign the mineral to the creep
-            this.memory.assignedMineral = mineral.id;
-            // success!
-            return true;
-        }
+    const minerals = this.room.find(FIND_MINERALS, {
+        filter: (i: Mineral) => (
+            i.mineralAmount > 0 || i.ticksToRegeneration <= ((50 * 3) + MineralExtractor.ticksBeforeRenew)
+        )
+    });
+    if (minerals.length <= 0) {
+        return false;
     }
+    const mineral: Mineral = _.first(minerals);
+    this.memory.assignedMineral = mineral.id;
     // didn't work
-    return false;
+    return true;
 };
 
 /**
@@ -155,7 +142,6 @@ Creep.prototype.moveToMineral = function(): ScreepsReturnCode {
 Creep.prototype.mineMineral = function(): ScreepsReturnCode {
     if (!this.memory.dying && this.ticksToLive! <= MineralExtractor.ticksBeforeRenew) {
         this.memory.dying = true;
-        this.room.memory.assignedMinerals![this.memory.assignedMineral!] = null;
     }
     if (this.memory.assignedMineral) {
         const mineral: Mineral | null = Game.getObjectById(this.memory.assignedMineral);

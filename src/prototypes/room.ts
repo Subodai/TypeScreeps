@@ -288,37 +288,22 @@ export function loadRoomPrototypes(): void {
                 i.mineralAmount > 0 || i.ticksToRegeneration <= ((50 * 3) + MineralExtractor.ticksBeforeRenew)
             )
         });
-        // get the mineral extracters in this room
+        if (minerals.length === 0) {
+            this.memory.mineralsNeeded = 0;
+            return;
+        }
         const creeps = _.filter(Game.creeps, (c: Creep) =>
             c.role === MineralExtractor.roleName && c.memory.roomName === this.name &&
             // @todo Remote Mineral Extractor role name?
             !c.memory.dying);
+        const mineral: Mineral = _.first(minerals);
+        const spaces: number = mineral.pos.numSpacesAround(undefined, true);
+        this.log("Found " + spaces + " available spaces");
+        // get the mineral extracters in this room
+
         // set the number of mineralsNeeded to thelength of active mineral sites
-        this.memory.mineralsNeeded = minerals.length;
-        // make an empty array
-        const roomMinerals: { [key: string]: string | null } = {};
-        // loop through the minerals
-        for (const i in minerals) {
-            this.log("Clearing mineral association for " + minerals[i].id);
-            // set the mineral to null
-            roomMinerals[minerals[i].id] = null;
-            // loop through the creeps we found
-            for (const c in creeps) {
-                // grab the creep
-                const Creep = creeps[c];
-                this.log("Checking creep" + Creep.name);
-                // if this assigned to the mineral
-                if (Creep.memory.assignedMineral === minerals[i].id) {
-                    this.log("Assigning " + minerals[i].id + " to creep" + Creep.name);
-                    // update this source to this creepId
-                    roomMinerals[minerals[i].id] = Creep.id;
-                    delete creeps[c];
-                }
-            }
-        }
-        this.log(JSON.stringify(roomMinerals));
-        // update the room's assigned minerals
-        this.memory.assignedMinerals = roomMinerals;
+        this.log("Found " + creeps.length + " Creeps to fill the spaces");
+        this.memory.mineralsNeeded = spaces - creeps.length;
     };
 
     /**
