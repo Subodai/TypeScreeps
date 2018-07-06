@@ -337,7 +337,7 @@ export class Traveler {
                     console.log(`from: ${origin}, destination: ${destination}`);
                     options.useFindRoute = true;
                     ret = this.findTravelPath(origin, destination, options);
-                    console.log(`TRAVELER: second attempt was ${ret.incomplete ? "not " : ""}successful`);
+                    // console.log(`TRAVELER: second attempt was ${ret.incomplete ? "not " : ""}successful`);
                     return ret;
                 }
 
