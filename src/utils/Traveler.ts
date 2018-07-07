@@ -112,7 +112,7 @@ export class Traveler {
             }
 
             let color = "orange";
-            if (ret.incomplete) {
+            if (undefined === ret || ret.incomplete) {
                 // uncommenting this is a great way to diagnose creep behavior issues
                 // console.log(`TRAVELER: incomplete path for ${creep.name}`);
                 color = "red";
@@ -337,13 +337,14 @@ export class Traveler {
                     console.log(`from: ${origin}, destination: ${destination}`);
                     options.useFindRoute = true;
                     ret = this.findTravelPath(origin, destination, options);
-                    // console.log(`TRAVELER: second attempt was ${ret.incomplete ? "not " : ""}successful`);
+                    console.log(`TRAVELER: second attempt was ${ret.incomplete ? "not " : ""}successful`);
                     return ret;
                 }
 
                 // TODO: handle case where a wall or some other obstacle is blocking the exit assumed by findRoute
             } else {
-                return;
+                // stop undefined errors...
+                return ret;
             }
         }
 
