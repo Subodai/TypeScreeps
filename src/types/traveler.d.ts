@@ -151,6 +151,13 @@ declare class Traveler {
     static roomType(roomName: string): number;
 }
 
+interface PathfinderReturn {
+    path: RoomPosition[];
+    ops: number;
+    cost: number;
+    incomplete: boolean;
+}
+
 interface TravelToReturnData {
     nextPos?: RoomPosition;
     pathfinderReturn?: PathFinderPath;

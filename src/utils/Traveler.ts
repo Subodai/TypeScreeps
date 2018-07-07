@@ -112,7 +112,7 @@ export class Traveler {
             }
 
             let color = "orange";
-            if (undefined === ret || ret.incomplete) {
+            if (ret.incomplete) {
                 // uncommenting this is a great way to diagnose creep behavior issues
                 // console.log(`TRAVELER: incomplete path for ${creep.name}`);
                 color = "red";
@@ -244,7 +244,8 @@ export class Traveler {
     public static findTravelPath(
         origin: RoomPosition | HasPos,
         destination: RoomPosition | HasPos,
-        options: TravelToOptions = {}): any {
+        options: TravelToOptions = {}): PathfinderReturn {
+
         _.defaults(options, {
             ignoreCreeps: true,
             maxOps: DEFAULT_MAXOPS,
@@ -342,9 +343,6 @@ export class Traveler {
                 }
 
                 // TODO: handle case where a wall or some other obstacle is blocking the exit assumed by findRoute
-            } else {
-                // stop undefined errors...
-                return ret;
             }
         }
 
