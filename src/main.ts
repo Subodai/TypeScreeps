@@ -16,6 +16,7 @@ import { loadPrototypes } from "./prototypes/all";
 import { ErrorMapper } from "./utils/ErrorMapper";
 
 /* Screepsplus */
+import { Science } from "functions/Science";
 import { Screepsplus } from "./utils/Screepsplus/Screepsplus";
 
 /* Prototype loader */
@@ -37,6 +38,8 @@ export const loop = ErrorMapper.wrapLoop(() => {
     Counter.run(); // @todo make the counter count the things we need to run other things
     Spawner.run(); // @todo make this put items into the spawn queue
     Runner.run();  // @todo make this aware of the things the counter has counted so it won't run unnecessary items
+    const science = new Science();
+    global.science = science;
     const message = Screepsplus.run(); // Collect Stats
     Debug.Log(message);
 });
