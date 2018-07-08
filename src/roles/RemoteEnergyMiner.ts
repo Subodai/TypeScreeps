@@ -8,17 +8,17 @@ export class RemoteEnergyMiner {
     public static ticksBeforeRenew: number = 200;
     public static colour: string = "#ff66ff";
     public static roleName: string = "rEMiner";
-    public static roster: number[] = [ 0, 0, 0, 4, 4, 4, 4, 4, 4 ];
+    public static roster: number[] = [ 0, 0, 4, 4, 4, 4, 4, 4, 4 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         [],
-        [],
-        BodyBuilder({ WORK: 5, CARRY: 1, MOVE: 4 }),
-        BodyBuilder({ WORK: 6, CARRY: 1, MOVE: 5 }),
-        BodyBuilder({ WORK: 7, CARRY: 1, MOVE: 6 }),
-        BodyBuilder({ WORK: 7, CARRY: 1, MOVE: 6 }),
-        BodyBuilder({ WORK: 7, CARRY: 1, MOVE: 6 }),
-        BodyBuilder({ WORK: 7, CARRY: 1, MOVE: 6 })
+        BodyBuilder({ WORK: 5, CARRY: 1, MOVE: 5 }),
+        BodyBuilder({ WORK: 8, CARRY: 1, MOVE: 8 }),
+        BodyBuilder({ WORK: 10, CARRY: 1, MOVE: 10 }),
+        BodyBuilder({ WORK: 10, CARRY: 1, MOVE: 10 }),
+        BodyBuilder({ WORK: 10, CARRY: 1, MOVE: 10 }),
+        BodyBuilder({ WORK: 10, CARRY: 1, MOVE: 10 }),
+        BodyBuilder({ WORK: 10, CARRY: 1, MOVE: 10 })
     ];
     // is it enabled?
     public static enabled(room: Room): boolean {

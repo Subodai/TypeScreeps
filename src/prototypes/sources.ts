@@ -13,13 +13,16 @@ export function loadSourcePrototypes(): void {
         configurable: true,
         enumerable: false,
         get(): any {
-            if (!Memory.rooms[this.room.name].sources) {
-                Memory.rooms[this.room.name].sources = {};
+            if (!Memory.sources[this.room.name]) {
+                Memory.sources[this.room.name] = {};
             }
-            if (!Memory.rooms[this.room.name].sources[this.id]) {
-                Memory.rooms[this.room.name].sources[this.id] = {};
+            if (!Memory.sources[this.room.name].sources) {
+                Memory.sources[this.room.name].sources = {};
             }
-            return Memory.rooms[this.room.name].sources[this.id];
+            if (!Memory.sources[this.room.name].sources[this.id]) {
+                Memory.sources[this.room.name].sources[this.id] = {};
+            }
+            return Memory.sources[this.room.name].sources[this.id];
         },
         set(v: any): any {
             return _.set(Memory, "sources." + this.room.name + ".sources." + this.id, v);

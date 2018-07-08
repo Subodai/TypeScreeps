@@ -10,7 +10,6 @@ import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
-import { Supergrader } from "roles/Supergrader";
 import { Upgrader } from "roles/Upgrader";
 import { Debug } from "./debug";
 import { CalcBodyCost } from "./tools";
@@ -27,7 +26,11 @@ export class Spawner {
         }
     }
 
+    /**
+     * Check for available spawns
+     */
     private static checkForSpawns(): void {
+        const spawnedCreeps: {[k: string]: {[k: string]: boolean}} | null = {};
         for (const spawn in Game.spawns) {
             const Spawn: StructureSpawn = Game.spawns[spawn];
             if (Spawn.spawning) {
@@ -35,12 +38,19 @@ export class Spawner {
                 continue;
             }
             const Room = Spawn.room;
+            if (spawnedCreeps[Room.name] === undefined) {
+                spawnedCreeps[Room.name] = {};
+            }
             let spawned = false;
             for (const i in ROLES) {
                 // if we've spawned something, stop
                 if (spawned) { break; }
                 // get the roleName
                 const roleName: string = ROLES[i];
+                if (spawnedCreeps[Room.name][roleName] !== undefined) {
+                    Spawn.log(roleName + " Is already being spawned by this room");
+                    break;
+                }
                 Spawn.log("Checking for role " + roleName);
                 // skip if this role is disabled
                 if (!Room.memory.roles[roleName]) {
@@ -119,7 +129,12 @@ export class Spawner {
                     default:
                         break;
                 }
+
+                if (spawned) {
+                    spawnedCreeps[Room.name][roleName] = true;
+                }
             }
+            Spawn.log(JSON.stringify(spawnedCreeps));
         }
     }
 

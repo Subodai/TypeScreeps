@@ -7,7 +7,7 @@ import { Counter } from "functions/counter";
 import { Debug, debugEnablers } from "functions/debug";
 import { Runner } from "functions/runner";
 import { Spawner } from "functions/spawner";
-import { loadTools } from "functions/tools";
+import "functions/tools";
 
 /* Prototype imports */
 import { loadPrototypes } from "./prototypes/all";
@@ -22,7 +22,6 @@ import { Screepsplus } from "./utils/Screepsplus/Screepsplus";
 loadPrototypes();
 init();
 debugEnablers();
-loadTools();
 
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
