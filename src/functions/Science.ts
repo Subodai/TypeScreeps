@@ -1,18 +1,22 @@
+import { Debug } from "./debug";
 
 interface ScienceInterface {
-    queue: QueuedCompound[];
-    reactions: QueuedReaction[];
+    queue: Request[];
+    reactions: Reaction[];
+    log(message: string): void;
     load(): void;
     save(): void;
-    addRequest(type: ResourceConstant, amount: number): void;
+    addRequest(room: Room, type: ResourceConstant, amount: number): void;
 }
 
-interface QueuedCompound {
+interface Request {
+    room: Room;
     resource: ResourceConstant;
     amount: number;
 }
 
-interface QueuedReaction {
+interface Reaction {
+    room: Room;
     outputLab: StructureLab;
     sourceLab1: StructureLab;
     sourceLab2: StructureLab;
@@ -24,23 +28,101 @@ interface QueuedReaction {
  * Science class, handles labs and reactions
  */
 class Science implements ScienceInterface {
+    /**
+     * Queue of items we want
+     */
+    private _queue: Request[] = [];
 
-    private _queue: QueuedCompound[] = [];
-    private _reactions: QueuedReaction[] = [];
+    /**
+     * Queue of reactions to happen
+     */
+    private _reactions: Reaction[] = [];
 
-    public get reactions(): QueuedReaction[] {
+    /**
+     * Class Constructor
+     */
+    public constructor() {
+        this.load();
+    }
+
+    /**
+     * Log Something
+     * @param message The text you want to send
+     */
+    public log(message: string): void {
+        const msg: string = "[Science] " + message;
+        Debug.Log(msg);
+    }
+
+    /**
+     * Load our queue's into global
+     */
+    public load(): void {
+        this.loadRequests();
+        this.loadReactions();
+    }
+
+    /**
+     * Load Request queue into global
+     */
+    private loadRequests(): void {
+        if (undefined === global.scienceQueue) {
+            this.log("Loading request queue from memory");
+            global.scienceQueue = Memory.scienceQueue ? Memory.scienceQueue : [];
+        }
+        // clear queue
+        this._queue = [];
+        // grab the queue from global
+        const requests = global.scienceQueue;
+        // loop through and transpose into usable objects
+        for (const item of requests) {
+            const request: Request = {
+                amount: item.amount,
+                resource: item.resource as ResourceConstant,
+                room : Game.rooms[item.room] as Room
+            };
+            this._queue.push(request);
+        }
+    }
+
+    /**
+     * Load Reaction queue into global
+     */
+    private loadReactions(): void {
+        if (undefined === global.scienceReactions) {
+            this.log("Loading reaction list from memory");
+            global.scienceReactions = Memory.scienceReactions ? Memory.scienceReactions : [];
+        }
+        // Reactions needs to be processed back out
+        this._reactions = [];
+        const reactions = global.scienceReactions;
+        for (const item of reactions) {
+            const reaction: Reaction = {
+                inputMineral1: item.inputMineral1 as ResourceConstant,
+                inputMineral2: item.inputMineral2 as ResourceConstant,
+                outputLab: Game.getObjectById(item.outputLab) as StructureLab,
+                outputMineral: item.outputMineral as ResourceConstant,
+                room: Game.rooms[item.room] as Room,
+                sourceLab1: Game.getObjectById(item.sourceLab1) as StructureLab,
+                sourceLab2: Game.getObjectById(item.sourceLab2) as StructureLab
+            };
+            this._reactions.push(reaction);
+        }
+    }
+
+    public get reactions(): Reaction[] {
         return this._reactions;
     }
 
-    public set reactions(value: QueuedReaction[]) {
+    public set reactions(value: Reaction[]) {
         this._reactions = value;
     }
 
-    public get queue(): QueuedCompound[] {
+    public get queue(): Request[] {
         return this._queue;
     }
 
-    public set queue(queue: QueuedCompound[]) {
+    public set queue(queue: Request[]) {
         this._queue = queue;
     }
 
@@ -50,7 +132,17 @@ class Science implements ScienceInterface {
     }
 
     private saveRequests(): void {
-        _.set(Memory, "scienceQueue", this._queue);
+        const requests = [];
+        for (const item of this._queue) {
+            const obj = {
+                amount: item.amount,
+                resource: item.resource,
+                room: item.room.name
+            };
+            requests.push(obj);
+        }
+        global.scienceQueue = requests;
+        _.set(Memory, "scienceQueue", requests);
     }
 
     private saveReactions(): void {
@@ -66,45 +158,16 @@ class Science implements ScienceInterface {
             };
             reactions.push(obj);
         }
+        global.scienceReactions = reactions;
         _.set(Memory, "scienceReactions", reactions);
     }
 
-    public load(): void {
+    public addRequest(room: Room, resource: ResourceConstant, amount: number): void {
         this.loadRequests();
-        this.loadReactions();
-    }
-
-    private loadRequests(): void {
-        // Queue can come straight from memory
-        this._queue = Memory.scienceQueue;
-    }
-
-    private loadReactions(): void {
-        // Reactions needs to be processed back out
-        this._reactions = [];
-        const reactions = Memory.scienceReactions;
-        for (const item of reactions) {
-            const reaction: QueuedReaction = {
-                inputMineral1: item.inputMineral1 as ResourceConstant,
-                inputMineral2: item.inputMineral2 as ResourceConstant,
-                outputLab: Game.getObjectById(item.outputLab) as StructureLab,
-                outputMineral: item.outputMineral as ResourceConstant,
-                sourceLab1: Game.getObjectById(item.sourceLab1) as StructureLab,
-                sourceLab2: Game.getObjectById(item.sourceLab2) as StructureLab
-            };
-            this._reactions.push(reaction);
-        }
-    }
-
-    public constructor() {
-        this.load();
-    }
-
-    public addRequest(type: ResourceConstant, amount: number): void {
-        this.loadRequests();
-        const request: QueuedCompound = {
+        const request: Request = {
             amount,
-            resource: type
+            resource,
+            room
         };
         this._queue.push(request);
         this.saveRequests();
