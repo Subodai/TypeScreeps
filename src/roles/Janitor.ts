@@ -70,7 +70,7 @@ export class Janitor {
         // Is Creep Tired?
         if (creep.isTired()) {
             creep.log("Tired");
-            return;
+            // return;
         }
         // Death Check
         creep.deathCheck(this.ticksBeforeRenew);

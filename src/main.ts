@@ -6,6 +6,7 @@ import { Cleaner } from "functions/cleaner";
 import { Counter } from "functions/counter";
 import { Debug, debugEnablers } from "functions/debug";
 import { Runner } from "functions/runner";
+import { Science } from "functions/science/Science";
 import { Spawner } from "functions/spawner";
 import "functions/tools";
 
@@ -16,7 +17,6 @@ import { loadPrototypes } from "./prototypes/all";
 import { ErrorMapper } from "./utils/ErrorMapper";
 
 /* Screepsplus */
-import { Science } from "functions/Science";
 import { Screepsplus } from "./utils/Screepsplus/Screepsplus";
 
 /* Prototype loader */

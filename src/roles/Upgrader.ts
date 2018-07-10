@@ -46,7 +46,7 @@ export class Upgrader {
         // if creep is tired, don't waste intents
         if (creep.isTired()) {
             creep.log("Tired");
-            return;
+            // return;
         }
         // if creep is dying make sure it get's renewed
         creep.deathCheck(this.ticksBeforeRenew);

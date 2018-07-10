@@ -41,11 +41,14 @@ Creep.prototype.invalidateMineralTarget = function(full: boolean = false): Scree
 Creep.prototype.findStorageMinerals = function(): void {
     // Have an override, call it storeMinerals for now (it'l do)
     if (this.room.memory.storeMinerals) { return; }
+    if (!this.room.terminal) { return; }
     const storage = this.room.storage;
+    const terminal = this.room.terminal;
     // Does this room have a storage? (no harm in checking)
     if (storage) {
-        // Is there something other than energy in the storage?
-        if (_.sum(storage.store) - storage.store[RESOURCE_ENERGY] > 0) {
+        // Is there something other than energy in the storage? (and space in the terminal)
+        if (_.sum(storage.store) - storage.store[RESOURCE_ENERGY] > 0 &&
+            _.sum(terminal.store) < terminal.storeCapacity) {
             // Set the target to be the storage
             this.memory.mineralPickup = storage.id;
         }

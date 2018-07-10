@@ -8,7 +8,7 @@ export class Builder {
     public static ticksBeforeRenew: number = 100;
     public static colour: string = "#99ccff";
     public static roleName: string = "build";
-    public static roster: number[] = [ 0, 4, 4, 4, 4, 4, 4, 1, 1 ];
+    public static roster: number[] = [ 0, 4, 4, 4, 4, 4, 4, 1, 2 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 1 }),
@@ -34,7 +34,7 @@ export class Builder {
         // if creep is tired, don't waste intents
         if (creep.isTired()) {
             creep.log("Tired");
-            return;
+            // return;
         }
         // if creep is dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);

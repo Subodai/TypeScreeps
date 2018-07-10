@@ -37,8 +37,8 @@ export function loadRoomPrototypes(): void {
                 if (!this.memory.mode) { this.memory.mode = "safe"; }
             }
             if (!this.memory.sources) { this.memory.sources = {}; }
-            if (!this.memory.assignedSources) { this.memory.assignedSources = []; }
-            if (!this.memory.assignedMinerals) { this.memory.assignedMinerals = []; }
+            if (!this.memory.assignedSources) { this.memory.assignedSources = {}; }
+            if (!this.memory.assignedMinerals) { this.memory.assignedMinerals = {}; }
             this.log("Successfully initiated room");
         }
     };
@@ -56,7 +56,7 @@ export function loadRoomPrototypes(): void {
     */
     Room.prototype.collectableEnergy = function(): number {
         if (this.memory.lastEnergyCheck && this.memory.lastEnergyCheck === Game.time) {
-            return this.memory.energy;
+            return this.memory.energy || 0;
         }
         let energy = 0;
         const containers = this.find(FIND_STRUCTURES, {
@@ -82,7 +82,7 @@ export function loadRoomPrototypes(): void {
     */
     Room.prototype.hostiles = function(): number {
         if (this.memory.lastHostileCheck && this.memory.lastHostileCheck === Game.time) {
-            return this.memory.hostiles;
+            return this.memory.hostiles || 0;
         }
 
         const hostiles = this.find(FIND_HOSTILE_CREEPS, {

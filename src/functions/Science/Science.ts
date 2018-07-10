@@ -1,29 +1,5 @@
-import { Debug } from "./debug";
+import { Debug } from "../debug";
 
-interface ScienceInterface {
-    queue: Request[];
-    reactions: Reaction[];
-    log(message: string): void;
-    load(): void;
-    save(): void;
-    addRequest(room: Room, type: ResourceConstant, amount: number): void;
-}
-
-interface Request {
-    room: Room;
-    resource: ResourceConstant;
-    amount: number;
-}
-
-interface Reaction {
-    room: Room;
-    outputLab: StructureLab;
-    sourceLab1: StructureLab;
-    sourceLab2: StructureLab;
-    inputMineral1: ResourceConstant;
-    inputMineral2: ResourceConstant;
-    outputMineral: ResourceConstant;
-}
 /**
  * Science class, handles labs and reactions
  */
@@ -31,12 +7,12 @@ class Science implements ScienceInterface {
     /**
      * Queue of items we want
      */
-    private _queue: Request[] = [];
+    private _queue: ScienceRequest[] = [];
 
     /**
      * Queue of reactions to happen
      */
-    private _reactions: Reaction[] = [];
+    private _reactions: ScienceReaction[] = [];
 
     /**
      * Class Constructor
@@ -76,7 +52,7 @@ class Science implements ScienceInterface {
         const requests = global.scienceQueue;
         // loop through and transpose into usable objects
         for (const item of requests) {
-            const request: Request = {
+            const request: ScienceRequest = {
                 amount: item.amount,
                 resource: item.resource as ResourceConstant,
                 room : Game.rooms[item.room] as Room
@@ -97,7 +73,7 @@ class Science implements ScienceInterface {
         this._reactions = [];
         const reactions = global.scienceReactions;
         for (const item of reactions) {
-            const reaction: Reaction = {
+            const reaction: ScienceReaction = {
                 inputMineral1: item.inputMineral1 as ResourceConstant,
                 inputMineral2: item.inputMineral2 as ResourceConstant,
                 outputLab: Game.getObjectById(item.outputLab) as StructureLab,
@@ -110,19 +86,19 @@ class Science implements ScienceInterface {
         }
     }
 
-    public get reactions(): Reaction[] {
+    public get reactions(): ScienceReaction[] {
         return this._reactions;
     }
 
-    public set reactions(value: Reaction[]) {
+    public set reactions(value: ScienceReaction[]) {
         this._reactions = value;
     }
 
-    public get queue(): Request[] {
+    public get queue(): ScienceRequest[] {
         return this._queue;
     }
 
-    public set queue(queue: Request[]) {
+    public set queue(queue: ScienceRequest[]) {
         this._queue = queue;
     }
 
@@ -164,7 +140,7 @@ class Science implements ScienceInterface {
 
     public addRequest(room: Room, resource: ResourceConstant, amount: number): void {
         this.loadRequests();
-        const request: Request = {
+        const request: ScienceRequest = {
             amount,
             resource,
             room

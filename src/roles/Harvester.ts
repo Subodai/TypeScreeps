@@ -9,7 +9,7 @@ export class Harvester {
     public static colour: string = "#ffff00";
     public static roleName: string = "harvest";
     private static multiplier: number = 2;
-    public static roster: number[] = [ 0, 4, 3, 2, 2, 2, 2, 2, 2 ];
+    public static roster: number[] = [ 0, 4, 3, 2, 2, 2, 2, 2, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 1, CARRY: 2, MOVE: 2 }),
@@ -19,7 +19,7 @@ export class Harvester {
         BodyBuilder({ CARRY: 18, MOVE: 18 }),
         BodyBuilder({ CARRY: 18, MOVE: 18 }),
         BodyBuilder({ CARRY: 18, MOVE: 18 }),
-        BodyBuilder({ CARRY: 18, MOVE: 18 })
+        BodyBuilder({ CARRY: 25, MOVE: 25 })
     ];
     // is role enabled
     public static enabled(room: Room): boolean {
@@ -36,7 +36,7 @@ export class Harvester {
         // if creep is tired don't waste intents
         if (creep.isTired()) {
             creep.log("Tired");
-            return;
+            // return;
         }
         // if creep is dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);

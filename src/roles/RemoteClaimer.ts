@@ -58,7 +58,7 @@ export class RemoteClaimer {
     public static run(creep: Creep): void {
         if (creep.isTired()) {
             creep.log("Tired");
-            return;
+            // return;
         }
         creep.deathCheck(this.ticksBeforeRenew);
         // Make sure we can claim

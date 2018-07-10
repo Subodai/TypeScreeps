@@ -410,6 +410,10 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
                     target = storage;
                 } else {
                     target = terminal;
+                    if (!target || _.sum(terminal.store) === terminal.storeCapacity) {
+                        // try storage
+                        target = storage;
+                    }
                 }
             }
         } else {

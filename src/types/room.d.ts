@@ -61,6 +61,7 @@ interface Room {
 }
 
 interface RoomMemory {
+    init?: boolean;
     links?: boolean;
     prioritise?: string;
     avoid?: number;
