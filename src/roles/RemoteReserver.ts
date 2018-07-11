@@ -161,23 +161,26 @@ Creep.prototype.chooseReserveRoom = function(): void {
     }
 };
 
+/**
+ * Reserve a Remote Room
+ */
 Creep.prototype.reserveRemoteRoom = function(): void {
     // make sure this room has a controller before we go on
-    if (this.room.controller) {
-        // are we in range?
-        if (this.pos.inRangeTo(this.room.controller, 1)) {
-            this.log("Target should be in range, attempting reserve");
-            if (this.reserveController(this.room.controller) === ERR_NOT_IN_RANGE) {
-                this.log("Reserve Failed out of range");
-            } else {
-                if (!this.memory.signed && this.room.controller.sign === null) {
-                    this.memory.signed = true;
-                    this.signController(this.room.controller, "Room Reserved by Subodai - [Ypsilon Pact]");
-                }
-                return;
-            }
-        }
-        this.travelTo(this.room.controller, {ensurePath : true});
+    if (!this.room.controller) {
+        return;
+    }
+    // are we in range?
+    if (!this.pos.inRangeTo(this.room.controller, 1)) {
+        this.travelTo(this.room.controller, { ensurePath: true });
         this.roadCheck();
+    }
+    this.log("Target should be in range, attempting reserve");
+    if (this.reserveController(this.room.controller) === ERR_NOT_IN_RANGE) {
+        this.log("Reserve Failed out of range");
+        return;
+    }
+    if (!this.memory.signed && this.room.controller.sign === null) {
+        this.memory.signed = true;
+        this.signController(this.room.controller, "Room Reserved by Subodai - [Ypsilon Pact]");
     }
 };
