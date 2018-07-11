@@ -56,10 +56,6 @@ export class RemoteClaimer {
     }
     // run the creep role
     public static run(creep: Creep): void {
-        if (creep.isTired()) {
-            creep.log("Tired");
-            // return;
-        }
         creep.deathCheck(this.ticksBeforeRenew);
         // Make sure we can claim
         if (!creep.canDo(CLAIM)) {

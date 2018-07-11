@@ -70,10 +70,6 @@ export class RemoteEnergyMiner {
     }
     // run the creep role
     public static run(creep: Creep): void {
-        if (creep.isTired()) {
-            creep.log("Tired");
-            // return;
-        }
         // if creep dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
         if (!creep.canDo(WORK)) {

@@ -37,10 +37,6 @@ export class RemoteEnergyHauler {
     }
 
     public static run(creep: Creep): void {
-        if (creep.isTired()) {
-            creep.log("Tired");
-            // return;
-        }
         // if creep is dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
         // Make sure we can actually carry stuff first

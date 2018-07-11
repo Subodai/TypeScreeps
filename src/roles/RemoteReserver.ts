@@ -55,10 +55,6 @@ export class RemoteReserver {
     }
     // run the creep role
     public static run(creep: Creep): void {
-        if (creep.isTired()) {
-            creep.log("Tired");
-            // return;
-        }
         // if creep dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
         if (!creep.canDo(CLAIM)) {
@@ -107,12 +103,12 @@ export class RemoteReserver {
             case STATE._ARRIVED:
                 creep.log("Creep has arrived");
                 // have we somehow changed room?
-                if (creep.memory.reserveRoom !== creep.room.name) {
-                    // Back into move state
-                    creep.state = STATE._MOVE;
-                    this.run(creep);
-                    break;
-                }
+                // if (creep.memory.reserveRoom !== creep.room.name) {
+                //     // Back into move state
+                //     creep.state = STATE._MOVE;
+                //     this.run(creep);
+                //     break;
+                // }
                 // Reserve the remote room
                 creep.reserveRemoteRoom();
                 break;
@@ -166,21 +162,22 @@ Creep.prototype.chooseReserveRoom = function(): void {
  */
 Creep.prototype.reserveRemoteRoom = function(): void {
     // make sure this room has a controller before we go on
-    if (!this.room.controller) {
+    const room: Room = Game.rooms[this.memory.reserveRoom!];
+    if (!room.controller) {
         return;
     }
     // are we in range?
-    if (!this.pos.inRangeTo(this.room.controller, 1)) {
-        this.travelTo(this.room.controller, { ensurePath: true });
+    if (!this.pos.inRangeTo(room.controller, 1)) {
+        this.travelTo(room.controller, { ensurePath: true });
         this.roadCheck();
     }
     this.log("Target should be in range, attempting reserve");
-    if (this.reserveController(this.room.controller) === ERR_NOT_IN_RANGE) {
+    if (this.reserveController(room.controller) === ERR_NOT_IN_RANGE) {
         this.log("Reserve Failed out of range");
         return;
     }
-    if (!this.memory.signed && this.room.controller.sign === null) {
+    if (!this.memory.signed && room.controller.sign === null) {
         this.memory.signed = true;
-        this.signController(this.room.controller, "Room Reserved by Subodai - [Ypsilon Pact]");
+        this.signController(room.controller, "Room Reserved by Subodai - [Ypsilon Pact]");
     }
 };

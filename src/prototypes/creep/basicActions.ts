@@ -52,7 +52,7 @@ Creep.prototype.atHome = function(): boolean {
         delete this.memory.energyPickup;
         if (this.memory.roomName) {
             const pos = new RoomPosition(25, 25, this.memory.roomName);
-            this.travelTo(pos);
+            this.travelTo(pos, { ensurePath: true });
             return false;
         }
     }

@@ -116,9 +116,6 @@ Creep.prototype.pickMineral = function(): boolean {
  * @returns {ScreepsReturnCode}
  */
 Creep.prototype.moveToMineral = function(): ScreepsReturnCode {
-    if (this.isTired()) {
-        return ERR_TIRED;
-    }
     const mineral: Mineral | null = Game.getObjectById(this.memory.assignedMineral);
     this.log("Attemping to move to mineral: " + this.memory.assignedMineral);
     if (mineral) {

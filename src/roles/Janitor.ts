@@ -67,11 +67,6 @@ export class Janitor {
      * @param creep
      */
     public static run(creep: Creep): void {
-        // Is Creep Tired?
-        if (creep.isTired()) {
-            creep.log("Tired");
-            // return;
-        }
         // Death Check
         creep.deathCheck(this.ticksBeforeRenew);
         // Run through our switch statement
