@@ -24,7 +24,7 @@ export class Builder {
     public static enabled(room: Room): boolean {
         // fetch all construction sites within 3 rooms of this one
         const sites: ConstructionSite[] = _.filter(Game.constructionSites, (s: ConstructionSite) =>
-            s.my && (Game.map.getRoomLinearDistance(room.name, s.pos.roomName) < 3 || room.name === s.pos.roomName)
+            s.my && (Game.map.getRoomLinearDistance(room.name, s.pos.roomName) < 4 || room.name === s.pos.roomName)
         );
         // enabled if there are any
         return (sites.length > 0);
@@ -200,7 +200,7 @@ Creep.prototype.findNearestConstructionSite = function(my: boolean = true): void
     if (site === undefined || site === null) {
         for (const i in Game.constructionSites) {
             site = Game.getObjectById(i);
-            if (Game.map.getRoomLinearDistance(this.room.name, site!.pos.roomName) > 2) {
+            if (Game.map.getRoomLinearDistance(this.room.name, site!.pos.roomName) > 4) {
                 continue;
             }
             // did we find a site?
