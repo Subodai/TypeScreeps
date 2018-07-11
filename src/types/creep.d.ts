@@ -35,6 +35,10 @@ interface Creep {
     roadCheck(work?: boolean): void;
     containerCheck(): void | boolean;
     repairStructures(roads?: boolean, defences?: boolean, structures?: boolean): number;
+    validateCurrentRepairTarget(): void;
+    chooseRepairTarget(roads?: boolean, defences?: boolean, structures?: boolean): void;
+    chooseHighPriorityDefenceTarget(defences?: boolean, structures?: boolean): void;
+    repairCurrentTarget(): ScreepsReturnCode;
     findDamagedStructures(): void;
     findDamagedDefences(): void;
     findDamagedWall(): void;

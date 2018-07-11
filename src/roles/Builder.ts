@@ -173,13 +173,14 @@ Creep.prototype.goToAndBuild = function(siteId: string): ScreepsReturnCode {
  */
 Creep.prototype.checkSiteInMemory = function(): void {
     // do we have an item in memory
-    if (this.memory.siteId) {
-        // Check the object exists first
-        if (!Game.getObjectById(this.memory.siteId)) {
-            // if it doesn't clear it
-            delete this.memory.siteId;
-            delete this.memory.targetRoom;
-        }
+    if (!this.memory.siteId) {
+        return;
+    }
+    // Check the object exists first
+    if (!Game.getObjectById(this.memory.siteId)) {
+        // if it doesn't clear it
+        delete this.memory.siteId;
+        delete this.memory.targetRoom;
     }
 };
 

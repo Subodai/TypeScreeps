@@ -333,42 +333,37 @@ Creep.prototype.findRampart = function(hp: number): void {
     }
 };
 
-Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = false, s: boolean = false): number {
-    // First are we empty?
-    if (this.carry.energy === 0) {
-        this.log("Empty cannot repair anything");
-        // Clear repair target
-        // delete this.memory.repairTarget;
-        // delete this.memory.targetMaxHP;
-        return ERR_NOT_ENOUGH_ENERGY;
-    }
+/**
+ * Validate current repair target
+ */
+Creep.prototype.validateCurrentRepairTarget = function(): void {
     // Is their an item in memory, with full health already?
-    if (this.memory.repairTarget) {
-        const target: Structure | null = Game.getObjectById(this.memory.repairTarget);
-        if (target) {
-            let targetHits = 0;
-            if (this.memory.targetMaxHP) {
-                targetHits = this.memory.targetMaxHP;
-            }
-            // Have we already filled the items health to what we want?
-            if (target.hits >= targetHits) {
-                // Clear the target, time for a new one
-                delete this.memory.repairTarget;
-                delete this.memory.targetMaxHP;
-            }
-        } else {
-            delete this.memory.repairTarget;
-            delete this.memory.targetMaxHP;
-        }
+    if (!this.memory.repairTarget) {
+        return;
     }
+    const target: Structure | null = Game.getObjectById(this.memory.repairTarget);
+    if (!target) {
+        delete this.memory.repairTarget;
+        delete this.memory.targetMaxHP;
+        return;
+    }
+    const targetHits = this.memory.targetMaxHP ? this.memory.targetMaxHP : 0;
+    // Have we already filled the items health to what we want?
+    if (target.hits >= targetHits) {
+        // Clear the target, time for a new one
+        delete this.memory.repairTarget;
+        delete this.memory.targetMaxHP;
+    }
+};
 
+Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolean): void {
     // Do we have a repairTarget in memory?
     if (!this.memory.repairTarget && d) {
         this.log("Has no repair target, looking for 1 hp ramparts and walls");
         // Check for walls or ramparts with 1 hit first
         const targets = this.room.find(FIND_STRUCTURES, {
             filter: (i) => (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL) &&
-            i.hits === 1 && i.room === this.room
+                i.hits === 1 && i.room === this.room
         });
 
         if (targets.length > 0) {
@@ -380,7 +375,7 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
     }
 
     // Do we have a repairTarget in memory?
-    if (!this.memory.repairTarget && d) {
+    if (!this.memory.repairTarget && s) {
         this.log("Has no repair target, looking for containers");
         // Check for walls or ramparts with 1 hit first
         const targets = this.room.find(FIND_STRUCTURES, {
@@ -401,7 +396,7 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
         this.log("Has no repair target, looking for < 600hp ramparts and walls");
         const targets = this.room.find(FIND_STRUCTURES, {
             filter: (i) => (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL)
-                            && i.hits <= 600 && i.room === this.room
+                && i.hits <= 600 && i.room === this.room
         });
         if (targets.length > 0) {
             visualiseDamage(targets, this.room);
@@ -409,6 +404,13 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
             this.memory.targetMaxHP = 600;
         }
     }
+};
+
+Creep.prototype.chooseRepairTarget = function(r: boolean = false, d: boolean = false, s: boolean = false): void {
+    // If we have one, bailout
+    if (this.memory.repairTarget) { return; }
+
+    this.chooseHighPriorityDefenceTarget(d, s);
 
     // Next find damaged structures that aren't walls, ramparts or roads
     if (!this.memory.repairTarget && s) {
@@ -427,38 +429,21 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
         this.log("Has no repair target, looking for damaged defences");
         this.findDamagedDefences();
     }
+};
+
+Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = false, s: boolean = false): number {
+    // First are we empty?
+    if (this.carry.energy === 0) {
+        this.log("Empty cannot repair anything");
+        return ERR_NOT_ENOUGH_ENERGY;
+    }
+    // Validate current target
+    this.validateCurrentRepairTarget();
+    // pick one if we don't have one
+    this.chooseRepairTarget(r, d, s);
     // Do we have something to repair?
     if (this.memory.repairTarget) {
-        this.log("Has a repair target, checking close enough to repair");
-        const target: Structure | null = Game.getObjectById(this.memory.repairTarget);
-        // Make sure target is still valid
-        let targetHits = 0;
-        if (this.memory.targetMaxHP) {
-            targetHits = this.memory.targetMaxHP;
-        }
-        if (target) {
-            if (target.hits >= targetHits) {
-                this.log("Repair target at target XP deleting target from memory");
-                delete this.memory.repairTarget;
-                delete this.memory.targetMaxHP;
-                return ERR_FULL;
-            }
-            visualiseDamage([ target ], this.room);
-            if (this.pos.inRangeTo(target.pos, 3)) {
-                this.log("Target in range, attempting repair");
-                // attempt repair
-                if (this.repair(target) === ERR_NOT_IN_RANGE) {
-                    this.log("Repair Failed");
-                    return ERR_NOT_IN_RANGE;
-                } else {
-                    return OK;
-                }
-            } else {
-                this.log("Travelling to target");
-                this.travelTo(target);
-                return ERR_NOT_IN_RANGE;
-            }
-        }
+        return this.repairCurrentTarget();
     } else {
         // Nothing to repair?
         // No targets.. head back to the room spawn
@@ -472,5 +457,38 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
         }
         return ERR_INVALID_TARGET;
     }
-    return OK;
+};
+
+Creep.prototype.repairCurrentTarget = function(): ScreepsReturnCode {
+    this.log("Has a repair target, checking close enough to repair");
+    const target: Structure | null = Game.getObjectById(this.memory.repairTarget);
+    // Make sure target is still valid
+    let targetHits = 0;
+    if (this.memory.targetMaxHP) {
+        targetHits = this.memory.targetMaxHP;
+    }
+    if (target) {
+        if (target.hits >= targetHits) {
+            this.log("Repair target at target XP deleting target from memory");
+            delete this.memory.repairTarget;
+            delete this.memory.targetMaxHP;
+            return ERR_FULL;
+        }
+        visualiseDamage([target], this.room);
+        if (this.pos.inRangeTo(target.pos, 3)) {
+            this.log("Target in range, attempting repair");
+            // attempt repair
+            if (this.repair(target) === ERR_NOT_IN_RANGE) {
+                this.log("Repair Failed");
+                return ERR_NOT_IN_RANGE;
+            } else {
+                return OK;
+            }
+        } else {
+            this.log("Travelling to target");
+            this.travelTo(target);
+            return ERR_NOT_IN_RANGE;
+        }
+    }
+    return ERR_INVALID_TARGET;
 };
