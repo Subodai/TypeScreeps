@@ -21,6 +21,9 @@ Object.defineProperty(StructureLink.prototype, "linkType", {
     configurable: true,
     enumerable: false,
     get(): any {
+        if (!Memory.structures) {
+            Memory.structures = {};
+        }
         if (!Memory.structures[this.id]) {
             Memory.structures[this.id] = {};
         }
