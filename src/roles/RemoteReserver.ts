@@ -163,7 +163,7 @@ Creep.prototype.chooseReserveRoom = function(): void {
 Creep.prototype.reserveRemoteRoom = function(): void {
     // make sure this room has a controller before we go on
     const room: Room = Game.rooms[this.memory.reserveRoom!];
-    if (!room.controller) {
+    if (!room || !room.controller) {
         return;
     }
     // are we in range?

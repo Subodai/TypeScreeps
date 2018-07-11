@@ -32,6 +32,8 @@ export class Janitor {
         room.log("Room Controller level high enough");
         if (!room.storage) { return false; }
         room.log("Room has storage");
+        // if (room.storage.store[RESOURCE_ENERGY] < 50000) { return false; }
+        // room.log("Room has enough energy in storage");
         // @todo move to own method
         // get all walls and ramparts below their max hp
         const items: Structure[] = room.find(FIND_STRUCTURES, {
@@ -57,6 +59,7 @@ export class Janitor {
         });
         if (items.length > 0) {
             room.log("Items found to repair");
+            room.log(JSON.stringify(items));
             return true;
         }
         room.log("No items found, Janitors disabled");
@@ -124,7 +127,7 @@ export class Janitor {
 
     private static runChargeState(creep: Creep): void {
         creep.log("In Charge state");
-        const result = creep.repairStructures(false, true, false);
+        const result = creep.repairStructures(false, true, true);
         switch (result) {
             case ERR_NOT_IN_RANGE:
                 creep.log("Moved closer to target");

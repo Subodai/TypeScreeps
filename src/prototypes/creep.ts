@@ -415,7 +415,7 @@ Creep.prototype.chooseRepairTarget = function(r: boolean = false, d: boolean = f
     // Next find damaged structures that aren't walls, ramparts or roads
     if (!this.memory.repairTarget && s) {
         this.log("Has no repair target, looking for damaged structures");
-        this.findDamagedStructures();
+        // this.findDamagedStructures();
     }
 
     // Next find Damaged Roads

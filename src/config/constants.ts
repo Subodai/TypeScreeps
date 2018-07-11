@@ -67,8 +67,8 @@ export function loadConstants(): void {
 
     global.seedRemoteRoads = true;
     global.cpuDesired = 5000;
-    global.rampartMax = 100000;
-    global.wallMax = 700000;
+    global.rampartMax = 10000;
+    global.wallMax = 100000;
     global.towerRepair = false;
     global.linkLimit = 980000;
     global.chargeLimit = 980000;

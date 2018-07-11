@@ -152,6 +152,11 @@ Creep.prototype.mineSource = function(): ScreepsReturnCode {
     if (this.memory.assignedSource) {
         const source: Source | null = Game.getObjectById(this.memory.assignedSource);
         if (source) {
+            if (this.pos.roomName !== source.pos.roomName) {
+                this.log("Not in same room as source");
+                this.state = STATE._GATHER;
+                return ERR_NOT_IN_RANGE;
+            }
             return this.harvest(source);
         }
     }

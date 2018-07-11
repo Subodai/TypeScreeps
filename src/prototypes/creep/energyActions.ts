@@ -507,7 +507,8 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     // after 5 we fill storage and terminal
     // unless emergency, then we fill spawns too
     if (this.carry.energy > 0 && (
-        fillSpawns || this.room.controller!.level < 4 || this.room.memory.emergency || !this.room.storage)
+        fillSpawns || (this.room.controller && this.room.controller.level < 4) ||
+        this.room.memory.emergency || !this.room.storage)
      ) {
         // Attempt to fill spawns
         const spawnsResult = this.fillSpawns();
