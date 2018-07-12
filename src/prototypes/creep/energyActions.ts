@@ -1,7 +1,6 @@
 import { Builder } from "roles/Builder";
 import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
-import { Supergrader } from "roles/Supergrader";
 import { Upgrader } from "roles/Upgrader";
 
 /**
@@ -20,12 +19,9 @@ Creep.prototype.getNearbyEnergy = function(
         delete this.memory.energyPickup;
         return ERR_FULL;
     }
-    /* Are we near a link with memory of receiver limit to only upgraders or supergraders,
+    /* Are we near a link with memory of receiver limit to only upgraders,
     otherwise refillers become.. interesting*/
-    if (!this.memory.energyPickup &&
-        (this.memory.role === Upgrader.roleName ||
-         this.memory.role === Supergrader.roleName)
-    ) {
+    if (!this.memory.energyPickup && this.memory.role === Upgrader.roleName) {
         this.log("Checking for links");
         // If we're in our own room, with our own controller, above level 5 (should have links)
         if (this.room.controller && this.room.controller.my && this.room.controller.level >= 5) {
@@ -371,7 +367,9 @@ Creep.prototype.fillRoomStorageOrTerminal = function(): ScreepsReturnCode | fals
             this.log(JSON.stringify(target));
             // Attempt to transfer them
             if (this.carry.hasOwnProperty(res) && this.carry[res] > 0) {
+                this.log("Attempting transfer");
                 if (this.transfer(target, res as ResourceConstant) === ERR_NOT_IN_RANGE) {
+                    this.log("Not in range");
                     this.travelTo(target);
                     return ERR_NOT_IN_RANGE;
                 } else {
@@ -380,6 +378,7 @@ Creep.prototype.fillRoomStorageOrTerminal = function(): ScreepsReturnCode | fals
                 }
             }
         }
+        this.log("Nothing in Carry");
     }
     // nope
     return false;

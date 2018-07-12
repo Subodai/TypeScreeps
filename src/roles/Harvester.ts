@@ -75,6 +75,10 @@ export class Harvester {
     private static runInitState(creep: Creep): void {
         creep.log("Initiating Harvester");
         if (creep.atHome()) {
+            if (!creep.empty()) {
+                creep.state = STATE._DELIVER;
+                this.run(creep);
+            }
             creep.log("at home ready to collect");
             creep.state = STATE._GATHERM;
             this.run(creep);
@@ -122,6 +126,7 @@ export class Harvester {
         }
         if (creep.deliverEnergy() === OK) {
             creep.log("Delivered some energy");
+            creep.state = STATE._INIT;
         }
     }
 }

@@ -11,7 +11,6 @@ import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
-import { Supergrader } from "roles/Supergrader";
 import { Upgrader } from "roles/Upgrader";
 
 export function loadRoomPrototypes(): void {

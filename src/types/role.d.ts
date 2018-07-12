@@ -44,7 +44,6 @@ declare class Role {
 declare class Miner extends Role {}
 declare class Harvester extends Role {}
 declare class Upgrader extends Role {}
-declare class Supergrader extends Role {}
 declare class Builder extends Role {}
 declare class Refiller extends Role {}
 declare class RemoteEnergyHauler extends Role {}
@@ -61,7 +60,6 @@ type CreepRole = Role
     | Miner
     | Harvester
     | Upgrader
-    | Supergrader
     | Builder
     | Refiller
     | RemoteEnergyHauler

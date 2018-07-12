@@ -19,6 +19,8 @@ import { ErrorMapper } from "./utils/ErrorMapper";
 /* Screepsplus */
 import { Screepsplus } from "./utils/Screepsplus/Screepsplus";
 
+import { convertOldData } from "functions/tools";
+
 /* Prototype loader */
 loadPrototypes();
 init();
@@ -27,6 +29,7 @@ debugEnablers();
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
+    convertOldData();
     if (!global.born) {
         global.born = Game.time;
     }
