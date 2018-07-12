@@ -11,18 +11,23 @@ export function init(): void {
     loadDiplomacy();
     loadSpeech();
     if (Memory.debugEnabled === undefined) {
-        Memory.debugEnabled = true;
+        Memory.debugEnabled = false;
     }
     if (Memory.creepDebug === undefined) {
-        Memory.creepDebug = true;
+        Memory.creepDebug = false;
     }
     if (Memory.roomDebug === undefined) {
-        Memory.roomDebug = true;
+        Memory.roomDebug = false;
     }
     if (Memory.memoryDebug === undefined) {
-        Memory.memoryDebug = true;
+        Memory.memoryDebug = false;
     }
     if (Memory.spawnDebug === undefined) {
-        Memory.spawnDebug = true;
+        Memory.spawnDebug = false;
     }
+    Memory.debugEnabled = true;
+    Memory.creepDebug = false;
+    Memory.roomDebug = false;
+    Memory.memoryDebug = false;
+    Memory.spawnDebug = false;
 }

@@ -13,6 +13,9 @@ export function loadSourcePrototypes(): void {
         configurable: true,
         enumerable: false,
         get(): any {
+            if (!Memory.sources) {
+                Memory.sources = {};
+            }
             if (!Memory.sources[this.room.name]) {
                 Memory.sources[this.room.name] = {};
             }

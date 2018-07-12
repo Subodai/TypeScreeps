@@ -551,13 +551,20 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         // Are we in our home room?
         // if (creep.room.name != creep.memory.roomName) {
         // lets go home
-        const spawns = Game.rooms[this.memory.roomName!].find(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_SPAWN
-        });
-        const spawn = spawns[0];
-        if (spawn) {
-            this.travelTo(spawn);
-            return ERR_NOT_FOUND;
+        if (this.memory.roomName) {
+            if (!Game.rooms[this.memory.roomName]) {
+                const pos: RoomPosition = new RoomPosition(25, 25, this.memory.roomName);
+                this.travelTo(pos);
+                return ERR_NOT_FOUND;
+            }
+            const spawns = Game.rooms[this.memory.roomName].find(FIND_STRUCTURES, {
+                filter: (i) => i.structureType === STRUCTURE_SPAWN
+            });
+            const spawn = spawns[0];
+            if (spawn) {
+                this.travelTo(spawn);
+                return ERR_NOT_FOUND;
+            }
         }
         // }
     }

@@ -27,8 +27,11 @@ export class RemoteEnergyMiner {
         if (!room.controller || !room.controller.my) {
             return false;
         }
+        if (room.memory.emergency) {
+            return false;
+        }
         // get all reserve flags
-        const flags = _.filter(Game.flags, (f) =>
+        const flags = _.filter(Game.flags, (f: Flag) =>
             f.color === global.flagColor.remote &&
             Game.map.getRoomLinearDistance(room.name, f.pos.roomName) <= 2
         );

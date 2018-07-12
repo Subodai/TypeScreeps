@@ -32,6 +32,7 @@ export function loadRoomPrototypes(): void {
                 if (!this.memory.charging) { this.memory.charging = true; }
                 if (!this.memory.roles) { this.memory.roles = {}; }
                 if (!this.memory.links) { this.memory.links = false; }
+                if (!this.memory.prioritise) { this.memory.prioritise = "none"; }
             } else {
                 if (!this.memory.mode) { this.memory.mode = "safe"; }
             }

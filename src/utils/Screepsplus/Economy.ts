@@ -6,7 +6,6 @@ export class Economy {
      * Get the current economy
      */
     public static get(): object {
-        console.log("Fetching Economy");
         // Get now
         const now: number = Game.time;
         const start: number = Game.cpu.getUsed();

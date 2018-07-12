@@ -9,7 +9,7 @@ export class Screepsplus {
     /**
      * Run Every n ticks
      */
-    private static runEvery: number = 1;
+    private static runEvery: number = 5;
 
     /**
      * Run the Screepsplus data collector
@@ -29,7 +29,7 @@ export class Screepsplus {
      * Collect Stats
      */
     private static CollectStats(): void {
-        if (Game.time % 2 === 0) {
+        if (Game.time % 20 === 0) {
             this.SummarizeEconomy();
         }
         this.SummarizeRooms();
@@ -83,7 +83,8 @@ export class Screepsplus {
      * Write our CPU usage to memory, and return the used amount
      */
     private static CPUStats(): string {
-        return ":CPU: [" + (Memory.stats.cpu.used = Game.cpu.getUsed()).toFixed(3) + "]";
+        return " :CPU: Tick[" + Game.cpu.tickLimit + "] Bucket[" + Game.cpu.bucket
+        + "] Used[" + (Memory.stats.cpu.used = Game.cpu.getUsed()).toFixed(3) + "]";
     }
 
     /**

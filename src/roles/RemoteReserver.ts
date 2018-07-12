@@ -27,6 +27,9 @@ export class RemoteReserver {
         if (!room.controller || !room.controller.my) {
             return false;
         }
+        if (room.memory.emergency) {
+            return false;
+        }
         // get all reserve flags
         const flags = _.filter(Game.flags, (f: Flag) =>
             f.color === global.flagColor.reserve &&
