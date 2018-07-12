@@ -18,7 +18,12 @@ export function convertOldData(): void {
         console.log("Already Converted");
         return;
     }
+    clearMemory();
+    convertCreeps();
+    Memory.converted = true;
+}
 
+function clearMemory(): void {
     console.log("Clearing and converting Memory");
     Memory._rooms = Memory.rooms;
     delete Memory.rooms;
@@ -36,123 +41,147 @@ export function convertOldData(): void {
     delete Memory.queue;
 
     delete Memory.profiler;
+}
 
+function convertCreeps(): void {
     Memory._creeps = Memory.creeps;
     console.log("Converting old creeps");
     const creeps = _.filter(Game.creeps);
     for (const creep of creeps) {
         switch (creep.memory.role) {
             case "builder":
-                const mem1 = {
-                    level: creep.memory.level,
-                    role: Builder.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem1;
+                switchBuilder(creep);
                 break;
-
             case "extractor":
-                const mem2 = {
-                    level: creep.memory.level,
-                    role: MineralExtractor.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem2;
+                switchExtractor(creep);
                 break;
-
-            case "harvester":
-            case "mharvester":
-                const mem3 = {
-                    level: creep.memory.level,
-                    role: Harvester.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem3;
-                break;
-
             case "hauler":
-                const mem4 = {
-                    level: creep.memory.level,
-                    role: RemoteEnergyHauler.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem4;
+                switchHauler(creep);
                 break;
-
             case "miner":
-                const mem5 = {
-                    level: creep.memory.level,
-                    role: Miner.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem5;
+                switchMiner(creep);
                 break;
-
             case "refill":
-                const mem6 = {
-                    level: creep.memory.level,
-                    role: Refiller.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem6;
+                switchRefiller(creep);
                 break;
-
             case "remoteminer":
-                const mem7 = {
-                    level: creep.memory.level,
-                    role: RemoteEnergyMiner.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem7;
+                switchRemoteMiner(creep);
                 break;
-
             case "reserve":
-                const mem8 = {
-                    level: creep.memory.level,
-                    role: RemoteReserver.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem8;
+                switchReserver(creep);
                 break;
-
             case "scout":
-                const mem9 = {
-                    level: creep.memory.level,
-                    role: RemoteClaimer.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem9;
+                switchScout(creep);
                 break;
-
             case "supergrader":
             case "upgrader":
-                const mem10 = {
-                    level: creep.memory.level,
-                    role: Upgrader.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem10;
+                switchUpgrader(creep);
                 break;
+            case "harvester":
+            case "mharvester":
             default:
-                const mem11 = {
-                    level: creep.memory.level,
-                    role: Harvester.roleName,
-                    roomName: creep.memory.roomName,
-                    state: STATE._SPAWN
-                };
-                creep.memory = mem11;
+                switchHarvester(creep);
                 break;
         }
     }
-    Memory.converted = true;
+}
+
+function switchBuilder(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: Builder.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchExtractor(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: MineralExtractor.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchHarvester(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: Harvester.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchHauler(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: RemoteEnergyHauler.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchMiner(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: Miner.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchRefiller(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: Refiller.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchRemoteMiner(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: RemoteEnergyMiner.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchReserver(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: RemoteReserver.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchScout(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: RemoteClaimer.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
+}
+
+function switchUpgrader(creep: Creep): void {
+    const mem = {
+        level: creep.memory.level,
+        role: Upgrader.roleName,
+        roomName: creep.memory.roomName,
+        state: STATE._SPAWN
+    };
+    creep.memory = mem;
 }
