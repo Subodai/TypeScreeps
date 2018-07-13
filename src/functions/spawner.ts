@@ -1,16 +1,5 @@
-import { ROLES } from "config/constants";
+import { ROLEMODELS, ROLES } from "config/constants";
 import * as STATE from "config/states";
-import { Builder } from "roles/Builder";
-import { Harvester } from "roles/Harvester";
-import { Janitor } from "roles/Janitor";
-import { Miner } from "roles/Miner";
-import { MineralExtractor } from "roles/MineralExtractor";
-import { Refiller } from "roles/Refiller";
-import { RemoteClaimer } from "roles/RemoteClaimer";
-import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
-import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
-import { RemoteReserver } from "roles/RemoteReserver";
-import { Upgrader } from "roles/Upgrader";
 import { Debug } from "./debug";
 import { CalcBodyCost } from "./tools";
 
@@ -42,99 +31,27 @@ export class Spawner {
                 spawnedCreeps[Room.name] = {};
             }
             let spawned = false;
-            for (const i in ROLES) {
-                // if we've spawned something, stop
+
+            let handler: Role;
+            for (handler of ROLEMODELS) {
                 if (spawned) { break; }
-                // get the roleName
-                const roleName: string = ROLES[i];
+                const roleName: string = handler.roleName;
                 if (spawnedCreeps[Room.name][roleName] !== undefined) {
                     Spawn.log(roleName + " Is already being spawned by this room");
                     break;
                 }
                 Spawn.log("Checking for role " + roleName);
-                // skip if this role is disabled
                 if (!Room.memory.roles[roleName]) {
                     Spawn.log("Role not enabled " + roleName);
                     continue;
                 }
-                Spawn.log("Role enabled, checking for spawn routine");
-                // Switch on type (for now)
-                switch (roleName) {
-                    // Miners
-                    case Miner.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(Miner, Spawn);
-                        break;
-
-                    // Harvesters
-                    case Harvester.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(Harvester, Spawn);
-                        break;
-
-                    // Upgraders
-                    case Upgrader.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(Upgrader, Spawn);
-                        break;
-
-                    // Builders
-                    case Builder.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(Builder, Spawn);
-                        break;
-
-                    // Refillers
-                    case Refiller.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(Refiller, Spawn);
-                        break;
-
-                    // Remote Reserver
-                    case RemoteReserver.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(RemoteReserver, Spawn);
-                        break;
-
-                    // Remote Energy Miner
-                    case RemoteEnergyMiner.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(RemoteEnergyMiner, Spawn);
-                        break;
-
-                    // Remote Energy Hauler
-                    case RemoteEnergyHauler.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(RemoteEnergyHauler, Spawn);
-                        break;
-
-                    // Remote Claimer
-                    case RemoteClaimer.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(RemoteClaimer, Spawn);
-                        break;
-
-                    // Mineral Extractor
-                    case MineralExtractor.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(MineralExtractor, Spawn);
-                        break;
-
-                    // Janitor
-                    case Janitor.roleName:
-                        Spawn.log("Role " + roleName + " found, running spawn routine");
-                        spawned = this.spawnRoutine(Janitor, Spawn);
-                        break;
-
-                    default:
-                        break;
-                }
-
+                Spawn.log("Role " + roleName + " found, running spawn routine");
+                spawned = this.spawnRoutine(handler, Spawn);
                 if (spawned) {
                     spawnedCreeps[Room.name][roleName] = true;
                 }
             }
-            Spawn.log(JSON.stringify(spawnedCreeps));
+            Spawn.log("SpawnedCreeps" + JSON.stringify(spawnedCreeps));
         }
     }
 

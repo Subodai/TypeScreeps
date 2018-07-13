@@ -1,16 +1,5 @@
-import { ROLES } from "config/constants";
+import { ROLEMODELS, ROLES } from "config/constants";
 import { Debug } from "functions/debug";
-import { Builder } from "roles/Builder";
-import { Harvester } from "roles/Harvester";
-import { Janitor } from "roles/Janitor";
-import { Miner } from "roles/Miner";
-import { MineralExtractor } from "roles/MineralExtractor";
-import { Refiller } from "roles/Refiller";
-import { RemoteClaimer } from "roles/RemoteClaimer";
-import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
-import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
-import { RemoteReserver } from "roles/RemoteReserver";
-import { Upgrader } from "roles/Upgrader";
 import { toHex } from "./tools";
 
 export class Runner {
@@ -114,120 +103,17 @@ export class Runner {
     private static role(role: string): boolean {
         // Grab the creeps
         const creeps = _.filter(Game.creeps, (c: Creep) => c.role === role);
-        // switch based on role
-        switch (role) {
-            // Harvesters
-            case Harvester.roleName:
+        let handler: Role;
+        for (handler of ROLEMODELS) {
+            if (role === handler.roleName) {
                 for (const creep of creeps) {
                     const a = Game.cpu.getUsed();
-                    Harvester.run(creep);
+                    handler.run(creep);
                     const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, Harvester.colour, cost);
+                    this.visualise(creep, handler.colour, cost);
                 }
-                break;
-            // Miners
-            case Miner.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    Miner.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, Miner.colour, cost);
-                }
-                break;
-            // Upgraders
-            case Upgrader.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    Upgrader.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, Upgrader.colour, cost);
-                }
-                break;
-            // Builders
-            case Builder.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    Builder.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, Builder.colour, cost);
-                }
-                break;
-            // Refillers
-            case Refiller.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    Refiller.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, Refiller.colour, cost);
-                }
-                break;
-            // Remote Energy Hauler
-            case RemoteEnergyHauler.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    RemoteEnergyHauler.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, RemoteEnergyHauler.colour, cost);
-                }
-                break;
-            // Remote Energy Miner
-            case RemoteEnergyMiner.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    RemoteEnergyMiner.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, RemoteEnergyMiner.colour, cost);
-                }
-                break;
-            // Remote Reserver
-            case RemoteReserver.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    RemoteReserver.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, RemoteReserver.colour, cost);
-                }
-                break;
-            // Remote Claimer
-            case RemoteClaimer.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    RemoteClaimer.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, RemoteClaimer.colour, cost);
-                }
-                break;
-            // Mineral Extractor
-            case MineralExtractor.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    MineralExtractor.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, MineralExtractor.colour, cost);
-                }
-                break;
-            // Janitor
-            case Janitor.roleName:
-                for (const creep of creeps) {
-                    const a = Game.cpu.getUsed();
-                    Janitor.run(creep);
-                    const cost = Game.cpu.getUsed() - a;
-                    this.visualise(creep, Janitor.colour, cost);
-                }
-                break;
-            default:
-                // Way to catch "lost" creeps that need migrating
-                if (role === "miner") {
-                    this.migrateCreepsToRole(Miner.roleName, creeps);
-                }
-                break;
+            }
         }
-        // for (const name in Game.creeps) {
-        //     const worker = Game.creeps[name];
-        //     if (worker.state === STATE_SPAWN) {
-
-        //     }
-        // }
         return true;
     }
 

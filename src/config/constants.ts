@@ -30,6 +30,20 @@ export const ROLES: string[] = [
     RemoteEnergyHauler.roleName
 ];
 
+export const ROLEMODELS: Role[] = [
+    Miner,
+    Refiller,
+    Harvester,
+    Upgrader,
+    Builder,
+    Janitor,
+    MineralExtractor,
+    RemoteClaimer,
+    RemoteEnergyMiner,
+    RemoteReserver,
+    RemoteEnergyHauler
+];
+
 export function loadConstants(): void {
     // Debug
     Debug.Load("Config: Empire Constants");
