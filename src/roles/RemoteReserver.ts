@@ -69,11 +69,9 @@ export class RemoteReserver {
             // SPAWN state
             case STATE._SPAWN:
                 creep.log("In spawn state");
-                if (!creep.isTired()) {
-                    creep.log("Done spawning setting to init");
-                    creep.state = STATE._INIT;
-                    this.run(creep);
-                }
+                creep.log("Done spawning setting to init");
+                creep.state = STATE._INIT;
+                this.run(creep);
                 break;
             // INIT state
             case STATE._INIT:
@@ -82,7 +80,13 @@ export class RemoteReserver {
                 creep.log("Choosing remote reserve room");
                 creep.chooseReserveRoom();
                 if (creep.memory.flagName && creep.memory.reserveRoom) {
-                    creep.state = STATE._MOVE;
+                    creep.log("Reserve room chosen");
+                    if (!creep.isTired()) {
+                        creep.log("ready to move out");
+                        creep.state = STATE._MOVE;
+                    }
+                } else {
+                    creep.log("Failed to find flag");
                 }
                 break;
             // MOVE state
@@ -128,8 +132,7 @@ Creep.prototype.chooseReserveRoom = function(): void {
         this.log("No flag in memory or reserve in memory");
         // @todo perhaps add distance to the filter
         const flags = _.filter(Game.flags, (f: Flag) =>
-            f.color === global.flagColor.reserve &&
-            f.assignedCreep !== this);
+            f.color === global.flagColor.reserve);
         if (flags.length === 0) {
             this.log("No flags found, must be an issue");
         }
@@ -140,6 +143,12 @@ Creep.prototype.chooseReserveRoom = function(): void {
             if (distance > 2) {
                 this.log("Distance " + distance + " too far");
                 continue;
+            }
+            if (flag.assignedCreep === this) {
+                this.log("Already assigned to flag, storing in memory");
+                this.memory.flagName = flag.name;
+                this.memory.reserveRoom = flag.pos.roomName;
+                break;
             }
             // check for other creeps that are assigned to this flag
             const creeps = _.filter(Game.creeps, (c: Creep) =>
@@ -156,6 +165,16 @@ Creep.prototype.chooseReserveRoom = function(): void {
             this.memory.flagName = flag.name;
             this.memory.reserveRoom = flag.pos.roomName;
             flag.assignedCreep = this;
+            break;
+        }
+        this.log("Couldn't find a suitable flag despawning?");
+        const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (i) => i.structureType === STRUCTURE_SPAWN
+        }) as StructureSpawn;
+        if (spawn) {
+            if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
+                this.travelTo(spawn);
+            }
         }
     }
 };

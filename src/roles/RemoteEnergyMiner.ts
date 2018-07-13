@@ -173,24 +173,39 @@ Creep.prototype.chooseRemoteMinerRoom = function(): void {
                 this.log("Distance " + distance + " too far");
                 continue;
             }
+            this.log("possible candidate");
             const room = Game.rooms[flag.pos.roomName];
             let useFlag = true;
             // do we have a room?
             if (room) {
+                this.log("we're aware of the room");
                 if (room.memory.minersNeeded && room.memory.minersNeeded > 0) {
+                    this.log("it's aware it needs miners");
                     const creeps = _.filter(Game.creeps, (c: Creep) =>
                         c.role === RemoteEnergyMiner.roleName &&
                         c.memory.remoteRoom === flag.pos.roomName &&
                        !c.memory.dying);
                     if (creeps.length >= room.memory.minersNeeded) {
+                        this.log("Already enough creeps for this room " + creeps.length);
                         useFlag = false;
                     }
                 }
             }
             if (useFlag) {
+                this.log("Using flag");
                 this.memory.flagName = flag.name;
                 this.memory.remoteRoom = flag.pos.roomName;
                 return;
+            }
+            this.log("Not suitable");
+        }
+        this.log("Couldn't find a suitable flag despawning?");
+        const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (i) => i.structureType === STRUCTURE_SPAWN
+        }) as StructureSpawn;
+        if (spawn) {
+            if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
+                this.travelTo(spawn);
             }
         }
     }

@@ -7,7 +7,7 @@ export class MineralExtractor {
     public static ticksBeforeRenew: number = 200;
     public static colour: string = "#663300";
     public static roleName: string = "mMiner";
-    public static roster: number[] = [ 0, 0, 0, 0, 0, 0, 8, 8, 8 ];
+    public static roster: number[] = [ 0, 0, 0, 0, 0, 0, 2, 2, 2 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         [],
@@ -103,6 +103,14 @@ Creep.prototype.pickMineral = function(): boolean {
         )
     });
     if (minerals.length <= 0) {
+        const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (i) => i.structureType === STRUCTURE_SPAWN
+        }) as StructureSpawn;
+        if (spawn) {
+            if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
+                this.travelTo(spawn);
+            }
+        }
         return false;
     }
     const mineral: Mineral = _.first(minerals);

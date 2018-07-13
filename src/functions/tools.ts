@@ -57,7 +57,6 @@ export function visualiseDamage(structures: Structure[], room: Room): void {
             percent = (structure.hits / structure.hitsMax);
         }
         const colour = percentToColour(percent);
-        Debug.Log(percent.toFixed(2) + ":" + colour);
         room.visual.circle(structure.pos, {
             fill: colour,
             opacity: 0.3,

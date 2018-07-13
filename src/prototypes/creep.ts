@@ -412,6 +412,12 @@ Creep.prototype.chooseRepairTarget = function(r: boolean = false, d: boolean = f
 
     this.chooseHighPriorityDefenceTarget(d, s);
 
+    if (this.room.storage) {
+        if (this.room.storage.store[RESOURCE_ENERGY] < 50000) {
+            d = false;
+        }
+    }
+
     // Next find damaged structures that aren't walls, ramparts or roads
     if (!this.memory.repairTarget && s) {
         this.log("Has no repair target, looking for damaged structures");
