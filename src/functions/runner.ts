@@ -9,10 +9,11 @@ export class Runner {
     public static run(): void {
         if (Game.time % this.runEvery === 0) {
             Debug.Log("Runner Start");
-            const cpu: number = Game.cpu.getUsed();
+            const before: number = Game.cpu.getUsed();
             const creepsCPU = this.creeps();
             this.rooms(creepsCPU);
-            Debug.Log("Runner Finished used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
+            const after: number = Game.cpu.getUsed();
+            Debug.Log("Runner Finished used " + (after - before).toFixed(3) + " CPU");
         }
     }
 
