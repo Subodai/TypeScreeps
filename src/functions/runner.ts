@@ -40,22 +40,34 @@ export class Runner {
             const linkCost = this.links(room);
             const avg = creepsCPU / Object.keys(Game.creeps).length;
             const storedEnergy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
-            room.visual.text(
-                "Room CPU : " + (Game.cpu.getUsed() - roomCPU).toFixed(2) +
-                " All Creeps: " + creepsCPU.toFixed(2) + " Per Creep: " + avg.toFixed(2), 1, 1, {
-                align : "left"
-            }).text("Towers : " + towerCost.toFixed(2), 1, 2, {
-                align: "left"
-            }).text("Links : " + linkCost.toFixed(2), 1, 3, {
-                align: "left"
-            }).text("Energy : " + room.energyAvailable + "/" + room.energyCapacityAvailable,  1, 4, {
-                align: "left", color: this.percentToColour(room.energyAvailable / room.energyCapacityAvailable)
-            }).text("Stored : " + storedEnergy, 1, 5, {
-                align: "left", color: this.percentToColour(storedEnergy / 1000000)
-            }).text("Collectable : " + room.collectableEnergy(), 1, 6, {
-                align: "left", color: "#00FFFF"});
+            this.roomVisual(room, roomCPU, creepsCPU, avg, towerCost, linkCost, storedEnergy);
         }
         Debug.Log("Rooms used " + (Game.cpu.getUsed() - cpu).toFixed(3) + " CPU");
+    }
+
+    private static roomVisual(
+        room: Room,
+        roomCPU: number,
+        creepsCPU: number,
+        avg: number,
+        towerCost: number,
+        linkCost: number,
+        storedEnergy: number): void {
+        room.visual.text(
+        "Room CPU : " + (Game.cpu.getUsed() - roomCPU).toFixed(2) +
+        " All Creeps: " + creepsCPU.toFixed(2) + " Per Creep: " + avg.toFixed(2), 1, 1, {
+            align: "left"
+        }).text("Towers : " + towerCost.toFixed(2), 1, 2, {
+            align: "left"
+        }).text("Links : " + linkCost.toFixed(2), 1, 3, {
+            align: "left"
+        }).text("Energy : " + room.energyAvailable + "/" + room.energyCapacityAvailable, 1, 4, {
+            align: "left", color: this.percentToColour(room.energyAvailable / room.energyCapacityAvailable)
+        }).text("Stored : " + storedEnergy, 1, 5, {
+            align: "left", color: this.percentToColour(storedEnergy / 1000000)
+        }).text("Collectable : " + room.collectableEnergy(), 1, 6, {
+            align: "left", color: "#00FFFF"
+        });
     }
 
     private static towers(room: Room): number {
