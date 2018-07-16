@@ -9,7 +9,7 @@ export class Harvester {
     public static colour: string = "#ffff00";
     public static roleName: string = "harvest";
     private static multiplier: number = 2;
-    public static roster: number[] = [ 0, 4, 3, 2, 2, 2, 2, 2, 2 ];
+    public static roster: number[] = [ 0, 4, 3, 2, 2, 2, 2, 3, 2 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 1, CARRY: 2, MOVE: 2 }),

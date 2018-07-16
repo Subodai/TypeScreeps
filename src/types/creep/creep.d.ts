@@ -6,6 +6,7 @@ interface Creep {
     checkEmptyAtPos(pos: RoomPosition): boolean;
     findSpaceAtSource(source: Source): boolean;
     isTired(): boolean;
+    isOnHold(): boolean;
     clearTargets(): void;
     getNearbyEnergy(useStorage?: boolean, emergency?: boolean): ScreepsReturnCode;
     deliverEnergy(): ScreepsReturnCode;

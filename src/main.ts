@@ -19,8 +19,6 @@ import { ErrorMapper } from "./utils/ErrorMapper";
 /* Screepsplus */
 import { Screepsplus } from "./utils/Screepsplus/Screepsplus";
 
-import { convertOldData } from "functions/runOnce";
-
 /* Prototype loader */
 loadPrototypes();
 init();
@@ -30,11 +28,20 @@ debugEnablers();
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
     if (Game.cpu.bucket < 500) { throw new Error("Super Low Bucket, Recovery Mode Activated"); }
-    // convertOldData();
     if (!global.born) {
         global.born = Game.time;
     }
+
     global.feedEnabled = Memory.feedEnabled;
+
+    if (Game.time % 10 === 0) {
+        if (global.feedEnabled) {
+            Counter.runRoomFeed();
+        } else {
+            Counter.clearRoomFeed();
+        }
+    }
+
     // Debug start of tick
     Debug.Log(`Current game tick is ${Game.time}: Age:${Game.time - global.born}`);
     // Run Cleaner First

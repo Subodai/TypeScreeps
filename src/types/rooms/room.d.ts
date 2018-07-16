@@ -38,6 +38,8 @@ interface Room {
      * Feed energy to the current feed Target
      */
     feedEnergy(): void;
+
+    setupFeedTarget(): void;
     /**
      * Count and assign the energy sources in a room
      */

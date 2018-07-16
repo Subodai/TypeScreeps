@@ -214,15 +214,31 @@ Room.prototype.feedEnergy = function(): void {
         this.memory.prioritise = "none";
         return;
     }
-
+    this.log("Chunk " + this.memory.feedTarget.chunk);
+    this.log("Terminal store " + this.terminal.store[RESOURCE_ENERGY]);
     // Get the multiplier
-    const multiplier = (this.terminal.store[RESOURCE_ENERGY] / this.memory.feedTarget.chunk);
+    const multiplier = Math.round((this.terminal.store[RESOURCE_ENERGY] / this.memory.feedTarget.chunk));
+    this.log("Multiplier " + multiplier);
     // now get the total we want to send
-    const total = (multiplier * 1000).toFixed();
+    const total = (multiplier * 1000);
+    this.log("Total " + total);
     // Alright, send it
     const msg = "Feeding [" + this.memory.feedTarget + "]";
-    this.terminal.send(RESOURCE_ENERGY, total, this.memory.feedTarget.room, msg);
-    this.log("Feeding Target");
+    const response = this.terminal.send(RESOURCE_ENERGY, total, this.memory.feedTarget.room, msg);
+    this.log("Feeding Target with " + total + " energy " + response);
+};
+
+/*
+ * Setup a room's feed target
+ */
+Room.prototype.setupFeedTarget = function(): void {
+    const cost = Game.market.calcTransactionCost(1000, this.name, Memory.feedRoom);
+    const chunk = cost + 1000;
+    const feedTarget: { [k: string]: any } = {};
+    feedTarget.room = Memory.feedRoom;
+    feedTarget.chunk = chunk;
+    this.memory.feedTarget = feedTarget;
+    console.log("[EMPIRE][" + this.name + "] Feed Target Set: " + JSON.stringify(this.memory.feedTarget));
 };
 
 /**

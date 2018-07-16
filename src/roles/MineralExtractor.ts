@@ -38,8 +38,8 @@ export class MineralExtractor {
     // role runner
     public static run(creep: Creep): void {
         // check tired
-        if (creep.isTired()) {
-            creep.log("Tired");
+        if (creep.isOnHold()) {
+            creep.log("Hold");
             return;
         }
         // if creep is dying, make sure it gets renewed

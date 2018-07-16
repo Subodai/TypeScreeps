@@ -7,13 +7,20 @@
  * @returns {boolean}
  */
 Creep.prototype.isTired = function(): boolean {
+    return this.spawning || this.fatigue > 0;
+};
+
+/**
+ * Is Creep on hold?
+ */
+Creep.prototype.isOnHold = function(): boolean {
     if (this.memory.sleepUntil) {
         if (this.memory.sleepUntil > Game.time) {
             return true;
         }
         delete this.memory.sleepUntil;
     }
-    return this.spawning || this.fatigue > 0;
+    return false;
 };
 
 /**
