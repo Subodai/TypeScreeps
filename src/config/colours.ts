@@ -3,23 +3,6 @@ import { Debug } from "functions/debug";
 export function loadColours(): void {
     // Debug
     Debug.Load("Config: Colours");
-
-    // Bunch of colour definitions
-    global.colourPickup = "#000077";
-    global.colourPickupRes = "#FFFFFF";
-    global.colourPickupMins = "#663300";
-    global.colourDropoff = "#007700";
-    global.colourBuild = "#FFFF00";
-    global.colourHostile = "#FF0000";
-    global.colourResPickup = "#ADAD00";
-    global.colourIdle = "#555555";
-    global.colourTower = "#FFFF99";
-    global.colourUpgrade = "#33CC33";
-    global.colourClaim = "#330033";
-    global.colourMine = "#330000";
-    global.colourReserve = "#330033";
-    global.colourRepair = "#00FF00";
-
     // The path opacity
     global.pathOpacity = .3;
 
@@ -61,23 +44,5 @@ export function loadColours(): void {
         4: STRUCTURE_TERMINAL,   // COLOR_CYAN
         2: STRUCTURE_LAB,        // COLOR_PURPLE
         7: STRUCTURE_EXTRACTOR  // COLOR_ORANGE
-    };
-
-    global.roleColour = {
-        builder: "#99ccff",
-        extractor: "#663300",
-        guard: "#cc0000",
-        harvester: "#ffff00",
-        hauler: "#006600",
-        janitor: "#006699",
-        mharvester: "#f4cb42",
-        miner: "#996600",
-        mover: "#FFFFFF",
-        refill: "#888888",
-        remoteminer: "#ff66ff",
-        reserve: "#660066",
-        scout: "#FFFFFF",
-        supergrader: "#ff6600",
-        upgrader: "#009900"
     };
 }
