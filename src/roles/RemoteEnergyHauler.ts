@@ -9,7 +9,7 @@ export class RemoteEnergyHauler {
     public static colour: string = "#006600";
     public static roleName: string = "rEHaul";
     private static multiplier: number = 2;
-    public static roster: number[] = [ 0, 2, 2, 2, 3, 3, 3, 4, 3 ];
+    public static roster: number[] = [ 0, 0, 0, 2, 3, 3, 3, 4, 3 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ CARRY: 2, MOVE: 2 }),

@@ -96,6 +96,9 @@ export class Screepsplus {
             // Traveler.structureMatrixCache = {};
             // Traveler.creepMatrixCache = {};
             const heapStats = Game.cpu.getHeapStatistics();
+            if (_.isUndefined(heapStats)) {
+                return "";
+            }
             const heapPercent = Math.round(
                 ((heapStats.total_heap_size + heapStats.externally_allocated_size) / heapStats.heap_size_limit)
                     * 100);
