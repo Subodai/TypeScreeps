@@ -2,8 +2,8 @@ import { Miner } from "roles/Miner";
 import { Debug } from "./debug";
 
 export class Counter {
-    private static runEvery: number = 5;
-
+    private static runEvery: number = 1;
+    private static runSetupEvery: number = 5;
     // private static notify: boolean = false;
 
     /**
@@ -25,7 +25,11 @@ export class Counter {
             let owned: boolean = false;
             let list = [];
             let miners = [];
-            const hostiles: number = Room.hostiles();
+            Room.countEnemies();
+            const hostiles: number = Room.memory.hostiles || 0;
+            if (hostiles > 0) {
+                Room.attackEnemiesWithTowers();
+            }
             // If Room is false
             if (!Room || Room === undefined) { continue; }
             // Check ownership
@@ -119,14 +123,16 @@ export class Counter {
                     Room.log("Remote Room is still Hostile");
                 }
             }
-            // Run build flags
-            Room.processBuildFlags();
-            // Run role setup
-            Room.roleSetup();
-            // Run source setup
-            Room.sourceSetup();
-            // Run mineral setup
-            Room.mineralSetup();
+            if (Game.time % this.runSetupEvery === 0) {
+                // Run build flags
+                Room.processBuildFlags();
+                // Run role setup
+                Room.roleSetup();
+                // Run source setup
+                Room.sourceSetup();
+                // Run mineral setup
+                Room.mineralSetup();
+            }
         }
     }
 

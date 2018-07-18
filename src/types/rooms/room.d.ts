@@ -60,6 +60,8 @@ interface Room {
      * Runs the towers in a room
      */
     runTowers(): number;
+    countEnemies(): void;
+    attackEnemiesWithTowers(): void;
 }
 
 interface RoomMemory {
@@ -85,4 +87,6 @@ interface RoomMemory {
     assignedMinerals?: { [key: string]: string | null };
     debug?: boolean;
     chargeNuke?: boolean;
+    enemies?:{ [k: string]: any};
+    targets?: string[];
 }

@@ -10,6 +10,43 @@ Room.prototype.log = function(msg: string): void {
     Debug.Room(msg, this);
 };
 
+/**
+ * The enemies in a room
+ */
+Object.defineProperty(Room.prototype, "enemies", {
+    configurable: true,
+    enumerable: true,
+    get(): {} | undefined {
+        if (!Memory.rooms[this.name]) {
+            Memory.rooms[this.name] = {};
+        }
+        if (!Memory.rooms[this.name].enemies) {
+            Memory.rooms[this.name].enemies = {};
+        }
+        return Memory.rooms[this.name].enemies;
+    },
+    set(v: {}): {} {
+        return _.set(Memory, "rooms." + this.name + ".enemies", v);
+    }
+});
+
+Object.defineProperty(Room.prototype, "targets", {
+    configurable: true,
+    enumerable: true,
+    get(): string[] | undefined {
+        if (!Memory.rooms[this.name]) {
+            Memory.rooms[this.name] = {};
+        }
+        if (!Memory.rooms[this.name].targets) {
+            Memory.rooms[this.name].targets = [];
+        }
+        return Memory.rooms[this.name].targets;
+    },
+    set(v: string[]): string[] {
+        return _.set(Memory, "rooms." + this.name + ".targets", v);
+    }
+});
+
 /*
 * Initiate a room's basic memory setup
 */
@@ -29,6 +66,8 @@ Room.prototype.init = function(): void {
         if (!this.memory.sources) { this.memory.sources = {}; }
         if (!this.memory.assignedSources) { this.memory.assignedSources = {}; }
         if (!this.memory.assignedMinerals) { this.memory.assignedMinerals = {}; }
+        if (!this.memory.enemies) { this.memory.enemies = {}; }
+        if (!this.memory.targets) { this.memory.targets = []; }
         this.log("Successfully initiated room");
     }
 };
@@ -82,6 +121,84 @@ Room.prototype.hostiles = function(): number {
     this.memory.lastHostileCheck = Game.time;
 
     return this.memory.hostiles;
+};
+
+/**
+ * Count the enemies in a room and rank them based on threat
+ */
+Room.prototype.countEnemies = function(): string[] {
+    if (this.memory.lastHostileCheck && this.memory.lastHostileCheck === Game.time) {
+        return this.targets || [];
+    }
+    this.log("Counting enemies in ");
+    const hostiles = this.find(FIND_HOSTILE_CREEPS, {
+        filter: (i: Creep) => !(ALLIES.indexOf(i.owner.username) > -1)
+    });
+    let targets = [];
+    if (hostiles.length > 0) {
+        let creep: Creep;
+        for (creep of hostiles) {
+            let threat = 0;
+            threat += (creep.getActiveBodyparts(ATTACK) * 5);
+            threat += (creep.getActiveBodyparts(HEAL) * 10);
+            threat += (creep.getActiveBodyparts(RANGED_ATTACK) * 15);
+            threat += creep.getActiveBodyparts(TOUGH);
+            creep.threat = threat;
+        }
+        targets = _.pluck(_.sortByOrder(hostiles, "threat", "desc"), "id");
+    } else {
+        this.memory.enemies = {};
+    }
+    this.targets = targets;
+    this.memory.hostiles = targets.length;
+    this.memory.lastHostileCheck = Game.time;
+    return this.targets;
+};
+
+Room.prototype.attackEnemiesWithTowers = function(): void {
+    let towers: StructureTower[] = this.find(FIND_MY_STRUCTURES, {
+        filter: (s: AnyStructure) => s.structureType === STRUCTURE_TOWER && s.energy > 0
+    });
+    console.log(JSON.stringify(this.targets));
+    for (const t of this.targets) {
+        const target: Creep | null = Game.getObjectById(t);
+        // if no target, do nothing
+        if (!target) { return; }
+        console.log("Target " + target.name);
+        // Sort towers by range to target
+        towers = _.sortByOrder(towers, (tower: StructureTower) => {
+            return tower.pos.getRangeTo(target);
+        }, "asc");
+
+        let hp = target.hits;
+        console.log("HP " + hp);
+        console.log("Active Towers " + towers.length);
+        for (const tower of towers) {
+            if (hp <= 0) {
+                continue;
+            }
+            let range = tower.pos.getRangeTo(target);
+            console.log("Range " + range);
+            console.log(tower.pos.x + " " + tower.pos.y);
+            let dmg = TOWER_POWER_ATTACK;
+            if (range > TOWER_OPTIMAL_RANGE) {
+                if (range > TOWER_FALLOFF_RANGE) {
+                    range = TOWER_FALLOFF_RANGE;
+                }
+                // tslint:disable-next-line:max-line-length
+                dmg -= dmg * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE);
+            }
+            dmg = Math.floor(dmg);
+            console.log("DMG " + dmg);
+            hp -= dmg;
+            console.log("HP After " + hp);
+            tower.attack(target);
+            // take out of the tower list
+            // towers = _.remove(towers, (twr: StructureTower) => {
+            //     return twr === tower;
+            // });
+        }
+    }
 };
 
 /*

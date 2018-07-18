@@ -75,6 +75,7 @@ interface Creep {
     findTombstoneEnergy(): Tombstone | null;
     findDroppedEnergy(): Resource | null;
     findContainerEnergy(): Structure | null;
+    threat: number;
 }
 
 interface CreepMemory {
@@ -107,4 +108,5 @@ interface CreepMemory {
     debug?: boolean;
     signed?: boolean;
     sleepUntil?: number;
+    threat?: number;
 }

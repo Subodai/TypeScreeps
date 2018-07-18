@@ -36,3 +36,26 @@ Object.defineProperty(Creep.prototype, "state", {
         return _.set(Memory, "creeps." + this.name + ".state", v);
     }
 });
+
+Object.defineProperty(Creep.prototype, "threat", {
+    configurable: true,
+    enumerable: true,
+    get(): number {
+        if (!Memory.rooms[this.room.name]) {
+            Memory.rooms[this.room.name] = {};
+        }
+        if (!Memory.rooms[this.room.name].enemies) {
+            Memory.rooms[this.room.name].enemies = [];
+        }
+        if (!Memory.rooms[this.room.name].enemies![this.id]) {
+            Memory.rooms[this.room.name].enemies![this.id] = {};
+        }
+        if (!Memory.rooms[this.room.name].enemies![this.id].threat) {
+            Memory.rooms[this.room.name].enemies![this.id].threat = null;
+        }
+        return Memory.rooms[this.room.name].enemies![this.id].threat;
+    },
+    set(v: number) {
+        return _.set(Memory, "rooms." + this.room.name + ".enemies." + this.id + ".threat", v);
+    }
+});

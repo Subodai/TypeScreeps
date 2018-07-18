@@ -76,15 +76,15 @@ export class Runner {
             filter: (s) => s.structureType === STRUCTURE_TOWER && s.energy > 0
         });
         let towerCost = 0;
-        if (towers.length > 0) {
-            for (const i in towers) {
-                const tower: StructureTower = towers[i] as StructureTower;
-                const cost = tower.run();
-                this.visualiseTower(tower, cost);
-                towerCost += cost;
-            }
-        }
-        room.log("Towers used " + towerCost + " CPU");
+        // if (towers.length > 0) {
+        //     for (const i in towers) {
+        //         const tower: StructureTower = towers[i] as StructureTower;
+        //         const cost = tower.run();
+        //         this.visualiseTower(tower, cost);
+        //         towerCost += cost;
+        //     }
+        // }
+        // room.log("Towers used " + towerCost + " CPU");
         return towerCost;
     }
 

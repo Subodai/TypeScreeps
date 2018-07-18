@@ -25,7 +25,7 @@ export function init(): void {
     if (Memory.spawnDebug === undefined) {
         Memory.spawnDebug = false;
     }
-    Memory.debugEnabled = true;
+    Memory.debugEnabled = false;
     Memory.creepDebug = false;
     Memory.roomDebug = false;
     Memory.memoryDebug = false;
