@@ -140,7 +140,7 @@ Room.prototype.countEnemies = function(): string[] {
         for (creep of hostiles) {
             let threat = 0;
             threat += (creep.getActiveBodyparts(ATTACK) * 5);
-            threat += (creep.getActiveBodyparts(HEAL) * 10);
+            threat += (creep.getActiveBodyparts(HEAL) * 20);
             threat += (creep.getActiveBodyparts(RANGED_ATTACK) * 15);
             threat += creep.getActiveBodyparts(TOUGH);
             creep.threat = threat;
