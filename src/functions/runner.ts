@@ -75,7 +75,7 @@ export class Runner {
         const towers = room.find(FIND_MY_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_TOWER && s.energy > 0
         });
-        let towerCost = 0;
+        const towerCost = 0;
         // if (towers.length > 0) {
         //     for (const i in towers) {
         //         const tower: StructureTower = towers[i] as StructureTower;
