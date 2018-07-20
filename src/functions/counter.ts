@@ -1,4 +1,6 @@
+import { Builder } from "roles/Builder";
 import { Miner } from "roles/Miner";
+import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { Debug } from "./debug";
 
 export class Counter {
@@ -28,7 +30,7 @@ export class Counter {
             Room.countEnemies();
             const hostiles: number = Room.memory.hostiles || 0;
             if (hostiles > 0) {
-                Room.attackEnemiesWithTowers();
+                // Room.attackEnemiesWithTowers();
             }
             // If Room is false
             if (!Room || Room === undefined) { continue; }
@@ -47,7 +49,9 @@ export class Counter {
                     minMiners = 1;
                 }
                 list = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
-                    i.role !== "hauler" && i.role !== "guard"); // TODO replace with hauler and guard rolenames
+                    i.role !== RemoteEnergyHauler.roleName &&
+                    i.role !== Builder.roleName &&
+                    i.role !== "guard"); // TODO replace with hauler and guard rolenames
                 miners = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
                     (i.role === Miner.roleName || i.role === "linkminer")); // TODO replace with linkMiner rolename?
                 if (!Room.storage) {

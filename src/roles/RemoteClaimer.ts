@@ -23,6 +23,7 @@ export class RemoteClaimer {
     ];
     // is it enabled
     public static enabled(room: Room): boolean {
+        if (room.memory.emergency) { return false; }
         if (!room.controller || !room.controller.my) {
             return false;
         }

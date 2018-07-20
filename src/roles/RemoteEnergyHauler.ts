@@ -23,6 +23,7 @@ export class RemoteEnergyHauler {
     ];
     // is it enabled
     public static enabled(room: Room): boolean {
+        if (room.memory.emergency) { return false; }
         if (room.memory.charging === false) {
             return false;
         }

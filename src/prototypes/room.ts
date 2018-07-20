@@ -159,27 +159,21 @@ Room.prototype.attackEnemiesWithTowers = function(): void {
     let towers: StructureTower[] = this.find(FIND_MY_STRUCTURES, {
         filter: (s: AnyStructure) => s.structureType === STRUCTURE_TOWER && s.energy > 0
     });
-    console.log(JSON.stringify(this.targets));
     for (const t of this.targets) {
         const target: Creep | null = Game.getObjectById(t);
         // if no target, do nothing
         if (!target) { return; }
-        console.log("Target " + target.name);
         // Sort towers by range to target
         towers = _.sortByOrder(towers, (tower: StructureTower) => {
             return tower.pos.getRangeTo(target);
         }, "asc");
 
         let hp = target.hits;
-        console.log("HP " + hp);
-        console.log("Active Towers " + towers.length);
         for (const tower of towers) {
             if (hp <= 0) {
                 continue;
             }
             let range = tower.pos.getRangeTo(target);
-            console.log("Range " + range);
-            console.log(tower.pos.x + " " + tower.pos.y);
             let dmg = TOWER_POWER_ATTACK;
             if (range > TOWER_OPTIMAL_RANGE) {
                 if (range > TOWER_FALLOFF_RANGE) {
@@ -189,9 +183,7 @@ Room.prototype.attackEnemiesWithTowers = function(): void {
                 dmg -= dmg * TOWER_FALLOFF * (range - TOWER_OPTIMAL_RANGE) / (TOWER_FALLOFF_RANGE - TOWER_OPTIMAL_RANGE);
             }
             dmg = Math.floor(dmg);
-            console.log("DMG " + dmg);
             hp -= dmg;
-            console.log("HP After " + hp);
             tower.attack(target);
             // take out of the tower list
             // towers = _.remove(towers, (twr: StructureTower) => {
@@ -243,7 +235,6 @@ Room.prototype.processBuildFlags = function(): number {
         const flag = flags[i];
         if (!flag) {
             this.log("Looped for too long or flag broke, forced break from buildsite loop");
-            // console.log(JSON.stringify(flag));
             // console.log(JSON.stringify(flags));
             break;
         }

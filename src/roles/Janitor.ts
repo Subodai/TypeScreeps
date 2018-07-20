@@ -21,6 +21,7 @@ export class Janitor {
      * Is this role enabled
      */
     public static enabled(room: Room): boolean {
+        if (room.memory.emergency) { return false; }
         // if tower repair is on, we don't need janitors for walls and ramparts
         if (global.towerRepair) {
             room.log("Tower Repair enabled, so janitor disabled");

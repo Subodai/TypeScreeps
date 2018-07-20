@@ -24,6 +24,11 @@ export class Refiller {
      * @param room
      */
     public static enabled(room: Room): boolean {
+        if (room.memory.emergency) {
+            if (room.storage && room.storage.store[RESOURCE_ENERGY] < 10000) {
+                return false;
+            }
+        }
         // check for controller
         if (room.controller) {
             // check for level >= 4 and has storage

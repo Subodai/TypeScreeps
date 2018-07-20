@@ -8,7 +8,7 @@ export class Upgrader {
     public static ticksBeforeRenew: number = 100;
     public static colour: string = "#009900";
     public static roleName: string = "upgrade";
-    public static roster: number[]      = [ 0, 4, 8, 8, 8, 1, 1, 1, 1 ];
+    public static roster: number[]      = [ 0, 4, 8, 8, 1, 1, 1, 1, 1 ];
     public static rosterLinks: number[] = [ 0, 4, 8, 8, 8, 8, 8, 8, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],

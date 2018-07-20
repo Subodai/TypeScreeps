@@ -22,6 +22,7 @@ export class Builder {
     ];
     // is role enabled
     public static enabled(room: Room): boolean {
+        if (room.memory.emergency) { return false; }
         // fetch all construction sites within 3 rooms of this one
         const sites: ConstructionSite[] = _.filter(Game.constructionSites, (s: ConstructionSite) =>
             s.my && (Game.map.getRoomLinearDistance(room.name, s.pos.roomName) < 3 || room.name === s.pos.roomName)

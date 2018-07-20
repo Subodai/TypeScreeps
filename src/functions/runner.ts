@@ -75,16 +75,16 @@ export class Runner {
         const towers = room.find(FIND_MY_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_TOWER && s.energy > 0
         });
-        const towerCost = 0;
-        // if (towers.length > 0) {
-        //     for (const i in towers) {
-        //         const tower: StructureTower = towers[i] as StructureTower;
-        //         const cost = tower.run();
-        //         this.visualiseTower(tower, cost);
-        //         towerCost += cost;
-        //     }
-        // }
-        // room.log("Towers used " + towerCost + " CPU");
+        let towerCost = 0;
+        if (towers.length > 0) {
+            for (const i in towers) {
+                const tower: StructureTower = towers[i] as StructureTower;
+                const cost = tower.run();
+                this.visualiseTower(tower, cost);
+                towerCost += cost;
+            }
+        }
+        room.log("Towers used " + towerCost + " CPU");
         return towerCost;
     }
 
