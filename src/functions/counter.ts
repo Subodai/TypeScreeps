@@ -6,7 +6,7 @@ import { Debug } from "./debug";
 export class Counter {
     private static runEvery: number = 1;
     private static runSetupEvery: number = 5;
-    private static runHaulerSetupEvery: number = 1000;
+    private static runHaulerSetupEvery: number = 200;
     // private static notify: boolean = false;
 
     /**
