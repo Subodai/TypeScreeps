@@ -143,65 +143,65 @@ global.InitRespawn = (MeanIt = false): void => {
     }
 };
 
-global.haulerSetup = (): void => {
-    Debug.Log("Running Hauler Target setup");
-    const Before = Game.cpu.getUsed();
+// global.haulerSetup = (): void => {
+//     Debug.Log("Running Hauler Target setup");
+//     const Before = Game.cpu.getUsed();
 
-    // Check the level of the energy in the current target
-    const target = Game.rooms[Memory.remoteRoom];
-    // if the room has less than 500 energy, lets pick a different one
-    if (!target || target.collectableEnergy() <= 500 || target.hostiles() > 0) {
-        Debug.Log("picking new room");
-        const remoteRooms = [];
-        for (const room in Game.rooms) {
-            const _room = Game.rooms[room];
-            if (_room != null) {
-                if (!_room.controller || (_room.controller && !_room.controller.my)) {
-                    // If there are no hostiles, send the haulers!
-                    if (_room.hostiles() <= 0) {
-                        remoteRooms.push(_room.name);
-                    }
-                }
-            }
-        }
-        const remoteRoom = _.max(remoteRooms, (c) => Game.rooms[c].collectableEnergy());
-        Memory.remoteRoom = remoteRoom;
-    } else {
-        Debug.Log(Memory.remoteRoom + ":" + target.collectableEnergy());
-    }
-    // // Now reset haulers with this remoteRoom
-    // let creeps = _.filter(Game.creeps, c => c.memory.role === 'hauler');
-    // for(let i in creeps) {
-    //     let c = creeps[i];
-    //     if (_.sum(c.carry) < c.carryCapacity && c.carryCapacity > 0) {
-    //         if (c.memory.remoteRoom !== Memory.remoteRoom) {
-    //             Debug.Log('[MEMORY] Clearing hauler [' + c.name + '] target because room empty');
-    //             c.memory.remoteRoom = Memory.remoteRoom;
-    //             delete c.memory.arrived;
-    //             delete c.memory.energyPickup;
-    //         }
-    //     }
-    // }
-    // Get a list of our rooms
-    let myRooms = [];
-    for (const room in Game.rooms) {
-        if (Game.rooms[room].controller) {
-            if (Game.rooms[room].controller!.my) {
-                if (Game.rooms[room].memory.charging && Game.rooms[room].storage) {
-                    myRooms.push(room);
-                }
-            }
-        }
-    }
-    if (myRooms.length === 0) {
-        myRooms.push("E12N6");
-    }
-    myRooms = _.filter(myRooms, (c) => Game.rooms[c].storage);
-    const myRoom = _.min(myRooms, (c) => Game.rooms[c].storage!.store[RESOURCE_ENERGY]);
-    Memory.myRoom = myRoom;
-    const After = Game.cpu.getUsed() - Before;
-    Debug.Log("Hauler Target setup used " + After + " CPU");
-};
+//     // Check the level of the energy in the current target
+//     const target = Game.rooms[Memory.remoteRoom];
+//     // if the room has less than 500 energy, lets pick a different one
+//     if (!target || target.collectableEnergy() <= 500 || target.hostiles() > 0) {
+//         Debug.Log("picking new room");
+//         const remoteRooms = [];
+//         for (const room in Game.rooms) {
+//             const _room = Game.rooms[room];
+//             if (_room != null) {
+//                 if (!_room.controller || (_room.controller && !_room.controller.my)) {
+//                     // If there are no hostiles, send the haulers!
+//                     if (_room.hostiles() <= 0) {
+//                         remoteRooms.push(_room.name);
+//                     }
+//                 }
+//             }
+//         }
+//         const remoteRoom = _.max(remoteRooms, (c) => Game.rooms[c].collectableEnergy());
+//         Memory.remoteRoom = remoteRoom;
+//     } else {
+//         Debug.Log(Memory.remoteRoom + ":" + target.collectableEnergy());
+//     }
+//     // // Now reset haulers with this remoteRoom
+//     // let creeps = _.filter(Game.creeps, c => c.memory.role === 'hauler');
+//     // for(let i in creeps) {
+//     //     let c = creeps[i];
+//     //     if (_.sum(c.carry) < c.carryCapacity && c.carryCapacity > 0) {
+//     //         if (c.memory.remoteRoom !== Memory.remoteRoom) {
+//     //             Debug.Log('[MEMORY] Clearing hauler [' + c.name + '] target because room empty');
+//     //             c.memory.remoteRoom = Memory.remoteRoom;
+//     //             delete c.memory.arrived;
+//     //             delete c.memory.energyPickup;
+//     //         }
+//     //     }
+//     // }
+//     // Get a list of our rooms
+//     let myRooms = [];
+//     for (const room in Game.rooms) {
+//         if (Game.rooms[room].controller) {
+//             if (Game.rooms[room].controller!.my) {
+//                 if (Game.rooms[room].memory.charging && Game.rooms[room].storage) {
+//                     myRooms.push(room);
+//                 }
+//             }
+//         }
+//     }
+//     if (myRooms.length === 0) {
+//         myRooms.push("E18N4");
+//     }
+//     myRooms = _.filter(myRooms, (c) => Game.rooms[c].storage);
+//     const myRoom = _.min(myRooms, (c) => Game.rooms[c].storage!.store[RESOURCE_ENERGY]);
+//     Memory.myRoom = myRoom;
+//     const After = Game.cpu.getUsed() - Before;
+//     Debug.Log("Hauler Target setup used " + After + " CPU");
+// };
 
 global.initDrain = (): string => {
     for (const room in Game.rooms) {

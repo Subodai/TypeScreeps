@@ -96,7 +96,7 @@ export class RemoteEnergyHauler {
                 break;
             // RETURN State
             case STATE._RETURN:
-                if (creep.memory.roomName) {
+                if (!creep.memory.roomName) {
                     creep.chooseHomeRoom();
                 }
                 if (creep.atHome()) {
@@ -112,12 +112,17 @@ export class RemoteEnergyHauler {
                 if (creep.empty()) {
                     creep.state = STATE._INIT;
                     // this.run(creep);
+                    break;
                 }
-                if (creep.deliverEnergy() === OK) {
+                const result = creep.deliverEnergy();
+                if (result === OK) {
                     creep.log("Delivered some energy");
                     if (Memory.settings.fillLowest) {
                         delete creep.memory.roomName;
                     }
+                }
+                if (result === ERR_NOT_FOUND) {
+                    creep.state = STATE._RETURN;
                 }
                 break;
             default:
@@ -129,6 +134,7 @@ export class RemoteEnergyHauler {
 }
 
 Creep.prototype.chooseRemoteRoom = function(): void {
+    this.log("Choosing remote room");
     if (!Memory.settings) {
         Memory.settings = {};
     }
@@ -136,10 +142,11 @@ Creep.prototype.chooseRemoteRoom = function(): void {
         Memory.settings.fetchHighest = false;
     }
     if (Memory.settings.fetchHighest) {
+        this.log("Fetching higest, setting to remoteRoom");
         this.memory.remoteRoom = Memory.settings.remoteRoom;
         return;
     }
-
+    this.log("Finding a remote room");
     const flags = _.filter(Game.flags, (f: Flag) => f.color === global.flagColor.haul && Game.rooms[f.pos.roomName]);
     if (flags.length === 0) {
         this.memory.remoteRoom = Memory.settings.remoteRoom;
@@ -167,8 +174,16 @@ Creep.prototype.chooseRemoteRoom = function(): void {
 
 Creep.prototype.chooseHomeRoom = function(): void {
     if (Memory.settings.fillLowest) {
-        this.memory.roomName = Memory.settings.myRoom;
-        return;
+        this.log("Filling lowest");
+        const home = this.memory._home || this.room.name;
+        const remote = Memory.myRoom || "E18N4";
+        if (Game.map.getRoomLinearDistance(home, remote) <= 3 &&
+            Game.map.getRoomLinearDistance(this.room.name, remote) <= 3) {
+            this.log("in Range setting to : " + remote);
+            this.memory.roomName = remote;
+            return;
+        }
     }
+    this.log("Normal, going home to " + this.memory._home);
     this.memory.roomName = this.memory._home;
 };
