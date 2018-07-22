@@ -62,6 +62,7 @@ interface Room {
     runTowers(): number;
     countEnemies(): void;
     attackEnemiesWithTowers(): void;
+    targets: string[];
 }
 
 interface RoomMemory {
@@ -89,4 +90,5 @@ interface RoomMemory {
     chargeNuke?: boolean;
     enemies?:{ [k: string]: any};
     targets?: string[];
+    feedTarget?: { [key: string]: string | number };
 }

@@ -63,7 +63,7 @@ StructureTower.prototype.run = function(): number | boolean {
 };
 
 StructureTower.prototype.attackEnemies = function(): boolean {
-    const hostile: Creep = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+    const hostile: Creep | null = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
         filter: (c: Creep) => !(ALLIES.indexOf(c.owner.username) > -1)
     });
     if (!hostile) {
@@ -80,7 +80,7 @@ StructureTower.prototype.attackEnemies = function(): boolean {
 };
 
 StructureTower.prototype.healMyCreeps = function(): boolean {
-    const injured: Creep = this.pos.findClosestByRange(FIND_MY_CREEPS, {
+    const injured: Creep | null = this.pos.findClosestByRange(FIND_MY_CREEPS, {
         filter: (c: Creep) => c.hits < c.hitsMax
     });
     if (!injured) {
@@ -91,7 +91,7 @@ StructureTower.prototype.healMyCreeps = function(): boolean {
 };
 
 StructureTower.prototype.healFriendlyCreeps = function(): boolean {
-    const friend: Creep = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+    const friend: Creep | null = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
         filter: (c: Creep) => ALLIES.indexOf(c.owner.username) > -1 && c.hits < c.hitsMax
     });
     if (!friend) {

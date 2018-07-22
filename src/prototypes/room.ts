@@ -88,9 +88,9 @@ Room.prototype.collectableEnergy = function(): number {
         return this.memory.energy || 0;
     }
     let energy = 0;
-    const containers = this.find(FIND_STRUCTURES, {
+    const containers: StructureContainer[] = this.find(FIND_STRUCTURES, {
         filter: (c: AnyStructure) => c.structureType === STRUCTURE_CONTAINER && c.store[RESOURCE_ENERGY] > 0
-    });
+    }) as StructureContainer[];
     const resources = this.find(FIND_DROPPED_RESOURCES, {
         filter: (r: Resource) => r.resourceType === RESOURCE_ENERGY
     });
@@ -158,7 +158,7 @@ Room.prototype.countEnemies = function(): string[] {
 Room.prototype.attackEnemiesWithTowers = function(): void {
     let towers: StructureTower[] = this.find(FIND_MY_STRUCTURES, {
         filter: (s: AnyStructure) => s.structureType === STRUCTURE_TOWER && s.energy > 0
-    });
+    }) as StructureTower[];
     for (const t of this.targets) {
         const target: Creep | null = Game.getObjectById(t);
         // if no target, do nothing
@@ -309,10 +309,13 @@ Room.prototype.feedEnergy = function(): void {
         // Run some setup
         this.setupFeedTarget();
     }
+    if (!this.memory.feedTarget || !this.memory.feedTarget.chunk) {
+        return;
+    }
     // only feed if we have more than 200k energy in storage (otherwise we flip about too much)
-    if (this.storage.store[RESOURCE_ENERGY] > 200000) {
+    if (this.storage && this.storage.store[RESOURCE_ENERGY] > 200000) {
         // Does the terminal have enough energy?
-        if (this.terminal.store[RESOURCE_ENERGY] < this.memory.feedTarget.chunk) {
+        if (this.terminal && this.terminal.store[RESOURCE_ENERGY] < this.memory.feedTarget.chunk) {
             this.memory.prioritise = "terminal";
             this.log("Charging Terminal");
             return;
@@ -325,14 +328,14 @@ Room.prototype.feedEnergy = function(): void {
     this.log("Chunk " + this.memory.feedTarget.chunk);
     this.log("Terminal store " + this.terminal.store[RESOURCE_ENERGY]);
     // Get the multiplier
-    const multiplier = Math.round((this.terminal.store[RESOURCE_ENERGY] / this.memory.feedTarget.chunk));
+    const multiplier = Math.round((this.terminal.store[RESOURCE_ENERGY] / Number(this.memory.feedTarget.chunk)));
     this.log("Multiplier " + multiplier);
     // now get the total we want to send
     const total = (multiplier * 1000);
     this.log("Total " + total);
     // Alright, send it
     const msg = "Feeding [" + this.memory.feedTarget + "]";
-    const response = this.terminal.send(RESOURCE_ENERGY, total, this.memory.feedTarget.room, msg);
+    const response = this.terminal.send(RESOURCE_ENERGY, total, String(this.memory.feedTarget.room), msg);
     this.log("Feeding Target with " + total + " energy " + response);
 };
 
@@ -453,7 +456,7 @@ Room.prototype.runTowers = function(): number {
     // get towers in this room
     const towers = this.find(FIND_MY_STRUCTURES, {
         filter: (s: AnyStructure) => s.structureType === STRUCTURE_TOWER && s.energy > 0
-    });
+    }) as StructureTower[];
     // if we have any
     if (towers.length > 0) {
         // loop

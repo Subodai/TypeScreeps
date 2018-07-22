@@ -24,6 +24,7 @@ interface Source {
 
 /// <reference types="typed-screeps" />
 
-interface StoreDefinition {
-    [resource: string]: number;
-}
+// TODO ADD & This to the creeps one
+// interface StoreDefinition {
+//     [k: string]: number;
+// }
