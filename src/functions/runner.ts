@@ -80,8 +80,14 @@ export class Runner {
             for (const i in towers) {
                 const tower: StructureTower = towers[i] as StructureTower;
                 const cost = tower.run();
-                this.visualiseTower(tower, cost);
-                towerCost += cost;
+                if (cost === false) {
+                    this.visualiseTower(tower, 0);
+                    return towerCost;
+                }
+                if (cost !== false && cost !== true) {
+                    this.visualiseTower(tower, cost);
+                    towerCost += cost;
+                }
             }
         }
         room.log("Towers used " + towerCost + " CPU");

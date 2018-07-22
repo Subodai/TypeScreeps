@@ -461,7 +461,9 @@ Room.prototype.runTowers = function(): number {
             // get the tower
             const tower: StructureTower = towers[i];
             // run it
-            tower.run();
+            if (tower.run() === false) {
+                return Game.cpu.getUsed() - start;
+            }
         }
     }
     return Game.cpu.getUsed() - start;

@@ -13,7 +13,7 @@ interface StructureTower {
     /**
      * Runs a tower and returns it's CPU use
      */
-    run(): number;
+    run(): number | boolean;
 
     /**
      * Take the current used CPU and subtracts start from it

@@ -12,7 +12,7 @@ StructureTower.prototype.countCPU = function(start: number): number {
     return Game.cpu.getUsed() - start;
 };
 
-StructureTower.prototype.run = function(): number {
+StructureTower.prototype.run = function(): number | boolean {
     // Get opening CPU
     const start = Game.cpu.getUsed();
     // if we have less than 10 energy, just don't bother
@@ -57,11 +57,9 @@ StructureTower.prototype.run = function(): number {
             this.repairContainers()
         )
     ) {
-        return this.countCPU(start);
+        return false;
     }
-
-    // always return the CPU used
-    return this.countCPU(start);
+    return false;
 };
 
 StructureTower.prototype.attackEnemies = function(): boolean {
