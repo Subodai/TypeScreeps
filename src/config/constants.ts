@@ -21,7 +21,7 @@ export const ROLES: string[] = [
 
     // mid priority roles
     Janitor.roleName,
-    MineralExtractor.roleName,
+    // MineralExtractor.roleName,
 
     // Remote roles
     RemoteClaimer.roleName,
@@ -37,7 +37,7 @@ export const ROLEMODELS: Role[] = [
     Upgrader,
     Builder,
     Janitor,
-    MineralExtractor,
+    // MineralExtractor,
     RemoteClaimer,
     RemoteEnergyMiner,
     RemoteReserver,
