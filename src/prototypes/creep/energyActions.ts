@@ -135,7 +135,7 @@ Creep.prototype.getNearbyEnergy = function(
             target instanceof StructureTerminal ||
             target instanceof Tombstone
         ) { // Container, Storage, Terminal
-            this.log("Target is Container, Storage, Terminal or Tombestone");
+            this.log("Target is Container, Storage, Terminal or Tombstone");
             // Check the container still has the energy
             if (target.store[RESOURCE_ENERGY] <= 0 /* (this.carryCapacity - _.sum(this.carry))/4*/) {
                 this.log("Target no longer has enough energy, clearing memory");
