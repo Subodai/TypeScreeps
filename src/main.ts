@@ -5,6 +5,7 @@ import { init } from "config/init";
 import { Cleaner } from "functions/cleaner";
 import { Counter } from "functions/counter";
 import { Debug, debugEnablers } from "functions/debug";
+import { Empire } from "functions/Empire";
 import { Runner } from "functions/runner";
 import { Science } from "functions/science/Science";
 import { Spawner } from "functions/spawner";
@@ -55,6 +56,10 @@ export const loop = ErrorMapper.wrapLoop(() => {
         Runner.run();  // @todo make this aware of the things the counter has counted so it won't run unnecessary items
         const science = new Science();
         global.science = science;
+
+        const empire = new Empire();
+        global.empire = empire;
+
         const message = Screepsplus.run(); // Collect Stats
         Debug.Log(message);
     // });
