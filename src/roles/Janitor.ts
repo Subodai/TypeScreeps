@@ -107,9 +107,11 @@ export class Janitor {
         const items: Structure[] = room.find(FIND_STRUCTURES, {
             filter: (s: AnyStructure) =>
                 // ramparts below max * 0.75 (no point spawning all the time to keep going away after)
-                (s.structureType === STRUCTURE_RAMPART && s.hits < (global.rampartMax * 0.75)) ||
+                // tslint:disable-next-line:max-line-length
+                (s.structureType === STRUCTURE_RAMPART && s.hits < (global.rampartMax * (room.controller!.level / 8) * 0.75)) ||
                 // walls below max * 0.9 (no point spawning all the time to keep going away after)
-                (s.structureType === STRUCTURE_WALL && s.hits < (global.wallMax * 0.9)) ||
+                // tslint:disable-next-line:max-line-length
+                (s.structureType === STRUCTURE_WALL && s.hits < (global.wallMax * (room.controller!.level / 8) * 0.9)) ||
                 // Containers only below half health
                 (s.structureType === STRUCTURE_CONTAINER && s.hits < (s.hitsMax * 0.5)) ||
                 // anything else

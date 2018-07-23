@@ -264,7 +264,7 @@ Creep.prototype.findDamagedDefences = function(): void {
 };
 
 Creep.prototype.findDamagedWall = function(): void {
-    const max = global.wallMax;
+    const max = global.wallMax * (this.room.controller!.level / 8);
     let values: number[] = [1];
     if (max > 1) {
         values = [
@@ -283,7 +283,7 @@ Creep.prototype.findDamagedWall = function(): void {
 };
 
 Creep.prototype.findDamagedRampart = function(): void {
-    const max = global.rampartMax;
+    const max = global.rampartMax * (this.room.controller!.level / 8);
     let values: number[] = [1];
     if (max > 1) {
         values = [

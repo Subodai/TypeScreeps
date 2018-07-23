@@ -47,14 +47,14 @@ StructureTower.prototype.run = function(): number | boolean {
     }
 
     // priority 6, rapair ramparts walls and containers
-    if (global.towerRepair &&
+    if ((global.towerRepair || this.room.controller!.level < 5) &&
         this.energy >= 600 &&
         this.room.storage &&
         this.room.storage.store[RESOURCE_ENERGY] >= 200000  &&
         (
-            this.repairRamparts(global.rampartMax) ||
-            this.repairWalls(global.wallMax) ||
-            this.repairContainers()
+            this.repairContainers() ||
+            this.repairRamparts(global.rampartMax * (this.room.controller!.level / 8)) ||
+            this.repairWalls(global.wallMax * (this.room.controller!.level / 8))
         )
     ) {
         return false;
