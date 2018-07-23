@@ -130,11 +130,12 @@ Creep.prototype.findContainerMinerals = function(): void {
  * Move to and pickup minerals
  */
 Creep.prototype.moveToAndPickupMinerals = function(): ScreepsReturnCode {
-    this.log("Found minerals in memory");
-    const target: Resource | StructureContainer | StructureStorage | null =
+    this.log("Found minerals in memory " + this.memory.mineralPickup);
+    const target: Resource | StructureContainer | StructureStorage | Tombstone | null =
         Game.getObjectById(this.memory.mineralPickup);
     // if the target is invalid, or cannot be found let's clear it
     if (!target) { return this.invalidateMineralTarget(); }
+
     // Quick validation pass on the target
     if (target instanceof Resource) {
         // If it's going to disapwn before we get there, then there's no point in carrying on
@@ -160,7 +161,12 @@ Creep.prototype.moveToAndPickupMinerals = function(): ScreepsReturnCode {
                 return this.invalidateMineralTarget(true);
             }
         }
-    } else if (target instanceof StructureContainer || target instanceof StructureStorage) {
+    } else if (target instanceof StructureContainer ||
+                target instanceof StructureStorage ||
+                target instanceof StructureTerminal ||
+                target instanceof Tombstone
+    ) {
+        this.log("Target is Container, Storage, Terminal or Tombstone");
         // Check there is still res in the container
         if (_.sum(target.store) - target.store[RESOURCE_ENERGY] === 0) {
             return this.invalidateMineralTarget();
