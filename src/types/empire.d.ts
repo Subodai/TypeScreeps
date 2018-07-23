@@ -49,7 +49,7 @@ interface Empire {
     /**
      * Run through the queue and check for possible fulfillers!
      */
-    processQueue(): void;
+    processRequestQueue(): void;
 
     loadQueueFromCache(): void;
     saveQueueToCache(): void;

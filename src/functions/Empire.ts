@@ -94,6 +94,95 @@ class Empire implements Empire {
     }
 
     /**
+     * Process the request queue
+     */
+    public processRequestQueue(): void {
+        if (this.requestQueue === undefined || this.requestQueue === null) {
+            this.loadQueueFromCache();
+        }
+        if (this.requestQueue.length === 0) {
+            console.log("No requests to process");
+            // todo sleep?
+            return;
+        }
+        const request = _.first(this.requestQueue);
+        let amount = request.amount;
+        const receiver: StructureTerminal | undefined = Game.rooms[request.room].terminal;
+        const space = receiver!.storeCapacity - _.sum(receiver!.store);
+        let runFeed = true;
+        if (space === 0) {
+            console.log("No Space at destination removing from queue");
+            this.removeRequest(request.id);
+            runFeed = false;
+        }
+        for (const name in Game.rooms) {
+            console.log("Checking " + name);
+            const room = Game.rooms[name];
+            if (!runFeed) {
+                console.log("Clearing priority because target full");
+                room.memory.prioritise = "none";
+                continue;
+            }
+            if (name === request.room) {
+                console.log("This is the requesting room");
+                // Make sure it's not trying to charge it's terminal
+                room.memory.prioritise = "none";
+                continue;
+            }
+            if (amount <= 0) {
+                console.log("Request fulfilled removing");
+                this.removeRequest(request.id);
+                return;
+            }
+
+            if (room.terminal && room.memory.charging === true) {
+                console.log(name + " Has a terminal and is charging");
+                // Get how much we have
+                const stored = room.terminal.store[request.resource] || 0;
+                // get the cost per 1000
+                const costPer    = Game.market.calcTransactionCost(1000, room.name, request.room);
+                const totalCost  = 1000 + costPer;
+                const multiplier = Math.floor(stored / totalCost);
+                const toSend     = multiplier * 1000;
+                console.log("Has " + stored + " Of the item in terminal");
+                if (stored === 0) {
+                    console.log("Has none of requested resource");
+                    const storageStored = room.storage ? room.storage.store[request.resource] || 0 : 0;
+                    if (storageStored > 0) {
+                        console.log("Has some in storage (probably energy)");
+                        console.log("Charging terminal");
+                        room.memory.prioritise = "terminal";
+                    }
+                }
+                if (stored > 0) {
+                    const send = _.min([toSend, amount]);
+                    const result = this.fulfilRequest(request.id, room, send);
+                    switch (result) {
+                        case OK:
+                            amount -= send;
+                            break;
+                        case ERR_NOT_ENOUGH_ENERGY:
+                            room.memory.prioritise = "terminal";
+                            console.log("Not enough energy charging terminal in " + name);
+                            break;
+                        case ERR_NOT_ENOUGH_RESOURCES:
+                            // Not enough resources? wtf?
+                            console.log("Not enough resources");
+                            break;
+                        case ERR_INVALID_TARGET:
+                            this.removeRequest(request.id);
+                            break;
+                        default:
+                            // Something went wrong
+                            console.log(result + " Response from terminal send");
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Checks the queue, and gives an unused Id
      */
     private getNextId(): number {
