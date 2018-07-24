@@ -11,7 +11,7 @@ export function init(): void {
     loadDiplomacy();
     loadSpeech();
     if (Memory.debugEnabled === undefined) {
-        Memory.debugEnabled = true;
+        Memory.debugEnabled = false;
     }
     if (Memory.creepDebug === undefined) {
         Memory.creepDebug = false;
@@ -25,7 +25,7 @@ export function init(): void {
     if (Memory.spawnDebug === undefined) {
         Memory.spawnDebug = false;
     }
-    Memory.debugEnabled = true;
+    Memory.debugEnabled = false;
     Memory.creepDebug = false;
     Memory.roomDebug = false;
     Memory.memoryDebug = false;

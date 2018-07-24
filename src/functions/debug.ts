@@ -146,6 +146,14 @@ export class Debug {
      */
     public static Log(message: string): void {
         if (!this.debugEnabled) { return; }
+        this.LogAlways(message);
+    }
+
+    /**
+     * Always writes to the log
+     * @param message {string}
+     */
+    public static LogAlways(message: string): void {
         let msg: string = "";
         msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
         msg += message;

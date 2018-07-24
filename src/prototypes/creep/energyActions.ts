@@ -393,13 +393,13 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
     if (storage && terminal) {
         if (this.room.memory.prioritise) {
             if (this.room.memory.prioritise === "terminal") {
-                if (_.sum(terminal.store) < terminal.storeCapacity) {
+                if (_.sum(terminal.store) < terminal.storeCapacity * 0.8) {
                     target = terminal;
                 } else {
                     target = storage;
                 }
             } else if (this.room.memory.prioritise === "storage") {
-                if (_.sum(storage.store) < storage.storeCapacity) {
+                if (_.sum(storage.store) < storage.storeCapacity * 0.9) {
                     target = storage;
                 } else {
                     target = terminal;
@@ -409,7 +409,7 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
                     target = storage;
                 } else {
                     target = terminal;
-                    if (!target || _.sum(terminal.store) === terminal.storeCapacity) {
+                    if (!target || _.sum(terminal.store) === terminal.storeCapacity * 0.8) {
                         // try storage
                         target = storage;
                     }

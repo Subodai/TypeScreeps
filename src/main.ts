@@ -48,7 +48,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
         // }
 
         // Debug start of tick
-        Debug.Log(`Current game tick is ${Game.time}: Age:${Game.time - global.born}`);
+        Debug.LogAlways(`Current game tick is ${Game.time}: Age:${Game.time - global.born}`);
         // Run Cleaner First
         Cleaner.run();
         Counter.run(); // @todo make the counter count the things we need to run other things
@@ -63,6 +63,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
             empire.run();
         }
         const message = Screepsplus.run(); // Collect Stats
-        Debug.Log(message);
+        Debug.LogAlways(message);
     // });
 });

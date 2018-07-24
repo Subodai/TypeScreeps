@@ -11,7 +11,7 @@ class Empire implements Empire {
      * Run our tasks
      */
     public run(): void {
-        // TODO run this off a list of methods, with a tick count for each etc, sleepers between tasks
+        // TODO run this off a list of methods, with a tick count for each etc, sleepers between
         const start = Game.cpu.getUsed();
         this.processRequestQueue();
         const end = Game.cpu.getUsed() - start;
@@ -124,7 +124,7 @@ class Empire implements Empire {
         this.log("Attempting to process request " + request.id);
         let amount = request.amount;
         const receiver: StructureTerminal | undefined = Game.rooms[request.room].terminal;
-        const space = receiver!.storeCapacity - _.sum(receiver!.store);
+        let space = receiver!.storeCapacity - _.sum(receiver!.store);
         if (space === 0) {
             this.log("No Space at destination holding transfers");
             this.clearAllTerminalCharges();
@@ -140,7 +140,7 @@ class Empire implements Empire {
                 room.memory.prioritise = "none";
                 continue;
             }
-            if (amount <= 0) {
+            if (amount <= 0 || space <= 0) {
                 this.log("Request fulfilled removing");
                 this.removeRequest(request.id);
                 return;
@@ -175,11 +175,14 @@ class Empire implements Empire {
                     }
                 }
                 if (stored >= 1000) {
-                    const send = _.min([toSend, amount]);
+                    const send = _.min([toSend, amount, space]);
+                    this.log("Attempting to send " + send);
                     const result = this.fulfilRequest(request.id, room, send);
                     switch (result) {
                         case OK:
+                            this.log("Successful send reducing amount by " + send);
                             amount -= send;
+                            space -= send;
                             break;
                         case ERR_NOT_ENOUGH_ENERGY:
                             room.memory.prioritise = "terminal";
@@ -190,7 +193,8 @@ class Empire implements Empire {
                             this.log("Not enough resources");
                             break;
                         case ERR_INVALID_TARGET:
-                            this.removeRequest(request.id);
+                            // invalid target
+                            this.log("Invalid Target");
                             break;
                         default:
                             // Something went wrong
@@ -279,7 +283,7 @@ class Empire implements Empire {
         let msg: string = "";
         msg += "<span style='color:" + Debug.cRed + ";'>[EMPIRE]</span> ";
         msg += message;
-        Debug.Log(msg);
+        Debug.LogAlways(msg);
     }
 }
 
