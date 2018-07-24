@@ -8,7 +8,7 @@ export class Janitor {
     public static ticksBeforeRenew: number = 150;
     public static colour: string = "#006699";
     public static roleName: string = "janitor";
-    public static roster: number[] = [ 0, 0, 0, 0, 0, 1, 1, 1, 1 ];
+    public static roster: number[] = [ 0, 0, 0, 0, 0, 1, 1, 1, 3 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [], [], [], [], [],
         BodyBuilder({ WORK: 9,  CARRY: 4, MOVE: 13 }),
