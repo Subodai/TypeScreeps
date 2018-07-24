@@ -49,10 +49,12 @@ export function visualiseDamage(structures: Structure[], room: Room): void {
     for (const i in structures) {
         const structure: Structure = structures[i];
         let percent = 1;
+        const rampartMax = room.memory.rampartMax || global.rampartMax || Memory.rampartMax || 1;
+        const wallMax = room.memory.wallMax || global.wallMax || Memory.wallMax || 1;
         if (structure.structureType === STRUCTURE_RAMPART) {
-            percent = (structure.hits / global.rampartMax);
+            percent = (structure.hits / rampartMax);
         } else if (structure.structureType === STRUCTURE_WALL) {
-            percent = (structure.hits / global.wallMax);
+            percent = (structure.hits / wallMax);
         } else {
             percent = (structure.hits / structure.hitsMax);
         }

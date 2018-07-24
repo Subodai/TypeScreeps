@@ -57,9 +57,11 @@ Room.prototype.init = function(): void {
             if (!this.memory.mode) { this.memory.mode = "normal"; }
             if (!this.memory.war) { this.memory.war = false; }
             if (!this.memory.charging) { this.memory.charging = true; }
-            if (!this.memory.roles) { this.memory.roles = {}; }
             if (!this.memory.links) { this.memory.links = false; }
             if (!this.memory.prioritise) { this.memory.prioritise = "none"; }
+            if (!this.memory.wallMax) { this.memory.wallMax = 10000; }
+            if (!this.memory.rampartMax) { this.memory.rampartMax = 10000; }
+            if (!this.memory.roles) { this.memory.roles = {}; }
         } else {
             if (!this.memory.mode) { this.memory.mode = "safe"; }
         }
@@ -78,6 +80,31 @@ Room.prototype.clearSites = function() {
         sites[s].remove();
     }
     return OK;
+};
+
+Room.prototype.checkDefenceMax = function(): void {
+    // our room, max level with storage
+    if (this.controller && this.controller.my && this.controller.level === 8 && this.storage) {
+        if (this.storage.store[RESOURCE_ENERGY] >= 700000) {
+            const walls: StructureWall[] = this.find(FIND_STRUCTURES, {
+                filter: (c: AnyStructure) => c.structureType === STRUCTURE_WALL
+            }) as StructureWall[];
+            const wallAvg = _.sum(walls, (c) => c.hits) / walls.length;
+            const wallMax = this.memory.wallMax || global.wallMax || Memory.wallMax;
+            if (wallAvg > wallMax) {
+                this.memory.wallMax = wallMax * 1.1;
+            }
+
+            const ramparts: StructureRampart[] = this.find(FIND_STRUCTURES, {
+                filter: (c: AnyStructure) => c.structureType === STRUCTURE_RAMPART
+            }) as StructureRampart[];
+            const ramAvg = _.sum(ramparts, (c) => c.hits) / ramparts.length;
+            const ramMax = this.memory.rampartMax || global.rampartMax || Memory.rampartMax;
+            if (ramAvg > ramMax) {
+                this.memory.rampartMax = ramMax * 1.1;
+            }
+        }
+    }
 };
 
 /*

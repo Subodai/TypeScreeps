@@ -142,6 +142,8 @@ export class Counter {
                 Room.sourceSetup();
                 // Run mineral setup
                 Room.mineralSetup();
+                // Run defence setup
+                Room.checkDefenceMax();
             }
         }
     }

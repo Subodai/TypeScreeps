@@ -46,6 +46,9 @@ StructureTower.prototype.run = function(): number | boolean {
         return this.countCPU(start);
     }
 
+    const rampartMax = this.room.memory.rampartMax || global.rampartMax || Memory.rampartMax || 1;
+    const wallMax = this.room.memory.wallMax || global.wallMax || Memory.wallMax || 1;
+
     // priority 6, rapair ramparts walls and containers
     if ((global.towerRepair || this.room.controller!.level < 5) &&
         this.energy >= 600 &&
@@ -53,8 +56,8 @@ StructureTower.prototype.run = function(): number | boolean {
         this.room.storage.store[RESOURCE_ENERGY] >= 200000  &&
         (
             this.repairContainers() ||
-            this.repairRamparts(global.rampartMax * (this.room.controller!.level / 8)) ||
-            this.repairWalls(global.wallMax * (this.room.controller!.level / 8))
+            this.repairRamparts(rampartMax * (this.room.controller!.level / 8)) ||
+            this.repairWalls(wallMax * (this.room.controller!.level / 8))
         )
     ) {
         return false;

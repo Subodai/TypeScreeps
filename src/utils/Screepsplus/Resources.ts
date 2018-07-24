@@ -172,6 +172,9 @@ export class Resources {
             };
         }
 
+        const wallMax = room.memory.wallMax || global.wallMax || Memory.wallMax || 1;
+        const rampartMax = room.memory.rampartMax || global.rampartMax || Memory.rampartMax || 1;
+
         const retval = {
             room_name: room.name,
             // tslint:disable-next-line:object-literal-sort-keys
@@ -213,7 +216,9 @@ export class Resources {
             num_construction_sites: numConstructionSites,
             num_my_construction_sites: numMyConstructionSites,
             ground_resources: reducedResources,
-            num_source_containers: numSourceContainers
+            num_source_containers: numSourceContainers,
+            wallMax,
+            rampartMax
         };
 
         return retval;

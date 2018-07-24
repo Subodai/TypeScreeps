@@ -240,6 +240,32 @@ Creep.prototype.getNearbyEnergy = function(
     return ERR_NOT_FOUND;
 };
 
+Creep.prototype.fillContainers = function(): ScreepsReturnCode | false {
+    this.log("Dumping to container");
+    let target: StructureContainer;
+    if (this.room.storage && _.sum(this.room.storage.store) >= this.room.storage.storeCapacity) {
+        this.log("Room storage is full");
+        target = this.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (s) => s.structureType === STRUCTURE_CONTAINER
+        }) as StructureContainer;
+        this.log(JSON.stringify(target));
+        if (target) {
+            this.log("Found a container");
+            // Attempt transfer, unless out of range
+            if (this.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                // Let's go to the target
+                this.travelTo(target);
+                return ERR_NOT_IN_RANGE;
+            } else {
+                this.log("transfered to a container");
+                // Succesful drop off
+                return OK;
+            }
+        }
+    }
+    return false;
+};
+
 Creep.prototype.fillLinks = function(): ScreepsReturnCode | false {
     this.log("Making sure links are filled");
     let target: StructureLink;
@@ -359,6 +385,10 @@ Creep.prototype.fillRoomStorageOrTerminal = function(): ScreepsReturnCode | fals
     const target = this.pickStorageOrTerminal();
     if (target) {
         this.log("found storage or terminal");
+        if (_.sum(target.store) >= target.storeCapacity) {
+            this.log("storage or terminal full!");
+            return false;
+        }
         // reset idle
         this.memory.idle = 0;
         // Loop through our resources
@@ -539,6 +569,15 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     }
     if (storageResult !== false) {
         return storageResult;
+    }
+
+    const containerResult = this.fillContainers();
+
+    if (containerResult === OK) {
+        return containerResult;
+    }
+    if (containerResult !== false) {
+        return containerResult;
     }
 
     // if we got to here we're probably idle

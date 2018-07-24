@@ -65,6 +65,7 @@ interface Room {
     targets: string[];
     chargeTerminalOverride(): void;
     cancelTerminalOverride(): void;
+    checkDefenceMax(): void;
 }
 
 interface RoomMemory {
@@ -94,4 +95,6 @@ interface RoomMemory {
     enemies?:{ [k: string]: any};
     targets?: string[];
     feedTarget?: { [key: string]: string | number };
+    wallMax?: number;
+    rampartMax?: number;
 }
