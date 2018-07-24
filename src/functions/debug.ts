@@ -1,10 +1,10 @@
 export class Debug {
-    private static cGrey: string = "#e2e2e2";
-    private static cRed: string = "#f45138";
-    private static cGreen: string = "#aff98f";
-    private static cBlue: string = "#42d7f4";
-    private static cLBlue: string = "#8da6c6";
-    private static cYellow: string = "#f8f990";
+    public static cGrey: string = "#e2e2e2";
+    public static cRed: string = "#f45138";
+    public static cGreen: string = "#aff98f";
+    public static cBlue: string = "#42d7f4";
+    public static cLBlue: string = "#8da6c6";
+    public static cYellow: string = "#f8f990";
     private static debugEnabled: boolean = Memory.debugEnabled;
     private static creepDebugEnabled: boolean = Memory.creepDebug;
     private static roomDebugEnabled: boolean = Memory.roomDebug;

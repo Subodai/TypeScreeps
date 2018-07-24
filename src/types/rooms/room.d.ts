@@ -63,12 +63,15 @@ interface Room {
     countEnemies(): void;
     attackEnemiesWithTowers(): void;
     targets: string[];
+    chargeTerminalOverride(): void;
+    cancelTerminalOverride(): void;
 }
 
 interface RoomMemory {
     init?: boolean;
     links?: boolean;
     prioritise?: string;
+    override?: boolean;
     avoid?: number;
     sources?: any;
     storeMinerals?: boolean;

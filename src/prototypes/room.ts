@@ -471,3 +471,13 @@ Room.prototype.runTowers = function(): number {
     }
     return Game.cpu.getUsed() - start;
 };
+
+Room.prototype.chargeTerminalOverride = function(): void {
+    this.memory.prioritise = "terminal";
+    this.memory.override = true;
+};
+
+Room.prototype.cancelTerminalOverride = function(): void {
+    this.memory.prioritise = "none";
+    delete this.memory.override;
+};

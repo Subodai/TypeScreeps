@@ -39,13 +39,13 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
         global.feedEnabled = Memory.feedEnabled;
 
-        if (Game.time % 10 === 0) {
-            if (global.feedEnabled) {
-                Counter.runRoomFeed();
-            } else {
-                Counter.clearRoomFeed();
-            }
-        }
+        // if (Game.time % 10 === 0) {
+        //     if (global.feedEnabled) {
+        //         Counter.runRoomFeed();
+        //     } else {
+        //         Counter.clearRoomFeed();
+        //     }
+        // }
 
         // Debug start of tick
         Debug.Log(`Current game tick is ${Game.time}: Age:${Game.time - global.born}`);
@@ -59,7 +59,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
         const empire = new Empire();
         global.empire = empire;
-
+        if (Game.time % 20 === 0) {
+            empire.run();
+        }
         const message = Screepsplus.run(); // Collect Stats
         Debug.Log(message);
     // });

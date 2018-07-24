@@ -19,6 +19,11 @@ export class Counter {
             this.runCount();
             Debug.Log("Counter used " + (Game.cpu.getUsed() - cpu).toFixed(3) + "CPU");
         }
+        if (Game.time % this.runHaulerSetupEvery === 0) {
+            const cpu: number = Game.cpu.getUsed();
+            this.RunHaulerSetup();
+            Debug.Log("Hauler Setup used " + (Game.cpu.getUsed() - cpu).toFixed(3) + "CPU");
+        }
     }
 
     private static runCount(): void {
@@ -137,9 +142,6 @@ export class Counter {
                 Room.sourceSetup();
                 // Run mineral setup
                 Room.mineralSetup();
-            }
-            if (Game.time % this.runHaulerSetupEvery === 0) {
-                this.RunHaulerSetup();
             }
         }
     }
