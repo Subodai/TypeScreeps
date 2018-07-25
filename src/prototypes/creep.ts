@@ -339,6 +339,9 @@ Creep.prototype.findRampart = function(hp: number): void {
  * Validate current repair target
  */
 Creep.prototype.validateCurrentRepairTarget = function(): void {
+    // remove target locking for now
+    delete this.memory.repairTarget;
+    delete this.memory.targetMaxHP;
     // Is their an item in memory, with full health already?
     if (!this.memory.repairTarget) {
         return;

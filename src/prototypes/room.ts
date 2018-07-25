@@ -100,7 +100,8 @@ Room.prototype.checkDefenceMax = function(): void {
             }) as StructureRampart[];
             const ramAvg = _.sum(ramparts, (c) => c.hits) / ramparts.length;
             const ramMax = this.memory.rampartMax || global.rampartMax || Memory.rampartMax;
-            if (ramAvg > ramMax) {
+            // Always reduce the rampart max down a little since they decay
+            if (ramAvg > ramMax * 0.95) {
                 this.memory.rampartMax = ramMax * 1.1;
             }
         }
