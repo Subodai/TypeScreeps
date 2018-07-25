@@ -191,6 +191,9 @@ export class Janitor {
             case ERR_NOT_ENOUGH_ENERGY:
                 creep.log("Ran out of energy");
                 creep.state = STATE._GATHER;
+                // remove target locking for now
+                delete creep.memory.repairTarget;
+                delete creep.memory.targetMaxHP;
                 this.run(creep);
                 break;
             case ERR_INVALID_TARGET:
