@@ -4,10 +4,10 @@ import { BodyBuilder } from "functions/tools";
 /**
  * Builders turn energy into structures
  */
-export class Builder {
+export class Destroyer {
     public static ticksBeforeRenew: number = 100;
-    public static colour: string = "#99ccff";
-    public static roleName: string = "build";
+    public static colour: string = "#5c0b70";
+    public static roleName: string = "destroy";
     public static roster: number[] = [ 0, 2, 2, 2, 2, 1, 1, 1, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
@@ -23,6 +23,13 @@ export class Builder {
     // is role enabled
     public static enabled(room: Room): boolean {
         if (room.memory.emergency) { return false; }
+        // TODO check for room destruction targets
+        // TODO use a flag to create destruction targets in processRoomFlags
+        // TODO use flag location to find item, and put into memory
+        // TODO get gameobjectbyID
+        // TODO goto object and dissasemble it
+        // TODO bring energy back to wherever
+
         // fetch all construction sites within 3 rooms of this one
         const sites: ConstructionSite[] = _.filter(Game.constructionSites, (s: ConstructionSite) =>
             s.my && (Game.map.getRoomLinearDistance(room.name, s.pos.roomName) < 3 || room.name === s.pos.roomName)

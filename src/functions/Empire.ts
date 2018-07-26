@@ -38,7 +38,7 @@ class Empire implements Empire {
         };
 
         this.requestQueue.push(request);
-        this.log("Added Request for " + amount + " of " + resource + " From:[" + room.name + "]");
+        this.logAlways("Added Request for " + amount + " of " + resource + " From:[" + room.name + "]");
         this.saveQueueToCache();
     }
 
@@ -113,9 +113,9 @@ class Empire implements Empire {
         if (this.requestQueue === undefined || this.requestQueue === null) {
             this.loadQueueFromCache();
         }
-        this.log("Preparing to run process queue");
+        this.logAlways("Preparing to run process queue");
         if (this.requestQueue.length === 0) {
-            this.log("No requests to process");
+            this.logAlways("No requests to process");
             this.clearAllTerminalCharges();
             // todo sleep?
             return;
@@ -126,7 +126,7 @@ class Empire implements Empire {
         const receiver: StructureTerminal | undefined = Game.rooms[request.room].terminal;
         let space = receiver!.storeCapacity - _.sum(receiver!.store);
         if (space === 0) {
-            this.log("No Space at destination holding transfers");
+            this.logAlways("No Space at destination holding transfers");
             this.clearAllTerminalCharges();
             return;
         }
@@ -149,10 +149,11 @@ class Empire implements Empire {
             if (room.terminal && room.storage) {
                 const totalEnergy = _.sum([ room.terminal.store.energy, room.storage.store.energy ]);
                 if (totalEnergy <= 200000) {
-                    this.log("Room below min energy level, skipping");
+                    this.log("Room below min energy level, " + totalEnergy + "  skipping");
+                    room.memory.prioritise = "none";
                     continue;
                 }
-                this.log("Room has enough energy in storage to continue");
+                this.log("Room has enough energy in storage and terminal to continue");
             }
 
             if (room.terminal && room.memory.charging === true) {
@@ -176,11 +177,12 @@ class Empire implements Empire {
                 }
                 if (stored >= 1000) {
                     const send = _.min([toSend, amount, space]);
-                    this.log("Attempting to send " + send);
+                    const price = Game.market.calcTransactionCost(send, room.name, request.room);
+                    this.log("Attempting to send " + send + " at a cost of " + price + " Total: " + (price + send));
                     const result = this.fulfilRequest(request.id, room, send);
                     switch (result) {
                         case OK:
-                            this.log("Successful send reducing amount by " + send);
+                            this.logAlways("Successful send from [" + room.name + "] reducing amount by " + send);
                             amount -= send;
                             space -= send;
                             break;
@@ -214,7 +216,7 @@ class Empire implements Empire {
      * Clear all terminal priorities
      */
     private clearAllTerminalCharges(): void {
-        this.log("Clearing terminal charge states");
+        this.logAlways("Clearing terminal charge states");
         for (const name in Game.rooms) {
             const room = Game.rooms[name];
             if (!room.controller) { continue; }
@@ -280,6 +282,13 @@ class Empire implements Empire {
     }
 
     private log(message: string): void {
+        let msg: string = "";
+        msg += "<span style='color:" + Debug.cRed + ";'>[EMPIRE]</span> ";
+        msg += message;
+        Debug.Log(msg);
+    }
+
+    private logAlways(message: string): void {
         let msg: string = "";
         msg += "<span style='color:" + Debug.cRed + ";'>[EMPIRE]</span> ";
         msg += message;

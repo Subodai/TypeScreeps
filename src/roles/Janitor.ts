@@ -34,7 +34,7 @@ export class Janitor {
         if (!room.storage) { return false; }
         room.log("Room has storage");
         let items: Structure[] = [];
-        if (room.storage.store[RESOURCE_ENERGY] < 50000) {
+        if (room.storage.store[RESOURCE_ENERGY] < 200000) {
             items = this.getStructureRepairs(room);
         } else {
             items = this.getAllRepairs(room);
