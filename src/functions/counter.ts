@@ -67,7 +67,7 @@ export class Counter {
                         Room.memory.charging = false;
                     }
 
-                    if (Room.storage.store[RESOURCE_ENERGY] <= 10000 && Room.memory.charging === false) {
+                    if (Room.storage.store[RESOURCE_ENERGY] <= 100000 && Room.memory.charging === false) {
                         Room.memory.charging = true;
                     }
 
