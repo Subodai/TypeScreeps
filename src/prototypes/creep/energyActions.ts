@@ -246,7 +246,7 @@ Creep.prototype.fillContainers = function(): ScreepsReturnCode | false {
     if (this.room.storage && _.sum(this.room.storage.store) >= this.room.storage.storeCapacity) {
         this.log("Room storage is full");
         target = this.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (s) => s.structureType === STRUCTURE_CONTAINER
+            filter: (s) => s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) < s.storeCapacity
         }) as StructureContainer;
         this.log(JSON.stringify(target));
         if (target) {
@@ -437,6 +437,10 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
             } else {
                 if (this.carry.energy > 0) {
                     target = storage;
+                    if (!target || _.sum(storage.store) === storage.storeCapacity) {
+                        // try storage
+                        target = terminal;
+                    }
                 } else {
                     target = terminal;
                     if (!target || _.sum(terminal.store) === terminal.storeCapacity) {
