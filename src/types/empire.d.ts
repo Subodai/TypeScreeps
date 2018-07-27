@@ -3,6 +3,7 @@ interface ResourceRequest {
     room: string;
     resource: ResourceConstant;
     amount: number;
+    requestedAmount: number;
 }
 
 interface ReactionRequest {
@@ -11,6 +12,8 @@ interface ReactionRequest {
     compound: ResourceConstant;
     amount: number;
 }
+
+interface CompletedResourceRequest extends ResourceRequest{}
 
 interface Empire {
     requestQueue: ResourceRequest[];

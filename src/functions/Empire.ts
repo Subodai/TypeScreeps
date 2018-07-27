@@ -6,6 +6,7 @@ class Empire implements Empire {
      * Request Queue
      */
     public requestQueue!: ResourceRequest[];
+    public completedRequests!: CompletedResourceRequest[];
 
     /**
      * Run our tasks
@@ -34,7 +35,8 @@ class Empire implements Empire {
              room: room.name,
              // tslint:disable-next-line:object-literal-sort-keys
              resource,
-             amount
+             amount,
+             requestedAmount : amount
         };
 
         this.requestQueue.push(request);
@@ -50,6 +52,22 @@ class Empire implements Empire {
         if (this.requestQueue === undefined || this.requestQueue === null) {
             this.loadQueueFromCache();
         }
+        _.remove(this.requestQueue, (c: ResourceRequest) => c.id === id);
+        this.saveQueueToCache();
+    }
+
+    /**
+     * Complete a request and put it into the completed list
+     * @param id
+     */
+    public completeRequest(id: number): void {
+        if (this.requestQueue === undefined || this.requestQueue === null ||
+        this.completedRequests === undefined || this.completedRequests === null) {
+            this.loadQueueFromCache();
+        }
+        const request: ResourceRequest = _.first(_.filter(this.requestQueue, (c: ResourceRequest) => c.id = id));
+        const complete = request as CompletedResourceRequest;
+        this.completedRequests.push(complete);
         _.remove(this.requestQueue, (c: ResourceRequest) => c.id === id);
         this.saveQueueToCache();
     }
@@ -96,9 +114,9 @@ class Empire implements Empire {
         const response = from.send(request.resource, amount, to.room.name, "Fulfilling Request ID: " + request.id);
         if (response === OK) {
             request.amount -= amount;
-            if (request.amount <= 0) {
-                this.removeRequest(request.id);
-            }
+            // if (request.amount <= 0) {
+            //     this.completeRequest(request.id);
+            // }
         } else {
             return response;
         }
@@ -140,9 +158,15 @@ class Empire implements Empire {
                 room.memory.prioritise = "none";
                 continue;
             }
-            if (amount <= 0 || space <= 0) {
+
+            if (amount <= 0) {
                 this.log("Request fulfilled removing");
                 this.removeRequest(request.id);
+                return;
+            }
+
+            if (space <= 0) {
+                this.log("Not enough space, putting on hold");
                 return;
             }
 
@@ -243,6 +267,7 @@ class Empire implements Empire {
     public loadQueueFromCache(): void {
         this.checkAndInitCache();
         this.requestQueue = global.empire.requestQueue;
+        this.completedRequests = global.empire.completedRequests;
     }
 
     /**
@@ -251,6 +276,7 @@ class Empire implements Empire {
     public saveQueueToCache(): void {
         this.checkAndInitCache();
         global.empire.requestQueue = this.requestQueue;
+        global.empire.completedRequests = this.completedRequests;
     }
 
     /**
@@ -259,6 +285,7 @@ class Empire implements Empire {
     public saveQueueToMemory(): void {
         this.checkAndInitCache();
         Memory.empire.requestQueue = this.requestQueue;
+        Memory.empire.completedRequests = this.completedRequests;
     }
 
     /**
@@ -266,7 +293,7 @@ class Empire implements Empire {
      */
     private checkAndInitCache(): void {
         // Do we have empire setup in global?
-        if (!global.empire || !global.empire.requestQueue) {
+        if (!global.empire || !global.empire.requestQueue || !global.empire.completedRequests) {
             // Check and init memory
             this.checkAndInitMemory();
             // Pull from memory
@@ -279,6 +306,7 @@ class Empire implements Empire {
     private checkAndInitMemory(): void {
         if (!Memory.empire) { Memory.empire = {}; }
         if (!Memory.empire.requestQueue) { Memory.empire.requestQueue = []; }
+        if (!Memory.empire.completedRequests) { Memory.empire.completedRequests = []; }
     }
 
     private log(message: string): void {
