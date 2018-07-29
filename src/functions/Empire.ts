@@ -140,15 +140,45 @@ class Empire implements Empire {
         }
         const request = _.first(this.requestQueue);
         this.log("Attempting to process request " + request.id);
-        let amount = request.amount;
+
         const receiver: StructureTerminal | undefined = Game.rooms[request.room].terminal;
-        let space = receiver!.storeCapacity - _.sum(receiver!.store);
+        if (receiver === undefined) {
+            this.logAlways("Sending Couriers to empire request");
+            // We need to send couriers instead
+            this.sendCouriersTo(request);
+            return;
+        } else {
+            this.logAlways("Sending Resources via terminals");
+            this.sendResourcesViaTerminalsTo(request, receiver);
+            return;
+        }
+
+    }
+
+    private sendCouriersTo(request: ResourceRequest): void {
+        const myRooms = _.filter(Game.rooms, (r: Room) =>
+            r.controller && r.controller.my &&
+            Game.map.getRoomLinearDistance(r.name, request.room) <= 3 &&
+            r.name !== request.room
+        );
+
+        for (const room of myRooms) {
+            room.memory.courierTarget = request.room;
+        }
+    }
+
+    private sendResourcesViaTerminalsTo(request: ResourceRequest, receiver: StructureTerminal): void {
+        let amount = request.amount;
+        let space = receiver.storeCapacity - _.sum(receiver.store);
         if (space === 0) {
             this.logAlways("No Space at destination holding transfers");
             this.clearAllTerminalCharges();
             return;
         }
-        const myRooms = _.filter(Game.rooms, (r: Room) => r.controller && r.controller.my);
+        const myRooms = _.filter(Game.rooms, (r: Room) =>
+            r.controller && r.controller.my &&
+            r.name !== request.room
+        );
         for (const room of myRooms) {
             const name = room.name;
             this.log("Checking " + name);
@@ -171,7 +201,7 @@ class Empire implements Empire {
             }
 
             if (room.terminal && room.storage) {
-                const totalEnergy = _.sum([ room.terminal.store.energy, room.storage.store.energy ]);
+                const totalEnergy = _.sum([room.terminal.store.energy, room.storage.store.energy]);
                 if (totalEnergy <= 200000) {
                     this.log("Room below min energy level, " + totalEnergy + "  skipping");
                     room.memory.prioritise = "none";
@@ -185,10 +215,10 @@ class Empire implements Empire {
                 // Get how much we have
                 const stored = room.terminal.store[request.resource] || 0;
                 // get the cost per 1000
-                const costPer    = Game.market.calcTransactionCost(1000, room.name, request.room);
-                const totalCost  = 1000 + costPer;
+                const costPer = Game.market.calcTransactionCost(1000, room.name, request.room);
+                const totalCost = 1000 + costPer;
                 const multiplier = Math.floor(stored / totalCost);
-                const toSend     = multiplier * 1000;
+                const toSend = multiplier * 1000;
                 this.log("Has " + stored + " Of the item in terminal");
                 if (stored === 0) {
                     this.log("Has none of requested resource");
@@ -247,6 +277,7 @@ class Empire implements Empire {
             if (!room.controller.my) { continue; }
             if (room.memory.override) { continue; }
             room.memory.prioritise = "none";
+            delete room.memory.courierTarget;
         }
     }
 

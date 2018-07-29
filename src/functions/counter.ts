@@ -144,6 +144,9 @@ export class Counter {
                 Room.mineralSetup();
                 // Run defence setup
                 Room.checkDefenceMax();
+                // Run deconstruction checker
+                Room.processDeconFlags();
+                // Room.visualiseDecons();
             }
         }
     }
@@ -243,7 +246,7 @@ export class Counter {
             }
         }
         if (myRooms.length === 0) {
-            myRooms.push("E18N4");
+            return;
         }
         myRooms = _.filter(myRooms, (c) => Game.rooms[c].storage);
         const myRoom = _.min(myRooms, (c) => Game.rooms[c].storage!.store[RESOURCE_ENERGY]);

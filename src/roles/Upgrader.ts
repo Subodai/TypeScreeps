@@ -29,7 +29,7 @@ export class Upgrader {
         BodyBuilder({ WORK: 6, CARRY:   2, MOVE: 5  }),
         BodyBuilder({ WORK: 14, CARRY:  2, MOVE: 6  }),
         BodyBuilder({ WORK: 20, CARRY:  2, MOVE: 4  }),
-        BodyBuilder({ WORK: 40, CARRY:  2, MOVE: 8  }),
+        BodyBuilder({ WORK: 30, CARRY:  2, MOVE: 15 }),
         BodyBuilder({ WORK: 15, CARRY:  2, MOVE: 8  })
     ];
 

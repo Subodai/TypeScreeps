@@ -6,9 +6,9 @@ import { BodyBuilder } from "functions/tools";
  */
 export class Destroyer {
     public static ticksBeforeRenew: number = 100;
-    public static colour: string = "#5c0b70";
+    public static colour: string = "#bfff00";
     public static roleName: string = "destroy";
-    public static roster: number[] = [ 0, 2, 2, 2, 2, 1, 1, 1, 1 ];
+    public static roster: number[] = [ 0, 2, 2, 2, 2, 2, 2, 3, 3 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         BodyBuilder({ WORK: 1, CARRY: 1, MOVE: 1 }),
@@ -23,19 +23,11 @@ export class Destroyer {
     // is role enabled
     public static enabled(room: Room): boolean {
         if (room.memory.emergency) { return false; }
-        // TODO check for room destruction targets
-        // TODO use a flag to create destruction targets in processRoomFlags
-        // TODO use flag location to find item, and put into memory
-        // TODO get gameobjectbyID
-        // TODO goto object and dissasemble it
-        // TODO bring energy back to wherever
-
-        // fetch all construction sites within 3 rooms of this one
-        const sites: ConstructionSite[] = _.filter(Game.constructionSites, (s: ConstructionSite) =>
-            s.my && (Game.map.getRoomLinearDistance(room.name, s.pos.roomName) < 3 || room.name === s.pos.roomName)
-        );
-        // enabled if there are any
-        return (sites.length > 0);
+        if (!room.memory.charging) { return false; }
+        if (room.getDeconList().length > 0) {
+            return true;
+        }
+        return false;
     }
     // Run this role
     public static run(creep: Creep): void {
@@ -59,12 +51,8 @@ export class Destroyer {
             case STATE._GATHER:
                 this.runGatherState(creep);
                 break;
-            case STATE._RETURN:
-                this.runReturnState(creep);
-                break;
-            // CONSTRUCT state
-            case STATE._CONSTRUCT:
-                this.runConstructState(creep);
+            case STATE._DELIVER:
+                this.runDeliverState(creep);
                 break;
             // default fallback
             default:
@@ -84,143 +72,65 @@ export class Destroyer {
     }
 
     private static runInitState(creep: Creep): void {
-        creep.log("Initiating Builder");
+        creep.log("Initiating Destroyer");
+        creep.chooseDeconstructionTarget();
         creep.state = STATE._GATHER;
         this.run(creep);
     }
 
+    /**
+     * Gather energy from items we need to deconstruct
+     *
+     * @param creep Creep
+     */
     private static runGatherState(creep: Creep): void {
         creep.log("In gather state");
-        const gatherResult = creep.getNearbyEnergy(true);
+        const gatherResult = creep.deconstructRoomTargets();
+        creep.log(gatherResult.toString());
+        if (gatherResult === OK) {
+            creep.log("dismantled successfully");
+            return;
+        }
+
+        if (gatherResult === ERR_NOT_IN_RANGE) {
+            creep.log("not in range moving to target");
+            return;
+        }
+
         if (gatherResult === ERR_FULL) {
-            creep.log("Got some energy");
-            creep.clearTargets();
-            creep.state = STATE._CONSTRUCT;
-        }
-        if (gatherResult === ERR_NOT_FOUND) {
-            creep.state = STATE._RETURN;
-        }
-    }
-
-    private static runReturnState(creep: Creep): void {
-        creep.log("Builder returning to find other resources");
-        if (creep.atHome()) {
-            creep.log("at home ready to collect");
-            creep.state = STATE._GATHER;
+            creep.log("Full, changing to deliver");
+            creep.state = STATE._DELIVER;
             this.run(creep);
+            return;
         }
-        const test = creep.getNearbyEnergy(true);
-        if (test !== ERR_NOT_FOUND) {
-            creep.log("Found room with resource");
-            creep.state = STATE._GATHER;
+
+        if (gatherResult === ERR_NOT_FOUND) {
+            creep.log("Nothing left to dismantle, despawning");
+            creep.deSpawn();
+            return;
+        }
+
+        if (gatherResult === ERR_INVALID_TARGET) {
+            creep.chooseDeconstructionTarget();
+            // DO nothing, will pick another target next run
+            return;
         }
     }
 
-    private static runConstructState(creep: Creep): void {
-        creep.log("In construct state");
-        const result = creep.buildNearestSite();
-        if (result === OK) {
-            creep.log("Built Site");
-        }
-        if (result === ERR_NOT_ENOUGH_RESOURCES) {
-            creep.log("Out of energy");
-            creep.clearTargets();
-            creep.state = STATE._GATHER;
+    /**
+     * Deliver energy back to our strorage/terminal/whatever
+     *
+     * @param creep Creep
+     */
+    private static runDeliverState(creep: Creep): void {
+        creep.log("Delivering energy");
+        if (creep.empty()) {
+            creep.state = STATE._INIT;
             // this.run(creep);
         }
-        if (result === ERR_INVALID_TARGET) {
-            creep.log("Invalid Site Resetting Memory");
-            creep.clearTargets();
-            // this.run(creep);
+        if (creep.deliverEnergy() === OK) {
+            creep.log("Delivered some energy");
+            creep.state = STATE._INIT;
         }
     }
 }
-
-/**
- * Choose, goto and build the nearest construction site
- * @returns {ScreepsReturnCode | void}
- */
-Creep.prototype.buildNearestSite = function(): ScreepsReturnCode | void {
-    this.checkSiteInMemory();
-    if (!this.memory.siteId) {
-        this.findNearestConstructionSite();
-    }
-    if (this.memory.siteId) {
-        return this.goToAndBuild(this.memory.siteId);
-    } else {
-        return this.deSpawn();
-    }
-};
-
-/**
- * Go to and build a construction site
- * @param siteId {string}
- */
-Creep.prototype.goToAndBuild = function(siteId: string): ScreepsReturnCode {
-    const site: ConstructionSite | null = Game.getObjectById(siteId);
-    if (!site) {
-        return ERR_INVALID_TARGET;
-    }
-    // if we're more than 3 away
-    if (this.pos.getRangeTo(site.pos) > 3) {
-        // go to it
-        this.travelTo(site);
-        return ERR_NOT_IN_RANGE;
-    }
-    return this.build(site);
-};
-
-/**
- * Make sure the site stored in memory is valid
- * @returns {void}
- */
-Creep.prototype.checkSiteInMemory = function(): void {
-    // do we have an item in memory
-    if (!this.memory.siteId) {
-        return;
-    }
-    // Check the object exists first
-    if (!Game.getObjectById(this.memory.siteId)) {
-        // if it doesn't clear it
-        delete this.memory.siteId;
-        delete this.memory.targetRoom;
-    }
-};
-
-/**
- * Find the nearest constructionSite to a creep
- * @param my {boolean} optional, if false will pick enemy site
- * @returns {void}
- */
-Creep.prototype.findNearestConstructionSite = function(my: boolean = true): void {
-    // get the nearest site by range
-    let site: ConstructionSite | null | undefined;
-    if (my) {
-        site = this.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
-    } else {
-        site = this.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
-    }
-    // if the findClosest failed (it does that sometimes)
-    if (site === undefined || site === null) {
-        for (const i in Game.constructionSites) {
-            site = Game.getObjectById(i);
-            if (Game.map.getRoomLinearDistance(this.room.name, site!.pos.roomName) > 3) {
-                continue;
-            }
-            // did we find a site?
-            if (site && my && site.my) {
-                break;
-            }
-
-            if (site && !my && !site.my) {
-                break;
-            }
-            // not sure how but we got here but clear the site
-            site = null;
-        }
-    }
-    if (site) {
-        this.memory.siteId = site.id;
-        this.memory.targetRoom = JSON.stringify(site.pos);
-    }
-};

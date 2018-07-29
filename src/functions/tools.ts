@@ -45,7 +45,7 @@ export function toHex(dec: number, padding?: number): string {
  * @param structures
  * @param room
  */
-export function visualiseDamage(structures: Structure[], room: Room): void {
+export function visualiseDamage(structures: Structure[], room: Room, prefix: string = "", suffix: string = ""): void {
     for (const i in structures) {
         const structure: Structure = structures[i];
         let percent = 1;
@@ -64,7 +64,7 @@ export function visualiseDamage(structures: Structure[], room: Room): void {
             opacity: 0.3,
             radius: 0.40,
             stroke: colour
-        }).text((percent * 100).toFixed(2) + "%", structure.pos, {
+        }).text(prefix + (percent * 100).toFixed(2) + "%" + suffix, structure.pos, {
             align: "center",
             color: colour,
             font: 0.5,

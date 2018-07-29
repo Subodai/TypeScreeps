@@ -1,5 +1,6 @@
 import { Debug } from "functions/debug";
 import { Builder } from "roles/Builder";
+import { Destroyer } from "roles/Destroyer";
 import { Harvester } from "roles/Harvester";
 import { Janitor } from "roles/Janitor";
 import { Miner } from "roles/Miner";
@@ -21,6 +22,7 @@ export const ROLES: string[] = [
 
     // mid priority roles
     Janitor.roleName,
+    Destroyer.roleName,
     // MineralExtractor.roleName,
 
     // Remote roles
@@ -37,6 +39,7 @@ export const ROLEMODELS: Role[] = [
     Upgrader,
     Builder,
     Janitor,
+    Destroyer,
     // MineralExtractor,
     RemoteClaimer,
     RemoteEnergyMiner,

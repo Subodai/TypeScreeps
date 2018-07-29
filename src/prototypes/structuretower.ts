@@ -185,9 +185,7 @@ StructureTower.prototype.repairWalls = function(max?: number): boolean {
 
 StructureTower.prototype.findWall = function(hp: number): StructureWall | void {
     let targets = [];
-    targets = this.room.find(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_WALL && s.hits <= hp
-    });
+    targets = this.room.find(FIND_STRUCTURES, { filter: (s) => s.structureType === STRUCTURE_WALL && s.hits <= hp });
     if (targets.length > 0) {
         const wall = _.min(targets, (t) => t.hits);
         if (wall instanceof StructureWall) {

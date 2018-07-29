@@ -108,6 +108,7 @@ export class Janitor {
         const wallMax = room.memory.wallMax || global.wallMax || Memory.wallMax || 1;
         const items: Structure[] = room.find(FIND_STRUCTURES, {
             filter: (s: AnyStructure) =>
+                !(room.getDeconList().indexOf(s.id) > -1) &&
                 // ramparts below max * 0.75 (no point spawning all the time to keep going away after)
                 // tslint:disable-next-line:max-line-length
                 (s.structureType === STRUCTURE_RAMPART && s.hits < (rampartMax * (room.controller!.level / 8) * 0.95)) ||
@@ -135,6 +136,7 @@ export class Janitor {
     private static getStructureRepairs(room: Room): Structure[] {
         const items: Structure[] = room.find(FIND_STRUCTURES, {
             filter: (s: AnyStructure) =>
+                !(room.getDeconList().indexOf(s.id) > -1) &&
                 // Containers only below half health
                 (s.structureType === STRUCTURE_CONTAINER && s.hits < (s.hitsMax * 0.5)) ||
                 // anything else

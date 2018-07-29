@@ -66,6 +66,10 @@ interface Room {
     chargeTerminalOverride(): void;
     cancelTerminalOverride(): void;
     checkDefenceMax(): void;
+    processDeconFlags(): void;
+    visualiseDecons(): void;
+    getDeconItems(): Structure[];
+    getDeconList(): string[];
 }
 
 interface RoomMemory {
@@ -92,9 +96,11 @@ interface RoomMemory {
     assignedMinerals?: { [key: string]: string | null };
     debug?: boolean;
     chargeNuke?: boolean;
-    enemies?:{ [k: string]: any};
+    enemies?: { [k: string]: any};
     targets?: string[];
     feedTarget?: { [key: string]: string | number };
     wallMax?: number;
     rampartMax?: number;
+    deconTargets?: string[];
+    courierTarget?: string;
 }

@@ -1,4 +1,5 @@
 import { Builder } from "roles/Builder";
+import { Destroyer } from "roles/Destroyer";
 import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { Upgrader } from "roles/Upgrader";
@@ -524,7 +525,7 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         fillSpawns = true;
     }
 
-    if (this.role === RemoteEnergyHauler.roleName) {
+    if (this.role === RemoteEnergyHauler.roleName || this.role === Destroyer.roleName) {
         fillSpawns = false;
     }
 

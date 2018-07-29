@@ -308,7 +308,9 @@ Creep.prototype.findDamagedRampart = function(): void {
 Creep.prototype.findWall = function(hp: number): void {
     let targets = [];
     targets = this.room.find(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_WALL && s.hits <= hp
+        filter: (s) =>
+        !(this.room.getDeconList().indexOf(s.id) > -1) &&
+        s.structureType === STRUCTURE_WALL && s.hits <= hp
     });
     if (targets.length > 0) {
         visualiseDamage(targets, this.room);
@@ -324,7 +326,9 @@ Creep.prototype.findWall = function(hp: number): void {
 Creep.prototype.findRampart = function(hp: number): void {
     let targets = [];
     targets = this.room.find(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my
+        filter: (s) =>
+        !(this.room.getDeconList().indexOf(s.id) > -1) &&
+        s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my
     });
     if (targets.length > 0) {
         visualiseDamage(targets, this.room);
@@ -343,6 +347,12 @@ Creep.prototype.findRampart = function(hp: number): void {
 Creep.prototype.validateCurrentRepairTarget = function(): void {
     // Is their an item in memory, with full health already?
     if (!this.memory.repairTarget) {
+        return;
+    }
+    // Check the deconstruction list
+    if (this.room.getDeconList().indexOf(this.memory.repairTarget) > -1) {
+        delete this.memory.repairTarget;
+        delete this.memory.targetMaxHP;
         return;
     }
     const target: Structure | null = Game.getObjectById(this.memory.repairTarget);
@@ -366,7 +376,9 @@ Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolea
         this.log("Has no repair target, looking for 1 hp ramparts and walls");
         // Check for walls or ramparts with 1 hit first
         const targets = this.room.find(FIND_STRUCTURES, {
-            filter: (i) => (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL) &&
+            filter: (i) =>
+                !(this.room.getDeconList().indexOf(i.id) > -1) &&
+                (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL) &&
                 i.hits === 1 && i.room === this.room
         });
 
@@ -383,7 +395,9 @@ Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolea
         this.log("Has no repair target, looking for containers");
         // Check for walls or ramparts with 1 hit first
         const targets = this.room.find(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
+            filter: (i) =>
+                !(this.room.getDeconList().indexOf(i.id) > -1) &&
+                i.structureType === STRUCTURE_CONTAINER &&
                 i.hits < i.hitsMax
         });
 
@@ -399,7 +413,9 @@ Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolea
     if (!this.memory.repairTarget && d) {
         this.log("Has no repair target, looking for < 600hp ramparts and walls");
         const targets = this.room.find(FIND_STRUCTURES, {
-            filter: (i) => (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL)
+            filter: (i) =>
+                !(this.room.getDeconList().indexOf(i.id) > -1) &&
+                (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL)
                 && i.hits <= 600 && i.room === this.room
         });
         if (targets.length > 0) {
@@ -457,14 +473,7 @@ Creep.prototype.repairStructures = function(r: boolean = false, d: boolean = fal
     } else {
         // Nothing to repair?
         // No targets.. head back to the room spawn
-        const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_SPAWN
-        }) as StructureSpawn;
-        if (spawn) {
-            if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
-                this.travelTo(spawn);
-            }
-        }
+        this.deSpawn();
         return ERR_INVALID_TARGET;
     }
 };
@@ -501,4 +510,50 @@ Creep.prototype.repairCurrentTarget = function(): ScreepsReturnCode {
         }
     }
     return ERR_INVALID_TARGET;
+};
+
+/**
+ * Creep should pick a target and dismantle it!
+ */
+Creep.prototype.deconstructRoomTargets = function(): ScreepsReturnCode {
+    if (this.room.getDeconList().length === 0) {
+        return ERR_NOT_FOUND;
+    }
+    if (_.sum(this.carry) >= this.carryCapacity) {
+        return ERR_FULL;
+    }
+
+    if (!this.memory.deconstructionTarget) {
+        this.chooseDeconstructionTarget();
+    }
+
+    if (!this.memory.deconstructionTarget) {
+        return ERR_NOT_FOUND; // We should be recycled for this
+    }
+
+    const target: Structure = Game.getObjectById(this.memory.deconstructionTarget) as Structure;
+    if (!target) {
+        return ERR_INVALID_TARGET; // just needs another target
+    }
+    visualiseDamage([target], this.room);
+    if (this.pos.getRangeTo(target) <= 1) {
+        this.dismantle(target);
+        return OK;
+    }
+    // We weren't close enough move to it
+    this.travelTo(target);
+    return ERR_NOT_IN_RANGE;
+};
+
+/**
+ * Grab the first item from the list
+ */
+Creep.prototype.chooseDeconstructionTarget = function(): void {
+    const item = _.first(this.room.getDeconItems());
+    if (!item) {
+        delete this.memory.deconstructionTarget;
+        return;
+    }
+    this.room.visualiseDecons();
+    this.memory.deconstructionTarget = item.id;
 };

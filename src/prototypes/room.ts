@@ -1,6 +1,7 @@
 import { ROLEMODELS, ROLES } from "config/constants";
 import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
+import { visualiseDamage } from "functions/tools";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
@@ -307,6 +308,66 @@ Room.prototype.processBuildFlags = function(): number {
     }
 
     return OK;
+};
+
+/**
+ * Process, and subsequently remove deconstruction flags
+ */
+Room.prototype.processDeconFlags = function(): void {
+    // Initialise the memory
+    if (!this.memory.deconTargets) { this.memory.deconTargets = []; }
+    // Filter the room for flags with decon colours
+    const flags: Flag[] = _.filter(Game.flags, (flag) =>
+        flag.pos.roomName === this.name &&
+        flag.color === COLOR_RED && flag.secondaryColor === COLOR_ORANGE
+    );
+    // No flags, nothing to do
+    if (flags.length === 0) {
+        this.log("No Decon Flags Found");
+        return;
+    }
+    this.log("Found " + flags.length + " decon flags");
+    for (const flag of flags) {
+        const items = this.lookForAt(LOOK_STRUCTURES, flag.pos);
+        for (const item of items) {
+            item.notifyWhenAttacked(false);
+            this.memory.deconTargets.push(item.id);
+        }
+        // Bin the flag
+        flag.remove();
+    }
+};
+
+/**
+ * Returns a list of the decon items from memory
+ */
+Room.prototype.getDeconList = function(): string[] {
+    if (!this.memory.deconTargets) { this.memory.deconTargets = []; }
+    return this.memory.deconTargets || [];
+};
+
+/**
+ * Gets the list of decon ids and converts into game objects
+ */
+Room.prototype.getDeconItems = function(): Structure[] {
+    const structures = _.filter(this.getDeconList(), (id) => {
+        const obj = Game.getObjectById(id);
+        if (obj) { return true; }
+        return false;
+    });
+    this.memory.deconTargets = structures;
+    if (structures.length === 0) { return []; }
+    // Return the mapped items
+    return _.map(structures, (id) => Game.getObjectById(id)) as Structure[];
+};
+
+/**
+ * Visualise the damage of the structures we want to remove
+ */
+Room.prototype.visualiseDecons = function(): void {
+    const structures: Structure[] = this.getDeconItems();
+    if (structures.length === 0) { return; } // Nothing to do
+    visualiseDamage(structures, this, "> ", " <");
 };
 
 /*

@@ -201,13 +201,6 @@ Creep.prototype.chooseRemoteMinerRoom = function(): void {
             this.log("Not suitable");
         }
         this.log("Couldn't find a suitable flag despawning?");
-        const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_SPAWN
-        }) as StructureSpawn;
-        if (spawn) {
-            if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
-                this.travelTo(spawn);
-            }
-        }
+        this.deSpawn();
     }
 };

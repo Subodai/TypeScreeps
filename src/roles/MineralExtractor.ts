@@ -104,14 +104,7 @@ Creep.prototype.pickMineral = function(): boolean {
         )
     });
     if (minerals.length <= 0) {
-        const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_SPAWN
-        }) as StructureSpawn;
-        if (spawn) {
-            if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
-                this.travelTo(spawn);
-            }
-        }
+        this.deSpawn();
         return false;
     }
     const mineral: Mineral = _.first(minerals);
@@ -153,14 +146,7 @@ Creep.prototype.mineMineral = function(): ScreepsReturnCode {
         const mineral: Mineral | null = Game.getObjectById(this.memory.assignedMineral);
         if (mineral) {
             if (mineral.mineralAmount === 0) {
-                const spawn: StructureSpawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
-                    filter: (i) => i.structureType === STRUCTURE_SPAWN
-                }) as StructureSpawn;
-                if (spawn) {
-                    if (spawn.recycleCreep(this) === ERR_NOT_IN_RANGE) {
-                        this.travelTo(spawn);
-                    }
-                }
+                this.deSpawn();
                 return ERR_INVALID_TARGET;
             }
             return this.harvest(mineral);
