@@ -135,6 +135,18 @@ class Empire implements Empire {
         if (this.requestQueue.length === 0) {
             this.logAlways("No requests to process");
             this.clearAllTerminalCharges();
+            // If we're attempting to charge a room, lets process that
+            if (global.chargeRoom) {
+                const room = Game.rooms[global.chargeRoom];
+                // check for terminal
+                if (room.terminal && room.controller) {
+                    // Check it has no energy
+                    if (room.controller.level < 8 && room.terminal.store[RESOURCE_ENERGY] === 0) {
+                        // put in a request
+                        this.addRequest(room, RESOURCE_ENERGY, 300000);
+                    }
+                }
+            }
             // todo sleep?
             return;
         }
