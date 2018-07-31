@@ -35,6 +35,7 @@ interface Creep {
     fillContainers(): ScreepsReturnCode | false;
     fillLabs(): ScreepsReturnCode | false;
     fillLinks(): ScreepsReturnCode | false;
+    fillLinksAndLabs(): ScreepsReturnCode | false;
     fillNukeEnergy(): ScreepsReturnCode | false;
     fillNukeGhodium(): ScreepsReturnCode | false;
     fillRoomStorageOrTerminal(): ScreepsReturnCode | false;

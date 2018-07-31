@@ -289,8 +289,12 @@ Creep.prototype.fillLabs = function(): ScreepsReturnCode | false {
 };
 
 Creep.prototype.fillLinks = function(): ScreepsReturnCode | false {
+    return this.fillLinksAndLabs();
+};
+
+Creep.prototype.fillLinksAndLabs = function(): ScreepsReturnCode | false {
     this.log("Making sure links are filled");
-    let target: StructureLink;
+    let target: StructureLink | StructureLab;
     if (this.room.storage) {
         this.log("Room has storage");
         target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -308,6 +312,24 @@ Creep.prototype.fillLinks = function(): ScreepsReturnCode | false {
                 return ERR_NOT_IN_RANGE;
             } else {
                 this.log("transfered to a link");
+                // Succesful drop off
+                return OK;
+            }
+        }
+        target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+            filter: (s) => s.structureType === STRUCTURE_LAB &&
+                s.energy < s.energyCapacity
+        }) as StructureLab;
+        this.log(JSON.stringify(target));
+        if (target) {
+            this.log("found a lab");
+            // Attempt transfer, unless out of range
+            if (this.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                // Let's go to the target
+                this.travelTo(target);
+                return ERR_NOT_IN_RANGE;
+            } else {
+                this.log("transfered to a lab");
                 // Succesful drop off
                 return OK;
             }
@@ -551,7 +573,10 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     }
 
     // if we're a refiller prioritise links
-    if (this.role === Refiller.roleName && this.room.controller && this.room.controller.level >= 5) {
+    if (this.role === Refiller.roleName &&
+        this.room.controller &&
+        this.room.controller.level >= 5 &&
+        this.carry.energy > 0) {
         const linkResult = this.fillLinks();
         if (linkResult !== false) {
             return linkResult;

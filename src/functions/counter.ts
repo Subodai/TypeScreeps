@@ -147,6 +147,7 @@ export class Counter {
                 // Run deconstruction checker
                 Room.processDeconFlags();
                 // Room.visualiseDecons();
+                Room.runBoostLab();
             }
         }
     }
