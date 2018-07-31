@@ -21,12 +21,7 @@ Object.defineProperty(StructureLink.prototype, "linkType", {
     configurable: true,
     enumerable: false,
     get(): any {
-        if (!Memory.structures) {
-            Memory.structures = {};
-        }
-        if (!Memory.structures[this.id]) {
-            Memory.structures[this.id] = {};
-        }
+        this.initMemory();
         if (!Memory.structures[this.id].linkType) {
             let type: string = "receiver";
             // if we're within 2 of the storage

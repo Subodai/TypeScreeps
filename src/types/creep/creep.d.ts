@@ -3,6 +3,7 @@
  */
 
 interface Creep {
+    boosted?: boolean;
     state: CreepState;
     role: string;
     threat: number;
@@ -114,4 +115,5 @@ interface CreepMemory {
     sleepUntil?: number;
     threat?: number;
     deconstructionTarget?: string;
+    boosted: boolean;
 }

@@ -5,6 +5,7 @@ export class Debug {
     public static cBlue: string = "#42d7f4";
     public static cLBlue: string = "#8da6c6";
     public static cYellow: string = "#f8f990";
+    public static cPurple: string = "#5900ff";
     private static debugEnabled: boolean = Memory.debugEnabled;
     private static creepDebugEnabled: boolean = Memory.creepDebug;
     private static roomDebugEnabled: boolean = Memory.roomDebug;
@@ -12,6 +13,8 @@ export class Debug {
     private static spawnDebugEnabled: boolean = Memory.spawnDebug;
     private static towerDebugEnabled: boolean = Memory.towerDebug;
     private static linkDebugEnabled: boolean = Memory.linkDebug;
+    private static labDebugEnabled: boolean = Memory.labDebug;
+
     /**
      * Debug messages for creeps, will spit out room details and creep details
      *
@@ -134,6 +137,31 @@ export class Debug {
         }
         if (link) {
             msg += "<span style='color:" + this.cBlue + ";'>[" + link.id + "]</span> ";
+        }
+        msg += message;
+        console.log(msg);
+    }
+
+    /**
+     * Debug messages for labs
+     *
+     * @param message {string}
+     * @param tower {StructureTower}
+     */
+    public static Lab(message: string, lab: StructureLab): void {
+        if (!lab.memory.debug) {
+            if (!this.labDebugEnabled || !this.debugEnabled) {
+                return;
+            }
+        }
+        let msg: string = "";
+        msg += "<span style='color:" + this.cGrey + ";'>[" + Game.time + "]</span> ";
+        const room: Room = lab.room;
+        if (room) {
+            msg += "<span style='color:" + this.cYellow + ";'>[" + room.name + "]</span> ";
+        }
+        if (lab) {
+            msg += "<span style='color:" + this.cPurple + ";'>[" + lab.id + "]</span> ";
         }
         msg += message;
         console.log(msg);

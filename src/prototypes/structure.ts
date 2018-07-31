@@ -15,17 +15,21 @@ export function loadStructurePrototypes(): void {
         configurable: true,
         enumerable: false,
         get(): any {
-            if (!Memory.structures[this.id]) {
-                Memory.structures[this.id] = {};
-            }
+            this.initMemory();
             return Memory.structures[this.id];
         },
         set(v: any): any {
             return _.set(Memory, "structures." + this.id, v);
         }
     });
+
+    OwnedStructure.prototype.initMemory = function(): void {
+        if (!Memory.structures) { Memory.structures = {}; }
+        if (!Memory.structures[this.id]) { Memory.structures[this.id] = {}; }
+    };
 }
 
+import "./structureLab";
 import "./structureLink";
 import "./structureSpawn";
 import "./structureTower";

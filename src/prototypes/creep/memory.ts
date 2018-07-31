@@ -59,3 +59,17 @@ Object.defineProperty(Creep.prototype, "threat", {
         return _.set(Memory, "rooms." + this.room.name + ".enemies." + this.id + ".threat", v);
     }
 });
+
+/**
+ * Boosted flag
+ */
+Object.defineProperty(Creep.prototype, "boosted", {
+    configurable: true,
+    enumerable: true,
+    get(): boolean {
+        return Memory.creeps[this.name].boosted ? Memory.creeps[this.name].boosted : false;
+    },
+    set(v: boolean): boolean {
+        return _.set(Memory, "creeps." + this.name + ".boosted", v);
+    }
+});
