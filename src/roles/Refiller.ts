@@ -83,8 +83,8 @@ export class Refiller {
                     creep.state = STATE._INIT;
                     this.run(creep);
                 }
-                if (creep.deliverMinerals() === OK) {
-                    creep.log("Delivered som resources");
+                if (creep.deliverEnergy() === OK) {
+                    creep.log("Delivered some resources");
                 }
                 break;
             // DELIVER state
@@ -112,21 +112,6 @@ export class Refiller {
         if (creep.atHome()) {
             creep.log("at home ready to gather");
 
-            // Check for things that need energy
-            const energyTargets = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => (
-                    s.structureType === STRUCTURE_SPAWN ||
-                    s.structureType === STRUCTURE_EXTENSION ||
-                    s.structureType === STRUCTURE_TOWER ||
-                    s.structureType === STRUCTURE_LAB
-                ) && s.energy < s.energyCapacity && s.my
-            });
-            if (energyTargets.length > 0) {
-                creep.state = STATE._GATHER;
-                this.run(creep);
-                return;
-            }
-
             const resourceTargets = creep.room.find(FIND_STRUCTURES, {
                 filter: (s) =>
                     s.structureType === STRUCTURE_LAB &&
@@ -147,6 +132,22 @@ export class Refiller {
                 this.run(creep);
                 return;
             }
+
+            // Check for things that need energy
+            const energyTargets = creep.room.find(FIND_STRUCTURES, {
+                filter: (s) => (
+                    s.structureType === STRUCTURE_SPAWN ||
+                    s.structureType === STRUCTURE_EXTENSION ||
+                    s.structureType === STRUCTURE_TOWER ||
+                    s.structureType === STRUCTURE_LAB
+                ) && s.energy < s.energyCapacity && s.my
+            });
+            if (energyTargets.length > 0) {
+                creep.state = STATE._GATHER;
+                this.run(creep);
+                return;
+            }
+
             // Just stick to gathering energy
             creep.state = STATE._GATHER;
             this.run(creep);

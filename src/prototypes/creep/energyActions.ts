@@ -267,6 +267,27 @@ Creep.prototype.fillContainers = function(): ScreepsReturnCode | false {
     return false;
 };
 
+Creep.prototype.fillLabs = function(): ScreepsReturnCode | false {
+    this.log("Attempting to fill a Lab");
+    let target: StructureLab;
+    target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_LAB &&
+            (s.compoundIn === this.memory.mineralType || s.mineralIn === this.memory.mineralType)
+            && s.mineralAmount < s.mineralCapacity
+    }) as StructureLab;
+    this.log(JSON.stringify(target));
+    if (target) {
+        this.log("found a lab");
+        if (this.pos.getRangeTo(target) <= 1) {
+            return this.transfer(target, this.memory.mineralType!);
+        } else {
+            this.travelTo(target);
+            return ERR_NOT_IN_RANGE;
+        }
+    }
+    return false;
+};
+
 Creep.prototype.fillLinks = function(): ScreepsReturnCode | false {
     this.log("Making sure links are filled");
     let target: StructureLink;
@@ -564,6 +585,11 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         if (nukeResult !== false) {
             return nukeResult;
         }
+    }
+
+    const labResult = this.fillLabs();
+    if (labResult !== false) {
+        return labResult;
     }
 
     // try and fill storage

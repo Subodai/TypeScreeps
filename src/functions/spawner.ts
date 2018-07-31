@@ -102,6 +102,7 @@ export class Spawner {
         Spawn.log("Spawning:" + JSON.stringify(bodyStructure[level]));
         const result = Spawn.spawnCreep(bodyStructure[level], name, {
             memory: {
+                boosted: false,
                 level,
                 role: Role.roleName,
                 roomName: Room.name,

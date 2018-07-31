@@ -33,6 +33,7 @@ interface Creep {
     deSpawn(): void;
     empty(): boolean;
     fillContainers(): ScreepsReturnCode | false;
+    fillLabs(): ScreepsReturnCode | false;
     fillLinks(): ScreepsReturnCode | false;
     fillNukeEnergy(): ScreepsReturnCode | false;
     fillNukeGhodium(): ScreepsReturnCode | false;
