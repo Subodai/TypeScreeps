@@ -5,7 +5,9 @@
 /**
  * Get Nearby minerals to pickup
  */
-Creep.prototype.getNearbyMinerals = function(storage: boolean = false): ScreepsReturnCode {
+Creep.prototype.getNearbyMinerals = function(
+    storage: boolean = false,
+    type?: ResourceConstant): ScreepsReturnCode {
     // First are we full?
     if (this.full()) {
         this.log("Creep full cannot get nearby minerals");
@@ -13,6 +15,7 @@ Creep.prototype.getNearbyMinerals = function(storage: boolean = false): ScreepsR
         this.invalidateMineralTarget(true);
         return ERR_FULL;
     }
+    if (type) { this.findResourceOfType(type); }
     if (!this.memory.mineralPickup && storage) { this.findStorageMinerals(); }
     // Start with ground minerals
     if (!this.memory.mineralPickup) { this.findGroundMinerals(); }
@@ -24,6 +27,37 @@ Creep.prototype.getNearbyMinerals = function(storage: boolean = false): ScreepsR
     if (this.memory.mineralPickup) { return this.moveToAndPickupMinerals(); }
     // No target return not found
     return ERR_NOT_FOUND;
+};
+
+/**
+ *
+ */
+Creep.prototype.findResourceOfType = function(type: ResourceConstant): void {
+    const targets = this.room.find(FIND_STRUCTURES, {
+        filter: (s) =>
+        (
+            (
+                s.structureType === STRUCTURE_TERMINAL ||
+                s.structureType === STRUCTURE_STORAGE ||
+                s.structureType === STRUCTURE_CONTAINER
+            ) && s.store[type] !== undefined
+        ) ||
+        (
+            s.structureType === STRUCTURE_LAB &&
+            s.labType !== "feeder" &&
+            s.mineralType === type &&
+            s.mineralAmount > 0
+        )
+    });
+    if (targets.length > 0) {
+        const target = _.first(targets);
+        this.memory.mineralPickup = target.id;
+        this.memory.mineralType = type;
+        return;
+    }
+    // no joy, clear any previous values
+    delete this.memory.mineralPickup;
+    delete this.memory.mineralType;
 };
 
 /**
@@ -131,14 +165,14 @@ Creep.prototype.findContainerMinerals = function(): void {
  */
 Creep.prototype.moveToAndPickupMinerals = function(): ScreepsReturnCode {
     this.log("Found minerals in memory " + this.memory.mineralPickup);
-    const target: Resource | StructureContainer | StructureStorage | Tombstone | null =
+    const target: Resource | StructureContainer | StructureStorage | Tombstone | StructureLab | null =
         Game.getObjectById(this.memory.mineralPickup);
     // if the target is invalid, or cannot be found let's clear it
     if (!target) { return this.invalidateMineralTarget(); }
 
     // Quick validation pass on the target
     if (target instanceof Resource) {
-        // If it's going to disapwn before we get there, then there's no point in carrying on
+        // If it's going to dispawn before we get there, then there's no point in carrying on
         if (target.amount < (this.pos.getRangeTo(target) / this.moveEfficiency())) {
             return this.invalidateMineralTarget();
         }
@@ -173,14 +207,13 @@ Creep.prototype.moveToAndPickupMinerals = function(): ScreepsReturnCode {
         }
         // Can we pick it up yet?
         if (!this.canPickup(target)) {
-            this.say(global.sayMove);
             // Can't pick it up yet, so lets move towards it
             this.travelTo(target);
         }
         // Can we pick it up now?
         if (this.canPickup(target)) {
-            // Loop through all the resources in the container
-            for (const r in target.store) {
+            if (this.memory.mineralType) {
+                const r = this.memory.mineralType;
                 // If there is more than 0 of this mineral, let's pick it up
                 if (target.store.hasOwnProperty(r) && r !== RESOURCE_ENERGY) {
                     // Attempt to pick it up
@@ -194,6 +227,46 @@ Creep.prototype.moveToAndPickupMinerals = function(): ScreepsReturnCode {
                         return this.invalidateMineralTarget(this.full());
                     }
                 }
+            } else {
+                // Loop through all the resources in the container
+                for (const r in target.store) {
+                    // If there is more than 0 of this mineral, let's pick it up
+                    if (target.store.hasOwnProperty(r) && r !== RESOURCE_ENERGY) {
+                        // Attempt to pick it up
+                        const pickupResult = this.withdraw(target, r as ResourceConstant);
+                        // check the result
+                        if (pickupResult === ERR_NOT_IN_RANGE) {
+                            // something probbaly went wrong
+                        } else if (pickupResult === OK) {
+                            this.say(global.sayWithdraw);
+                            // Invalidate and return full
+                            return this.invalidateMineralTarget(this.full());
+                        }
+                    }
+                }
+            }
+        }
+    } else if (target instanceof StructureLab) {
+        this.log("Target is a Lab");
+        if (target.mineralAmount === 0) {
+            return this.invalidateMineralTarget();
+        }
+        // Can we pick it up yet?
+        if (!this.canPickup(target)) {
+            // Can't pick it up yet, so lets move towards it
+            this.travelTo(target);
+        }
+        // Can we pick it up now?
+        if (this.canPickup(target)) {
+            // Attempt to pick it up
+            const pickupResult = this.withdraw(target, target.mineralType as ResourceConstant);
+            // check the result
+            if (pickupResult === ERR_NOT_IN_RANGE) {
+                // something probbaly went wrong
+            } else if (pickupResult === OK) {
+                this.say(global.sayWithdraw);
+                // Invalidate and return full
+                return this.invalidateMineralTarget(this.full());
             }
         }
     }

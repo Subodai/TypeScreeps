@@ -14,6 +14,7 @@ declare const _CONSTRUCT = 9;
 declare const _RETURN    = 10;
 declare const _CHARGE    = 11;
 declare const _GATHERM   = 12;
+declare const _DELIVERM  = 13;
 
 /**
  * State types
@@ -31,6 +32,7 @@ type _CONSTRUCT = 9;
 type _RETURN    = 10;
 type _CHARGE    = 11;
 type _GATHERM   = 12;
+type _DELIVERM  = 13;
 
 /**
  * CreepStates
@@ -49,4 +51,5 @@ type CreepState =
     | _RETURN
     | _CHARGE
     | _GATHERM
+    | _DELIVERM
     ;

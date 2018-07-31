@@ -72,6 +72,7 @@ Creep.prototype.atHome = function(): boolean {
  */
 Creep.prototype.clearTargets = function(): void {
     const mem: CreepMemory = {
+        boosted: this.memory.boosted,
         level: this.memory.level,
         role: this.memory.role,
         roomName: this.memory.roomName,
