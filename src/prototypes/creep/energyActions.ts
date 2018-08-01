@@ -287,7 +287,9 @@ Creep.prototype.fillLabsEnergy = function(): ScreepsReturnCode | false {
                 const lab = _.first(this.room.find(FIND_MY_STRUCTURES, {
                     filter: (s) => s.structureType === STRUCTURE_LAB && s.boostTarget !== null
                 })) as StructureLab;
-                this.travelTo(lab);
+                if (this.pos.getRangeTo(lab) > 1) {
+                    this.travelTo(lab);
+                }
                 return false;
             }
             // tslint:disable-next-line:max-line-length

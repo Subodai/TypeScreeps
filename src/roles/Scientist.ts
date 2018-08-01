@@ -97,8 +97,21 @@ export class Scientist {
                     creep.state = STATE._INIT;
                     this.run(creep);
                 }
-                if (creep.fillLabsEnergy() === OK) {
+                const result = creep.fillLabsEnergy();
+                if (result === OK) {
                     creep.log("Delivered some energy");
+                }
+                if (result === false && creep.memory.idle && creep.memory.idle >= 10) {
+                    const resourceTargets = creep.room.find(FIND_STRUCTURES, {
+                        filter: (s) =>
+                            s.structureType === STRUCTURE_LAB &&
+                            (s.mineralIn !== null || s.compoundIn !== null) &&
+                            s.mineralAmount < s.mineralCapacity &&
+                            s.labType !== "reactor"
+                    });
+                    if (resourceTargets.length > 0) {
+                        creep.deliverEnergy();
+                    }
                 }
                 break;
             // default unknown state

@@ -1,5 +1,6 @@
 import { Debug } from "functions/debug";
 import { Builder } from "roles/Builder";
+import { Courier } from "roles/Courier";
 import { Destroyer } from "roles/Destroyer";
 import { Harvester } from "roles/Harvester";
 import { Janitor } from "roles/Janitor";
@@ -28,10 +29,12 @@ export const ROLES: string[] = [
     // MineralExtractor.roleName,
 
     // Remote roles
+
     RemoteClaimer.roleName,
     RemoteEnergyMiner.roleName,
     RemoteReserver.roleName,
-    RemoteEnergyHauler.roleName
+    RemoteEnergyHauler.roleName,
+    Courier.roleName
 ];
 
 export const ROLEMODELS: Role[] = [
@@ -47,7 +50,8 @@ export const ROLEMODELS: Role[] = [
     RemoteClaimer,
     RemoteEnergyMiner,
     RemoteReserver,
-    RemoteEnergyHauler
+    RemoteEnergyHauler,
+    Courier
 ];
 
 export function loadConstants(): void {
