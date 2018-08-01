@@ -31,10 +31,6 @@ export class Courier {
     public static run(creep: Creep): void {
         // if creep is dying make sure it gets renewed
         creep.deathCheck(this.ticksBeforeRenew);
-        if (!creep.canDo(WORK)) {
-            creep.log("Damaged seeking repair");
-            return;
-        }
         // run as normal
         switch (creep.state) {
             // SPAWN state
@@ -72,6 +68,7 @@ export class Courier {
     private static runInitState(creep: Creep): void {
         creep.log("Initiating Courier");
         creep.memory.remoteRoom = creep.room.memory.courierTarget;
+        creep.memory.roomName = creep.room.memory.courierTarget;
         creep.state = STATE._MOVE;
         this.run(creep);
     }

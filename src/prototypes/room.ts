@@ -570,3 +570,46 @@ Room.prototype.cancelTerminalOverride = function(): void {
     this.memory.prioritise = "none";
     delete this.memory.override;
 };
+
+Room.prototype.runBoostLab = function(): void {
+    const boostLab = _.first(this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "booster" &&
+            s.mineralAmount > 0
+    })) as StructureLab;
+    if (!boostLab) {
+        return;
+    }
+    // okay now find spawns nearby spawning something
+    const boostTarget: BoostTarget | null = boostLab.boostTarget ? boostLab.boostTarget : null;
+    if (boostTarget) {
+        // Get nearby spawns that are spawning!
+        const spawns = this.find(FIND_MY_STRUCTURES, {
+            filter: (s) => s.structureType === STRUCTURE_SPAWN &&
+            s.spawning !== null
+        }) as StructureSpawn[];
+        for (const spawn of spawns) {
+            if (!spawn.spawning) {
+                continue;
+            }
+            const creep: Creep = Game.creeps[spawn.spawning.name];
+            if (creep.role === boostTarget.roleName) {
+                if (creep.boosted === false) {
+                    if (boostLab.boostCreep(creep) === OK) {
+                        creep.boosted = true;
+                        boostLab.room.visual.text(
+                            "Boost", boostLab.pos, {
+                                align: "center",
+                                color: "#b200ff",
+                                font: 0.5,
+                                opacity: 0.6,
+                                stroke: "rgba(0,0,0,0.5)"
+                            }
+                        );
+                    }
+                }
+            }
+        }
+    }
+};

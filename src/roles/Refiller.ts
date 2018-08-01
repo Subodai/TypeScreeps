@@ -55,12 +55,7 @@ export class Refiller {
                 break;
             // INIT state
             case STATE._INIT:
-                creep.log("Initiating Refiller");
-                if (creep.atHome()) {
-                    creep.log("at home ready to gather");
-                    creep.state = STATE._GATHER;
-                    this.run(creep);
-                }
+                this.runInitState(creep);
                 break;
             // GATHER state
             case STATE._GATHER:
@@ -88,6 +83,21 @@ export class Refiller {
                 creep.state = STATE._INIT;
                 break;
 
+        }
+    }
+
+    /**
+     * Run Initiation State
+     * @param creep Creep
+     */
+    private static runInitState(creep: Creep): void {
+        creep.log("Initiating Refiller");
+        if (creep.atHome()) {
+            creep.log("at home ready to gather");
+
+            // Just stick to gathering energy
+            creep.state = STATE._GATHER;
+            this.run(creep);
         }
     }
 }

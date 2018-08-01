@@ -1,15 +1,15 @@
 interface StructureLab {
     labType: any;
     mineralIn?: MineralConstant;
-    compoundIn?: ResourceConstant;
-    compoundOut?: ResourceConstant;
-    log(msg: string): void;
+    compoundIn?: _ResourceConstantSansEnergy;
+    compoundOut?: _ResourceConstantSansEnergy;
     boostTarget?: BoostTarget;
+    log(msg: string): void;
 }
 
 interface BoostTarget {
     roleName: string;
-    compound: ResourceConstant;
+    compound: _ResourceConstantSansEnergy;
 }
 
 interface LabReaction {

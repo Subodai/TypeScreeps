@@ -33,7 +33,10 @@ interface Creep {
     deSpawn(): void;
     empty(): boolean;
     fillContainers(): ScreepsReturnCode | false;
+    fillLabs(): ScreepsReturnCode | false;
+    fillLabsEnergy(): ScreepsReturnCode | false;
     fillLinks(): ScreepsReturnCode | false;
+    fillLinksAndLabs(): ScreepsReturnCode | false;
     fillNukeEnergy(): ScreepsReturnCode | false;
     fillNukeGhodium(): ScreepsReturnCode | false;
     fillRoomStorageOrTerminal(): ScreepsReturnCode | false;
@@ -50,6 +53,7 @@ interface Creep {
     findNearbyEnergyTarget(): void;
     findNearestConstructionSite(my?: boolean): void;
     findRampart(hp: number): void;
+    findResourceOfType(type: ResourceConstant): void;
     findSpaceAtSource(source: Source): boolean;
     findStorageMinerals(): void;
     findTombstoneEnergy(): Tombstone | null;
@@ -57,7 +61,7 @@ interface Creep {
     findWall(hp: number): void;
     full(): boolean;
     getNearbyEnergy(useStorage?: boolean, emergency?: boolean): ScreepsReturnCode;
-    getNearbyMinerals(storage: boolean): ScreepsReturnCode;
+    getNearbyMinerals(useStorage: boolean, type?: ResourceConstant): ScreepsReturnCode;
     goToAndBuild(siteId: string): ScreepsReturnCode;
     goToRoom(roomName: string): void;
     invalidateMineralTarget(full?: boolean): ScreepsReturnCode;
@@ -91,6 +95,7 @@ interface CreepMemory {
     roomName?: string;
     energyPickup?: string;
     mineralPickup?: string;
+    mineralType?: ResourceConstant;
     canWork?: string;
     repair?: boolean;
     _trav?: TravelData;

@@ -70,6 +70,7 @@ interface Room {
     visualiseDecons(): void;
     getDeconItems(): Structure[];
     getDeconList(): string[];
+    runBoostLab(): void;
 }
 
 interface RoomMemory {

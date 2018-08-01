@@ -2,6 +2,7 @@ import { Builder } from "roles/Builder";
 import { Destroyer } from "roles/Destroyer";
 import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
+import { Scientist } from "roles/Scientist";
 import { Upgrader } from "roles/Upgrader";
 
 /**
@@ -267,9 +268,60 @@ Creep.prototype.fillContainers = function(): ScreepsReturnCode | false {
     return false;
 };
 
+Creep.prototype.fillLabsEnergy = function(): ScreepsReturnCode | false {
+    this.log("Attempting to fill a Lab");
+    let target: StructureLab | StructureStorage | StructureTerminal | null;
+    target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_LAB &&
+            s.energy < s.energyCapacity &&
+            s.my
+    }) as StructureLab;
+    this.log(JSON.stringify(target));
+    if (this.role === Scientist.roleName) {
+        if (!target) {
+            let idle = this.memory.idle || 0;
+            idle++;
+            this.memory.idle = idle;
+            if (this.memory.idle >= 10) {
+                this.log("Idling, going to boost lab to get out the way");
+                const lab = _.first(this.room.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => s.structureType === STRUCTURE_LAB && s.boostTarget !== null
+                })) as StructureLab;
+                if (this.pos.getRangeTo(lab) > 1) {
+                    this.travelTo(lab);
+                }
+                return false;
+            }
+            // tslint:disable-next-line:max-line-length
+            target = this.room.storage && _.sum(this.room.storage.store) < this.room.storage.storeCapacity ? this.room.storage : null;
+            if (!target) {
+                // tslint:disable-next-line:max-line-length
+                target = this.room.terminal && _.sum(this.room.terminal.store) < this.room.terminal.storeCapacity ? this.room.terminal : null;
+            }
+            this.log("dumping to storage");
+        } else {
+            delete this.memory.idle;
+        }
+    }
+    if (target) {
+        this.log("found a target for energy");
+        if (this.pos.getRangeTo(target) <= 1) {
+            return this.transfer(target, RESOURCE_ENERGY);
+        } else {
+            this.travelTo(target);
+            return ERR_NOT_IN_RANGE;
+        }
+    }
+    return false;
+};
+
 Creep.prototype.fillLinks = function(): ScreepsReturnCode | false {
+    return this.fillLinksAndLabs();
+};
+
+Creep.prototype.fillLinksAndLabs = function(): ScreepsReturnCode | false {
     this.log("Making sure links are filled");
-    let target: StructureLink;
+    let target: StructureLink | StructureLab;
     if (this.room.storage) {
         this.log("Room has storage");
         target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
@@ -291,6 +343,24 @@ Creep.prototype.fillLinks = function(): ScreepsReturnCode | false {
                 return OK;
             }
         }
+        // target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+        //     filter: (s) => s.structureType === STRUCTURE_LAB &&
+        //         s.energy < s.energyCapacity
+        // }) as StructureLab;
+        // this.log(JSON.stringify(target));
+        // if (target) {
+        //     this.log("found a lab");
+        //     // Attempt transfer, unless out of range
+        //     if (this.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+        //         // Let's go to the target
+        //         this.travelTo(target);
+        //         return ERR_NOT_IN_RANGE;
+        //     } else {
+        //         this.log("transfered to a lab");
+        //         // Succesful drop off
+        //         return OK;
+        //     }
+        // }
     }
     return false;
 };
@@ -530,7 +600,10 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     }
 
     // if we're a refiller prioritise links
-    if (this.role === Refiller.roleName && this.room.controller && this.room.controller.level >= 5) {
+    if (this.role === Refiller.roleName &&
+        this.room.controller &&
+        this.room.controller.level >= 5 &&
+        this.carry.energy > 0) {
         const linkResult = this.fillLinks();
         if (linkResult !== false) {
             return linkResult;
@@ -564,6 +637,11 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         if (nukeResult !== false) {
             return nukeResult;
         }
+    }
+
+    const labResult = this.fillLabsEnergy();
+    if (labResult !== false) {
+        return labResult;
     }
 
     // try and fill storage

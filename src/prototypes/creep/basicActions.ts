@@ -72,6 +72,7 @@ Creep.prototype.atHome = function(): boolean {
  */
 Creep.prototype.clearTargets = function(): void {
     const mem: CreepMemory = {
+        boosted: this.memory.boosted,
         level: this.memory.level,
         role: this.memory.role,
         roomName: this.memory.roomName,
@@ -126,7 +127,9 @@ Creep.prototype.canDo = function(bodyPart: BodyPartConstant): boolean {
             if (this.memory.roomName) {
                 const pos: RoomPosition = new RoomPosition(25, 25, this.memory.roomName);
                 // Move the creep
-                this.travelTo(pos);
+                this.travelTo(pos, {
+                    ensurePath: true
+                });
             }
         }
         // Are we at max health?
