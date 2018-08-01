@@ -53,7 +53,7 @@ StructureLink.prototype.runReceiver = function(): number {
         // grab the link
         const from = storageLinks[0] as StructureLink;
         // transfer
-        from.transferEnergy(this, from.energy);
+        from.transferEnergy(this);
     }
     return this.countCPU(start);
 };

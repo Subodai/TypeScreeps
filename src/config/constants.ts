@@ -10,6 +10,7 @@ import { RemoteClaimer } from "roles/RemoteClaimer";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
+import { Scientist } from "roles/Scientist";
 import { Upgrader } from "roles/Upgrader";
 
 export const ROLES: string[] = [
@@ -23,6 +24,7 @@ export const ROLES: string[] = [
     // mid priority roles
     Janitor.roleName,
     Destroyer.roleName,
+    Scientist.roleName,
     // MineralExtractor.roleName,
 
     // Remote roles
@@ -40,6 +42,7 @@ export const ROLEMODELS: Role[] = [
     Builder,
     Janitor,
     Destroyer,
+    Scientist,
     // MineralExtractor,
     RemoteClaimer,
     RemoteEnergyMiner,

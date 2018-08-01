@@ -57,16 +57,6 @@ export class Refiller {
             case STATE._INIT:
                 this.runInitState(creep);
                 break;
-            // GATHERM state
-            case STATE._GATHERM:
-                creep.log("Fetching resources");
-
-                if (creep.getNearbyMinerals(true, creep.memory.mineralType || undefined) === ERR_FULL) {
-                    creep.log("Got Resrouces");
-                    creep.state = STATE._DELIVERM;
-                    this.run(creep);
-                }
-                break;
             // GATHER state
             case STATE._GATHER:
                 creep.log("In gather state");
@@ -74,17 +64,6 @@ export class Refiller {
                     creep.log("Got some energy");
                     creep.state = STATE._DELIVER;
                     this.run(creep);
-                }
-                break;
-            // DELIVER resource
-            case STATE._DELIVERM:
-                creep.log("Delivering resources");
-                if (creep.empty()) {
-                    creep.state = STATE._INIT;
-                    this.run(creep);
-                }
-                if (creep.deliverEnergy() === OK) {
-                    creep.log("Delivered some resources");
                 }
                 break;
             // DELIVER state
@@ -107,46 +86,14 @@ export class Refiller {
         }
     }
 
+    /**
+     * Run Initiation State
+     * @param creep Creep
+     */
     private static runInitState(creep: Creep): void {
         creep.log("Initiating Refiller");
         if (creep.atHome()) {
             creep.log("at home ready to gather");
-
-            const resourceTargets = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) =>
-                    s.structureType === STRUCTURE_LAB &&
-                    (s.mineralIn !== null || s.compoundIn !== null) &&
-                    s.mineralAmount < s.mineralCapacity &&
-                    s.labType !== "reactor"
-            });
-            if (resourceTargets.length > 0) {
-                const target: StructureLab = _.first(resourceTargets) as StructureLab;
-                if (target.compoundIn) {
-                    creep.memory.mineralType = target.compoundIn;
-                } else if (target.mineralIn) {
-                    creep.memory.mineralType = target.mineralIn;
-                } else {
-                    delete creep.memory.mineralType;
-                }
-                creep.state = STATE._GATHERM;
-                this.run(creep);
-                return;
-            }
-
-            // Check for things that need energy
-            const energyTargets = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => (
-                    s.structureType === STRUCTURE_SPAWN ||
-                    s.structureType === STRUCTURE_EXTENSION ||
-                    s.structureType === STRUCTURE_TOWER ||
-                    s.structureType === STRUCTURE_LAB
-                ) && s.energy < s.energyCapacity && s.my
-            });
-            if (energyTargets.length > 0) {
-                creep.state = STATE._GATHER;
-                this.run(creep);
-                return;
-            }
 
             // Just stick to gathering energy
             creep.state = STATE._GATHER;

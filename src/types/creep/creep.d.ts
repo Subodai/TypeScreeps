@@ -34,6 +34,7 @@ interface Creep {
     empty(): boolean;
     fillContainers(): ScreepsReturnCode | false;
     fillLabs(): ScreepsReturnCode | false;
+    fillLabsEnergy(): ScreepsReturnCode | false;
     fillLinks(): ScreepsReturnCode | false;
     fillLinksAndLabs(): ScreepsReturnCode | false;
     fillNukeEnergy(): ScreepsReturnCode | false;

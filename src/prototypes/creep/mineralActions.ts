@@ -310,3 +310,32 @@ Creep.prototype.fillNukeGhodium = function(): ScreepsReturnCode | false {
 //     // }
 //     return OK;
 // };
+Creep.prototype.fillLabs = function(): ScreepsReturnCode | false {
+    this.log("Attempting to fill a Lab");
+    let target: StructureLab | StructureTerminal | StructureStorage | null;
+    target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_LAB &&
+            (s.compoundIn === this.memory.mineralType || s.mineralIn === this.memory.mineralType)
+            && s.mineralAmount < s.mineralCapacity
+    }) as StructureLab;
+    this.log(JSON.stringify(target));
+    if (!target) {
+        // tslint:disable-next-line:max-line-length
+        target = this.room.terminal && _.sum(this.room.terminal.store) < this.room.terminal.storeCapacity ? this.room.terminal : null;
+        if (!target) {
+            // tslint:disable-next-line:max-line-length
+            target = this.room.storage && _.sum(this.room.storage.store) < this.room.storage.storeCapacity ? this.room.storage : null;
+        }
+        this.log("dumping to storage");
+    }
+    if (target) {
+        this.log("found a target");
+        if (this.pos.getRangeTo(target) <= 1) {
+            return this.transfer(target, this.memory.mineralType!);
+        } else {
+            this.travelTo(target);
+            return ERR_NOT_IN_RANGE;
+        }
+    }
+    return false;
+};

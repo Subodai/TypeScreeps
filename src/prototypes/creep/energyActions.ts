@@ -2,6 +2,7 @@ import { Builder } from "roles/Builder";
 import { Destroyer } from "roles/Destroyer";
 import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
+import { Scientist } from "roles/Scientist";
 import { Upgrader } from "roles/Upgrader";
 
 /**
@@ -267,19 +268,43 @@ Creep.prototype.fillContainers = function(): ScreepsReturnCode | false {
     return false;
 };
 
-Creep.prototype.fillLabs = function(): ScreepsReturnCode | false {
+Creep.prototype.fillLabsEnergy = function(): ScreepsReturnCode | false {
     this.log("Attempting to fill a Lab");
-    let target: StructureLab;
+    let target: StructureLab | StructureStorage | StructureTerminal | null;
     target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
         filter: (s) => s.structureType === STRUCTURE_LAB &&
-            (s.compoundIn === this.memory.mineralType || s.mineralIn === this.memory.mineralType)
-            && s.mineralAmount < s.mineralCapacity
+            s.energy < s.energyCapacity &&
+            s.my
     }) as StructureLab;
     this.log(JSON.stringify(target));
+    if (this.role === Scientist.roleName) {
+        if (!target) {
+            let idle = this.memory.idle || 0;
+            idle++;
+            this.memory.idle = idle;
+            if (this.memory.idle >= 10) {
+                this.log("Idling, going to boost lab to get out the way");
+                const lab = _.first(this.room.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => s.structureType === STRUCTURE_LAB && s.boostTarget !== null
+                })) as StructureLab;
+                this.travelTo(lab);
+                return false;
+            }
+            // tslint:disable-next-line:max-line-length
+            target = this.room.storage && _.sum(this.room.storage.store) < this.room.storage.storeCapacity ? this.room.storage : null;
+            if (!target) {
+                // tslint:disable-next-line:max-line-length
+                target = this.room.terminal && _.sum(this.room.terminal.store) < this.room.terminal.storeCapacity ? this.room.terminal : null;
+            }
+            this.log("dumping to storage");
+        } else {
+            delete this.memory.idle;
+        }
+    }
     if (target) {
-        this.log("found a lab");
+        this.log("found a target for energy");
         if (this.pos.getRangeTo(target) <= 1) {
-            return this.transfer(target, this.memory.mineralType!);
+            return this.transfer(target, RESOURCE_ENERGY);
         } else {
             this.travelTo(target);
             return ERR_NOT_IN_RANGE;
@@ -316,24 +341,24 @@ Creep.prototype.fillLinksAndLabs = function(): ScreepsReturnCode | false {
                 return OK;
             }
         }
-        target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-            filter: (s) => s.structureType === STRUCTURE_LAB &&
-                s.energy < s.energyCapacity
-        }) as StructureLab;
-        this.log(JSON.stringify(target));
-        if (target) {
-            this.log("found a lab");
-            // Attempt transfer, unless out of range
-            if (this.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                // Let's go to the target
-                this.travelTo(target);
-                return ERR_NOT_IN_RANGE;
-            } else {
-                this.log("transfered to a lab");
-                // Succesful drop off
-                return OK;
-            }
-        }
+        // target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+        //     filter: (s) => s.structureType === STRUCTURE_LAB &&
+        //         s.energy < s.energyCapacity
+        // }) as StructureLab;
+        // this.log(JSON.stringify(target));
+        // if (target) {
+        //     this.log("found a lab");
+        //     // Attempt transfer, unless out of range
+        //     if (this.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+        //         // Let's go to the target
+        //         this.travelTo(target);
+        //         return ERR_NOT_IN_RANGE;
+        //     } else {
+        //         this.log("transfered to a lab");
+        //         // Succesful drop off
+        //         return OK;
+        //     }
+        // }
     }
     return false;
 };
@@ -612,7 +637,7 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         }
     }
 
-    const labResult = this.fillLabs();
+    const labResult = this.fillLabsEnergy();
     if (labResult !== false) {
         return labResult;
     }
