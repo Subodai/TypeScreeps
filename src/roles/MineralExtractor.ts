@@ -21,6 +21,7 @@ export class MineralExtractor {
     ];
     // is this role enabled?
     public static enabled(room: Room): boolean {
+        if (!room.memory.charging && global.chargeRoom && global.chargeRoom === room.name) { return false; }
         if (room.memory.emergency) { return false; }
         // no controller?
         if (!room.controller) {

@@ -53,6 +53,7 @@ export class Runner {
         towerCost: number,
         linkCost: number,
         storedEnergy: number): void {
+        if (!global.visualsEnabled) { return; }
         room.visual.text(
         "Room CPU : " + (Game.cpu.getUsed() - roomCPU).toFixed(2) +
         " All Creeps: " + creepsCPU.toFixed(2) + " Per Creep: " + avg.toFixed(2), 1, 1, {
@@ -145,6 +146,7 @@ export class Runner {
     }
 
     private static visualise(item: Creep | StructureTower | StructureLink, colour: string, cost: number): void {
+        if (!global.visualsEnabled) { return; }
         item.room.visual.circle(item.pos, {
             fill: colour,
             opacity: 0.1,

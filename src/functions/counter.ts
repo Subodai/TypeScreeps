@@ -54,6 +54,9 @@ export class Counter {
                     desiredCreeps = 4;
                     minMiners = 1;
                 }
+                if (!Room.memory.charging && global.chargeRoom && global.chargeRoom === Room.name) {
+                    minMiners = 0;
+                }
                 list = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
                     i.role !== RemoteEnergyHauler.roleName &&
                     i.role !== Builder.roleName &&

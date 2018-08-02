@@ -23,6 +23,7 @@ export class Harvester {
     ];
     // is role enabled
     public static enabled(room: Room): boolean {
+        if (!room.memory.charging && global.chargeRoom && global.chargeRoom === room.name) { return false; }
         if (room.controller && room.memory.minersNeeded && room.memory.minersNeeded > 0) {
             const list = room.activeCreepsInRole(this);
             if (list.length < room.memory.minersNeeded * this.multiplier) {

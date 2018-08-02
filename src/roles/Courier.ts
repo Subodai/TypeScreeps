@@ -5,6 +5,7 @@ import { BodyBuilder } from "functions/tools";
  * Builders turn energy into structures
  */
 export class Courier {
+    private static minEnergyForSpawn: number = 50000;
     public static ticksBeforeRenew: number = 100;
     public static colour: string = "#4286f4";
     public static roleName: string = "courier";
@@ -23,7 +24,11 @@ export class Courier {
     // is role enabled
     public static enabled(room: Room): boolean {
         if (room.memory.emergency) { return false; }
-        if (room.memory.courierTarget) { return true; }
+        if (room.memory.courierTarget) {
+            if (room.storage && room.storage.store[RESOURCE_ENERGY] > this.minEnergyForSpawn) {
+                return true;
+            }
+        }
         // TODO Check for some kind of state so we know we need to feed a room
         return false;
     }

@@ -23,6 +23,7 @@ export class RemoteEnergyMiner {
     // is it enabled?
     public static enabled(room: Room): boolean {
         if (room.memory.emergency) { return false; }
+        if (!room.memory.charging) { return false; }
         // @todo is this check necessary?
         // not enabled for rooms that aren't mine
         if (!room.controller || !room.controller.my) {
