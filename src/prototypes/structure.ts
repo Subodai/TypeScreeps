@@ -27,6 +27,18 @@ export function loadStructurePrototypes(): void {
         if (!Memory.structures) { Memory.structures = {}; }
         if (!Memory.structures[this.id]) { Memory.structures[this.id] = {}; }
     };
+
+    Object.defineProperty(OwnedStructure.prototype, "targetted", {
+        configurable: true,
+        enumerable: true,
+        get(): number {
+            this.initMemory();
+            return this.memory.targetted || 0;
+        },
+        set(v: number): number {
+            return _.set(Memory, "structures." + this.id + ".targetted", v);
+        }
+    });
 }
 
 import "./structureLab";

@@ -327,17 +327,20 @@ Creep.prototype.fillLinksAndLabs = function(): ScreepsReturnCode | false {
         target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_LINK &&
                 s.linkType === "storage" &&
-                s.energy < s.energyCapacity
+                s.energy < s.energyCapacity &&
+                s.targetted < Game.time
         }) as StructureLink;
         this.log(JSON.stringify(target));
         if (target) {
             this.log("found a link");
             // Attempt transfer, unless out of range
             if (this.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                target.targetted = Game.time;
                 // Let's go to the target
                 this.travelTo(target);
                 return ERR_NOT_IN_RANGE;
             } else {
+                target.targetted = 0;
                 this.log("transfered to a link");
                 // Succesful drop off
                 return OK;
