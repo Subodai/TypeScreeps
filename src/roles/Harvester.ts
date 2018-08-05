@@ -98,12 +98,13 @@ export class Harvester {
                 this.run(creep);
                 break;
             case OK:
+            case ERR_INVALID_TARGET:
                 creep.log("Travelling to minerals");
                 break;
             // not found, just gather energy
             case ERR_NOT_FOUND:
             default:
-                creep.log("No Minerals attempting energy instead");
+                creep.log("No Minerals attempting energy instead " + result);
                 creep.state = STATE._GATHER;
                 this.run(creep);
                 break;

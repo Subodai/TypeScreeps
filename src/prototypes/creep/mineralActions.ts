@@ -79,10 +79,10 @@ Creep.prototype.findLabMinerals = function(): void {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
             s.labType === "reactor" &&
-            s.mineralAmount > 0
+            s.mineralAmount > s.mineralCapacity / 10
     }) as StructureLab[];
     if (labs.length > 0) {
-        const target: StructureLab = _.first(labs);
+        const target: StructureLab = _.max(labs, (l) => l.mineralAmount);
         this.memory.mineralPickup = target.id;
     }
 };
