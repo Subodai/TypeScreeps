@@ -34,7 +34,7 @@ export class Janitor {
         if (!room.storage) { return false; }
         room.log("Room has storage");
         let items: Structure[] = [];
-        if (!room.memory.charging) {
+        if (room.memory.charging) {
             items = this.getStructureRepairs(room);
         } else {
             items = this.getAllRepairs(room);
@@ -113,10 +113,11 @@ export class Janitor {
         const items: Structure[] = room.find(FIND_STRUCTURES, {
             filter: (s: AnyStructure) =>
                 !(room.getDeconList().indexOf(s.id) > -1) &&
-                (s.structureType === STRUCTURE_RAMPART && s.hits <= 1000) ||
+                // tslint:disable-next-line:max-line-length
+                (s.structureType === STRUCTURE_RAMPART && s.hits < 10000) ||
                 // walls below max * 0.9 (no point spawning all the time to keep going away after)
                 // tslint:disable-next-line:max-line-length
-                (s.structureType === STRUCTURE_WALL && s.hits <= 1000) ||
+                (s.structureType === STRUCTURE_WALL && s.hits < 10000) ||
                 // Containers only below half health
                 (s.structureType === STRUCTURE_CONTAINER && s.hits < (s.hitsMax * 0.5)) ||
                 // anything else
