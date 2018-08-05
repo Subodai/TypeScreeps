@@ -38,6 +38,7 @@ export class Runner {
             const towerCost = this.towers(room);
             // Run the links
             const linkCost = this.links(room);
+            room.runReactionLabs();
             const avg = creepsCPU / Object.keys(Game.creeps).length;
             const storedEnergy = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
             this.roomVisual(room, roomCPU, creepsCPU, avg, towerCost, linkCost, storedEnergy);

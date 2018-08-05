@@ -7,8 +7,8 @@ declare let global: { [k: string]: any };
 
 interface OwnedStructure {
     memory: { [k: string]: any };
-    initMemory(): void;
     targetted: number;
+    initMemory(): void;
 }
 
 interface StructureSpawn {

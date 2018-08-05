@@ -46,6 +46,7 @@ export function toHex(dec: number, padding?: number): string {
  * @param room
  */
 export function visualiseDamage(structures: Structure[], room: Room, prefix: string = "", suffix: string = ""): void {
+    if (!global.visualsEnabled) { return; }
     for (const i in structures) {
         const structure: Structure = structures[i];
         let percent = 1;

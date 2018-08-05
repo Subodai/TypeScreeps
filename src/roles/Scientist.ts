@@ -89,6 +89,7 @@ export class Scientist {
                 }
                 if (creep.fillLabs() === OK) {
                     creep.log("Delivered some resources");
+                    delete creep.memory.mineralType;
                 }
                 break;
             // DELIVER state
@@ -144,9 +145,9 @@ export class Scientist {
                     (s.mineralIn !== null || s.compoundIn !== null) &&
                     s.mineralAmount < s.mineralCapacity &&
                     s.labType !== "reactor"
-            });
+            }) as StructureLab[];
             if (resourceTargets.length > 0) {
-                const target: StructureLab = _.first(resourceTargets) as StructureLab;
+                const target: StructureLab = _.min(resourceTargets, (l) => l.mineralAmount) as StructureLab;
                 if (target.compoundIn) {
                     creep.memory.mineralType = target.compoundIn;
                 } else if (target.mineralIn) {

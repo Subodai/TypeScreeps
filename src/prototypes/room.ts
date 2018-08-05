@@ -613,3 +613,70 @@ Room.prototype.runBoostLab = function(): void {
         }
     }
 };
+
+Room.prototype.runReactionLabs = function(): void {
+    const sourceLabs = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_LAB &&
+        s.labType === "feeder" &&
+        s.mineralAmount > 0
+    }) as StructureLab[];
+    if (sourceLabs.length === 0) {
+        return;
+    }
+    for (const lab of sourceLabs) {
+        lab.room.visual.text(
+            lab.mineralType || "?", lab.pos, {
+                align: "center",
+                color: "#000000",
+                font: 0.4,
+                opacity: 0.8,
+                stroke: "rgba(0,0,0,0.1)"
+            }
+        );
+    }
+    const reactionLabs = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "reactor" &&
+            s.mineralAmount < s.mineralCapacity &&
+            s.cooldown <= 0 &&
+            s.reaction !== null
+    }) as StructureLab[];
+    if (reactionLabs.length === 0) {
+        return;
+    }
+
+    for (const lab of reactionLabs) {
+        const reaction: LabReaction | null = lab.reaction ? lab.reaction : null;
+        if (!reaction) {
+            continue;
+        }
+        // we have a reaction
+        const lab1 = reaction.sourceLab1;
+        const lab2 = reaction.sourceLab2;
+        const target = reaction.targetLab;
+        if (target !== lab) {
+            this.log("Something went wrong with reaction");
+            continue;
+        }
+        if (lab2.mineralAmount < 5 || lab1.mineralAmount < 5) {
+            this.log("Not enough source minerals");
+            continue;
+        }
+        const result = lab.runReaction(lab1, lab2);
+        if (result === OK) {
+            this.log("Lab Reaction complete");
+            lab.room.visual.text(
+                lab.mineralType || "!!", lab.pos, {
+                    align: "center",
+                    color: "#ffffff",
+                    font: 0.4,
+                    opacity: 0.8,
+                    stroke: "rgba(0,0,0,0.1)"
+                }
+            );
+            continue;
+        }
+        this.log("Lab reaction result " + result.toString());
+    }
+};

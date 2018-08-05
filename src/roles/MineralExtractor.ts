@@ -32,6 +32,12 @@ export class MineralExtractor {
                 return false;
             }
         }
+        const extractors = room.find(FIND_MY_STRUCTURES, {
+            filter: (s) => s.structureType === STRUCTURE_EXTRACTOR
+        });
+        if (extractors.length === 0) {
+            return false;
+        }
         if (room.memory.mineralsNeeded && room.memory.mineralsNeeded > 0) {
             return true;
         }

@@ -56,6 +56,38 @@ Object.defineProperty(StructureLab.prototype, "boostTarget", {
         return _.set(Memory, "structures." + this.id + ".boostTarget", v);
     }
 });
+
+Object.defineProperty(StructureLab.prototype, "reaction", {
+    configurable: true,
+    enumerable: false,
+    get(): LabReaction | null {
+        this.initMemory();
+        const response = Memory.structures[this.id].reaction || null;
+        if (response === null) {
+            return response;
+        }
+        const reaction: LabReaction = {
+            sourceLab1: Game.getObjectById(response.sourceLab1) as StructureLab,
+            // tslint:disable-next-line:object-literal-sort-keys
+            sourceLab2: Game.getObjectById(response.sourceLab2) as StructureLab,
+            targetLab: this
+        };
+        return reaction;
+    },
+    set(v: LabReaction | null): LabReaction | null {
+        if (v === null) {
+            return _.set(Memory, "structures." + this.id + ".reaction", v);
+        }
+        const data = {
+            sourceLab1: v.sourceLab1.id,
+            // tslint:disable-next-line:object-literal-sort-keys
+            sourceLab2: v.sourceLab2.id,
+            targetLab: v.targetLab.id
+        };
+        return _.set(Memory, "structures." + this.id + ".reaction", data);
+    }
+});
+
 /**
  * Define the labType based on it's position
  */
@@ -86,9 +118,9 @@ Object.defineProperty(StructureLab.prototype, "labType", {
                 type = "booster";
             }
             // Initialise this link
-            Memory.structures[this.id].linkType = type;
+            Memory.structures[this.id].labType = type;
         }
-        return Memory.structures[this.id].linkType;
+        return Memory.structures[this.id].labType;
     },
     set(v: any): any {
         return _.set(Memory, "structures." + this.id + ".labType", v);

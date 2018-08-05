@@ -23,6 +23,8 @@ Creep.prototype.getNearbyMinerals = function(
     if (!this.memory.mineralPickup) { this.findTombstoneMinerals(); }
     // Next Container Minerals
     if (!this.memory.mineralPickup) { this.findContainerMinerals(); }
+    // Next try reactor labs
+    if (!this.memory.mineralPickup) { this.findLabMinerals(); }
     // Do we have a target?
     if (this.memory.mineralPickup) { return this.moveToAndPickupMinerals(); }
     // No target return not found
@@ -67,6 +69,22 @@ Creep.prototype.invalidateMineralTarget = function(full: boolean = false): Scree
     delete this.memory.mineralPickup;
     if (full) { return ERR_FULL; }
     return ERR_INVALID_TARGET;
+};
+
+/**
+ * Finds reactors with minerals in
+ */
+Creep.prototype.findLabMinerals = function(): void {
+    const labs = this.room.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "reactor" &&
+            s.mineralAmount > 0
+    }) as StructureLab[];
+    if (labs.length > 0) {
+        const target: StructureLab = _.first(labs);
+        this.memory.mineralPickup = target.id;
+    }
 };
 
 /**
@@ -331,6 +349,26 @@ Creep.prototype.fillLabs = function(): ScreepsReturnCode | false {
     if (target) {
         this.log("found a target");
         if (this.pos.getRangeTo(target) <= 1) {
+            if (target instanceof StructureTerminal ||
+                target instanceof StructureStorage) {
+                    // Loop through our resources
+                    for (const res in this.carry) {
+                        this.log(res);
+                        this.log(JSON.stringify(target));
+                        // Attempt to transfer them
+                        if (this.carry.hasOwnProperty(res) && this.carry[res] > 0) {
+                            this.log("Attempting transfer");
+                            if (this.transfer(target, res as ResourceConstant) === ERR_NOT_IN_RANGE) {
+                                this.log("Not in range");
+                                this.travelTo(target);
+                                return ERR_NOT_IN_RANGE;
+                            } else {
+                                this.log("transferred to storage or terminal");
+                                return OK;
+                            }
+                        }
+                    }
+                }
             return this.transfer(target, this.memory.mineralType!);
         } else {
             this.travelTo(target);

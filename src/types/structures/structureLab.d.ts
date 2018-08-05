@@ -4,6 +4,7 @@ interface StructureLab {
     compoundIn?: _ResourceConstantSansEnergy;
     compoundOut?: _ResourceConstantSansEnergy;
     boostTarget?: BoostTarget;
+    reaction?: LabReaction;
     log(msg: string): void;
 }
 
@@ -14,6 +15,6 @@ interface BoostTarget {
 
 interface LabReaction {
     targetLab: StructureLab;
-    sourceLabl: StructureLab;
+    sourceLab1: StructureLab;
     sourceLab2: StructureLab;
 }

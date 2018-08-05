@@ -50,6 +50,7 @@ interface Creep {
     findDamagedWall(): void;
     findDroppedEnergy(): Resource | null;
     findGroundMinerals(): void;
+    findLabMinerals(): void;
     findNearbyEnergyTarget(): void;
     findNearestConstructionSite(my?: boolean): void;
     findRampart(hp: number): void;

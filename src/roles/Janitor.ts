@@ -39,30 +39,6 @@ export class Janitor {
         } else {
             items = this.getAllRepairs(room);
         }
-        // room.log("Room has enough energy in storage");
-        // @todo move to own method
-        // get all walls and ramparts below their max hp
-        // const items: Structure[] = room.find(FIND_STRUCTURES, {
-        //     filter: (s: AnyStructure) =>
-        //         // ramparts below max * 0.75 (no point spawning all the time to keep going away after)
-        //         (s.structureType === STRUCTURE_RAMPART && s.hits < (global.rampartMax * 0.75)) ||
-        //         // walls below max * 0.9 (no point spawning all the time to keep going away after)
-        //         (s.structureType === STRUCTURE_WALL && s.hits < (global.wallMax * 0.9)) ||
-        //         // Containers only below half health
-        //         (s.structureType === STRUCTURE_CONTAINER && s.hits < (s.hitsMax * 0.5)) ||
-        //         // anything else
-        //         (
-        //             // not a wall, rampart, conatiner or road
-        //             (
-        //                 s.structureType !== STRUCTURE_WALL &&
-        //                 s.structureType !== STRUCTURE_RAMPART &&
-        //                 s.structureType !== STRUCTURE_ROAD &&
-        //                 s.structureType !== STRUCTURE_CONTAINER
-        //             ) &&
-        //             // with less than 100% hp
-        //             s.hits < s.hitsMax
-        //         )
-        // });
         if (items.length > 0) {
             room.log("Items found to repair");
             room.log(JSON.stringify(items));
