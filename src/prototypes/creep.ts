@@ -416,12 +416,12 @@ Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolea
             filter: (i) =>
                 !(this.room.getDeconList().indexOf(i.id) > -1) &&
                 (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL)
-                && i.hits <= 600 && i.room === this.room
+                && i.hits <= 1000 && i.room === this.room
         });
         if (targets.length > 0) {
             visualiseDamage(targets, this.room);
             this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
-            this.memory.targetMaxHP = 600;
+            this.memory.targetMaxHP = 1000;
         }
     }
 };
@@ -433,7 +433,7 @@ Creep.prototype.chooseRepairTarget = function(r: boolean = false, d: boolean = f
     this.chooseHighPriorityDefenceTarget(d, s);
 
     if (this.room.storage) {
-        if (this.room.storage.store[RESOURCE_ENERGY] < 50000) {
+        if (this.room.memory.charging) {
             d = false;
         }
     }
