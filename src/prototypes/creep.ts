@@ -411,17 +411,17 @@ Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolea
 
     // Next juice up walls and ramparts to 600
     if (!this.memory.repairTarget && d) {
-        this.log("Has no repair target, looking for < 600hp ramparts and walls");
+        this.log("Has no repair target, looking for < 20000hp ramparts and walls");
         const targets = this.room.find(FIND_STRUCTURES, {
             filter: (i) =>
                 !(this.room.getDeconList().indexOf(i.id) > -1) &&
                 (i.structureType === STRUCTURE_RAMPART || i.structureType === STRUCTURE_WALL)
-                && i.hits <= 1000 && i.room === this.room
+                && i.hits <= 20000 && i.room === this.room
         });
         if (targets.length > 0) {
             visualiseDamage(targets, this.room);
             this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
-            this.memory.targetMaxHP = 1000;
+            this.memory.targetMaxHP = 20000;
         }
     }
 };
@@ -516,8 +516,10 @@ Creep.prototype.repairCurrentTarget = function(): ScreepsReturnCode {
  * Creep should pick a target and dismantle it!
  */
 Creep.prototype.deconstructRoomTargets = function(): ScreepsReturnCode {
-    if (this.room.getDeconList().length === 0) {
-        return ERR_NOT_FOUND;
+    if (!this.memory.deconstructionTarget) {
+        if (this.room.getDeconList().length === 0) {
+            return ERR_NOT_FOUND;
+        }
     }
     if (_.sum(this.carry) >= this.carryCapacity) {
         return ERR_FULL;
@@ -541,7 +543,7 @@ Creep.prototype.deconstructRoomTargets = function(): ScreepsReturnCode {
         return OK;
     }
     // We weren't close enough move to it
-    this.travelTo(target);
+    this.travelTo(target, { ensurePath: true });
     return ERR_NOT_IN_RANGE;
 };
 

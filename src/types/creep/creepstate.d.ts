@@ -1,38 +1,38 @@
 /**
  * State consts
  */
-declare const _SPAWN     = 0;
-declare const _INIT      = 1;
-declare const _MOVE      = 2;
-declare const _ARRIVED   = 3;
-declare const _DELIVER   = 4;
-declare const _DONE      = 5;
-declare const _MINE      = 6;
-declare const _UPGRADE   = 7;
-declare const _GATHER    = 8;
-declare const _CONSTRUCT = 9;
-declare const _RETURN    = 10;
-declare const _CHARGE    = 11;
-declare const _GATHERM   = 12;
-declare const _DELIVERM  = 13;
+declare const _SPAWN     = "spawn";
+declare const _INIT      = "init";
+declare const _MOVE      = "move";
+declare const _ARRIVED   = "arrived";
+declare const _DELIVER   = "deliver";
+declare const _DONE      = "done";
+declare const _MINE      = "mine";
+declare const _UPGRADE   = "upgrade";
+declare const _GATHER    = "gather";
+declare const _CONSTRUCT = "construct";
+declare const _RETURN    = "return";
+declare const _CHARGE    = "charge";
+declare const _GATHERM   = "gatherm";
+declare const _DELIVERM  = "deliverm";
 
 /**
  * State types
  */
-type _SPAWN     = 0;
-type _INIT      = 1;
-type _MOVE      = 2;
-type _ARRIVED   = 3;
-type _DELIVER   = 4;
-type _DONE      = 5;
-type _MINE      = 6;
-type _UPGRADE   = 7;
-type _GATHER    = 8;
-type _CONSTRUCT = 9;
-type _RETURN    = 10;
-type _CHARGE    = 11;
-type _GATHERM   = 12;
-type _DELIVERM  = 13;
+type _SPAWN     = "spawn";
+type _INIT      = "init";
+type _MOVE      = "move";
+type _ARRIVED   = "arrived";
+type _DELIVER   = "deliver";
+type _DONE      = "done";
+type _MINE      = "mine";
+type _UPGRADE   = "upgrade";
+type _GATHER    = "gather";
+type _CONSTRUCT = "construct";
+type _RETURN    = "return";
+type _CHARGE    = "charge";
+type _GATHERM   = "gatherm";
+type _DELIVERM  = "deliverm";
 
 /**
  * CreepStates

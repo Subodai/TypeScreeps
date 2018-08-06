@@ -65,11 +65,15 @@ export class Scientist {
             // GATHERM state
             case STATE._GATHERM:
                 creep.log("Fetching resources");
-
-                if (creep.getNearbyMinerals(true, creep.memory.mineralType || undefined) === ERR_FULL) {
+                const gatherResult = creep.getNearbyMinerals(true, creep.memory.mineralType || undefined);
+                if (gatherResult === ERR_FULL) {
                     creep.log("Got Resrouces");
                     creep.state = STATE._DELIVERM;
                     this.run(creep);
+                }
+                if (gatherResult === ERR_NOT_FOUND) {
+                    creep.log("Couldn't find resources resetting");
+                    creep.state = STATE._INIT;
                 }
                 break;
             // GATHER state

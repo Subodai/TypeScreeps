@@ -35,6 +35,7 @@ Creep.prototype.getNearbyMinerals = function(
  *
  */
 Creep.prototype.findResourceOfType = function(type: ResourceConstant): void {
+    this.log("looking for " + type);
     const targets = this.room.find(FIND_STRUCTURES, {
         filter: (s) =>
         (
@@ -75,6 +76,7 @@ Creep.prototype.invalidateMineralTarget = function(full: boolean = false): Scree
  * Finds reactors with minerals in
  */
 Creep.prototype.findLabMinerals = function(): void {
+    this.log("Creep searching for mineral labs");
     const labs = this.room.find(FIND_MY_STRUCTURES, {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
