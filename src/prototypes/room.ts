@@ -680,3 +680,21 @@ Room.prototype.runReactionLabs = function(): void {
         this.log("Lab reaction result " + result.toString());
     }
 };
+
+Room.prototype.emptyLabs = function(): void {
+    const labs = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_LAB
+    }) as StructureLab[];
+    for (const lab of labs) {
+        lab.emptyMe = true;
+    }
+};
+
+Room.prototype.cancelEmptyLabs = function(): void {
+    const labs = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_LAB
+    }) as StructureLab[];
+    for (const lab of labs) {
+        lab.emptyMe = false;
+    }
+};

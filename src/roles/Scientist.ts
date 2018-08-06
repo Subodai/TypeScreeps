@@ -35,7 +35,8 @@ export class Scientist {
             s.labType !== "reactor" &&
             (s.compoundIn !== null || s.mineralIn !== null) &&
             (s.mineralAmount < s.mineralCapacity ||
-            s.energy < s.energyCapacity)
+            s.energy < s.energyCapacity) &&
+            s.emptyMe === false
         });
         if (labs.length > 0) {
             return true;
@@ -109,7 +110,8 @@ export class Scientist {
                             s.structureType === STRUCTURE_LAB &&
                             (s.mineralIn !== null || s.compoundIn !== null) &&
                             s.mineralAmount < s.mineralCapacity &&
-                            s.labType !== "reactor"
+                            s.labType !== "reactor" &&
+                            s.emptyMe === false
                     });
                     if (resourceTargets.length > 0) {
                         creep.deliverEnergy();
@@ -144,7 +146,8 @@ export class Scientist {
                     s.structureType === STRUCTURE_LAB &&
                     (s.mineralIn !== null || s.compoundIn !== null) &&
                     s.mineralAmount < s.mineralCapacity &&
-                    s.labType !== "reactor"
+                    s.labType !== "reactor" &&
+                    s.emptyMe === false
             }) as StructureLab[];
             if (resourceTargets.length > 0) {
                 const target: StructureLab = _.min(resourceTargets, (l) => l.mineralAmount) as StructureLab;

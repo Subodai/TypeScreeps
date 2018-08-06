@@ -5,6 +5,7 @@ interface StructureLab {
     compoundOut?: _ResourceConstantSansEnergy;
     boostTarget?: BoostTarget;
     reaction?: LabReaction;
+    emptyMe?: boolean;
     log(msg: string): void;
 }
 

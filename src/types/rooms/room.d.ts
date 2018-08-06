@@ -72,6 +72,8 @@ interface Room {
     getDeconList(): string[];
     runBoostLab(): void;
     runReactionLabs(): void;
+    emptyLabs(): void;
+    cancelEmptyLabs(): void;
 }
 
 interface RoomMemory {

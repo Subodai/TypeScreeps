@@ -78,8 +78,10 @@ Creep.prototype.findLabMinerals = function(): void {
     const labs = this.room.find(FIND_MY_STRUCTURES, {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
-            s.labType === "reactor" &&
-            s.mineralAmount > s.mineralCapacity / 10
+            (
+                (s.labType === "reactor" && s.mineralAmount > s.mineralCapacity / 10) ||
+                (s.emptyMe === true && s.mineralAmount > 0) // TODO Can empty me be set by the lab itself?
+            )
     }) as StructureLab[];
     if (labs.length > 0) {
         const target: StructureLab = _.max(labs, (l) => l.mineralAmount);
@@ -335,6 +337,7 @@ Creep.prototype.fillLabs = function(): ScreepsReturnCode | false {
         filter: (s) => s.structureType === STRUCTURE_LAB &&
             (s.compoundIn === this.memory.mineralType || s.mineralIn === this.memory.mineralType)
             && s.mineralAmount < s.mineralCapacity
+            && s.emptyMe === false
     }) as StructureLab;
     this.log(JSON.stringify(target));
     if (!target) {

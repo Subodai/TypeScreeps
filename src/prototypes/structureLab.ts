@@ -126,3 +126,15 @@ Object.defineProperty(StructureLab.prototype, "labType", {
         return _.set(Memory, "structures." + this.id + ".labType", v);
     }
 });
+
+Object.defineProperty(StructureLab.prototype, "emptyMe", {
+    configurable: true,
+    enumerable: false,
+    get(): boolean {
+        this.initMemory();
+        return Memory.structures[this.id].emptyMe || false;
+    },
+    set(v: boolean): BoostTarget | null {
+        return _.set(Memory, "structures." + this.id + ".emptyMe", v);
+    }
+});
