@@ -90,7 +90,7 @@ export class Scientist {
                 creep.log("Delivering resources");
                 if (creep.empty()) {
                     creep.state = STATE._INIT;
-                    this.run(creep);
+                    return;
                 }
                 if (creep.fillLabs() === OK) {
                     creep.log("Delivered some resources");
