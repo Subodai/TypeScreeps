@@ -122,6 +122,15 @@ Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
             if (this.pos.getRangeTo(controller.pos) > 3) {
                 this.travelTo(controller);
                 return ERR_NOT_IN_RANGE;
+            } else {
+                // E26N8 Deadspot handling
+                // TODO turn this into something that has a list of deadzones in rooms
+                if (this.pos.roomName === "E26N8" && this.pos.x === 16 && this.pos.y === 6) {
+                    const left = new RoomPosition(15, 6, this.pos.roomName);
+                    if (left.hasCreep() === false) {
+                        this.moveTo(15, 6);
+                    }
+                }
             }
             // we must be within 3 spaces
             return this.upgradeController(controller);
