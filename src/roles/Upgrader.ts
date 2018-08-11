@@ -128,7 +128,7 @@ Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
                 if (this.pos.roomName === "E26N8" && this.pos.x === 16 && this.pos.y === 6) {
                     const left = new RoomPosition(15, 6, this.pos.roomName);
                     if (left.hasCreep() === false) {
-                        this.moveTo(15, 6);
+                        this.moveTo(left);
                     }
                 }
             }
