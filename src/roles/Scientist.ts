@@ -72,8 +72,14 @@ export class Scientist {
                     this.run(creep);
                 }
                 if (gatherResult === ERR_NOT_FOUND) {
-                    creep.log("Couldn't find resources resetting");
-                    creep.state = STATE._INIT;
+                    if (creep.empty()) {
+                        delete creep.memory.mineralType;
+                        creep.log("Couldn't find resources resetting");
+                        creep.state = STATE._INIT;
+                    } else {
+                        creep.state = STATE._DELIVERM;
+                        return;
+                    }
                 }
                 break;
             // GATHER state

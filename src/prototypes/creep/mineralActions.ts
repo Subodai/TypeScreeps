@@ -60,7 +60,7 @@ Creep.prototype.findResourceOfType = function(type: ResourceConstant): void {
     }
     // no joy, clear any previous values
     delete this.memory.mineralPickup;
-    delete this.memory.mineralType;
+    // delete this.memory.mineralType;
 };
 
 /**

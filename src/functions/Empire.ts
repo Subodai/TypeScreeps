@@ -114,9 +114,9 @@ class Empire implements Empire {
         const response = from.send(request.resource, amount, to.room.name, "Fulfilling Request ID: " + request.id);
         if (response === OK) {
             request.amount -= amount;
-            // if (request.amount <= 0) {
-            //     this.completeRequest(request.id);
-            // }
+            if (request.amount <= 0) {
+                this.completeRequest(request.id);
+            }
         } else {
             return response;
         }
@@ -203,7 +203,7 @@ class Empire implements Empire {
 
             if (amount <= 0) {
                 this.log("Request fulfilled removing");
-                this.removeRequest(request.id);
+                this.completeRequest(request.id);
                 return;
             }
 

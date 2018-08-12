@@ -497,27 +497,38 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
     if (storage && terminal) {
         if (this.room.memory.prioritise) {
             if (this.room.memory.prioritise === "terminal") {
+                this.log("Terminal priority");
                 if (_.sum(terminal.store) < terminal.storeCapacity) {
+                    this.log("Terminal has space");
                     target = terminal;
                 } else {
+                    this.log("Terminal full");
                     target = storage;
                 }
             } else if (this.room.memory.prioritise === "storage") {
+                this.log("Storage priority");
                 if (_.sum(storage.store) < storage.storeCapacity) {
+                    this.log("Storage has space");
                     target = storage;
                 } else {
+                    this.log("Storage is full");
                     target = terminal;
                 }
             } else {
+                this.log("No priority");
                 if (this.carry.energy > 0) {
+                    this.log("Carrying energy choosing storage");
                     target = storage;
                     if (!target || _.sum(storage.store) === storage.storeCapacity) {
+                        this.log("Storage is full");
                         // try storage
                         target = terminal;
                     }
                 } else {
+                    this.log("Carry minerals, choosing terminal");
                     target = terminal;
-                    if (!target || _.sum(terminal.store) === terminal.storeCapacity) {
+                    if (!target || _.sum(terminal.store) >= terminal.storeCapacity * 0.8) {
+                        this.log("Terminal full, choosing storage");
                         // try storage
                         target = storage;
                     }
@@ -543,7 +554,7 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
                 // Prioritise the terminal for non-energy
                 target = terminal;
                 // If we don't have one
-                if (!target || _.sum(terminal.store) === terminal.storeCapacity) {
+                if (!target || _.sum(terminal.store) === terminal.storeCapacity * 0.8) {
                     // try storage
                     target = storage;
                 }
@@ -556,6 +567,7 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
         // We've no targets... now what?
         target = null;
     }
+    this.log(JSON.stringify(target));
     return target;
 };
 

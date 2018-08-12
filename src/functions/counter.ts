@@ -66,7 +66,8 @@ export class Counter {
                 if (!Room.storage) {
                     Room.memory.links = false;
                 } else {
-                    if (Room.storage.store[RESOURCE_ENERGY] >= global.chargeLimit && Room.memory.charging === true) {
+                    if (Room.storage.store[RESOURCE_ENERGY] >= global.chargeLimit && Room.memory.charging === true ||
+                        _.sum(Room.storage.store) >= Room.storage.storeCapacity) {
                         Room.memory.charging = false;
                     }
 

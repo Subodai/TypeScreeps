@@ -26,7 +26,7 @@ export const ROLES: string[] = [
     Janitor.roleName,
     Destroyer.roleName,
     Scientist.roleName,
-    // MineralExtractor.roleName,
+    MineralExtractor.roleName,
 
     // Remote roles
 
@@ -46,7 +46,7 @@ export const ROLEMODELS: Role[] = [
     Janitor,
     Destroyer,
     Scientist,
-    // MineralExtractor,
+    MineralExtractor,
     RemoteClaimer,
     RemoteEnergyMiner,
     RemoteReserver,
