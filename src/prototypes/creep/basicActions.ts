@@ -160,11 +160,11 @@ Creep.prototype.deathCheck = function(ticks: number): void {
 Creep.prototype.deSpawn = function(): void {
     this.log("Despawning Creep");
     let spawn = this.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: (i) => i.structureType === STRUCTURE_SPAWN && i.my
+        filter: (i) => i.structureType === STRUCTURE_SPAWN && i.my && i.isActive()
     });
     if (!spawn) {
         const spawns = Game.rooms[this.memory.roomName!].find(FIND_STRUCTURES, {
-            filter: (i) => i.structureType === STRUCTURE_SPAWN && i.my
+            filter: (i) => i.structureType === STRUCTURE_SPAWN && i.my && i.isActive()
         });
         spawn = spawns[0];
     }

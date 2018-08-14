@@ -47,7 +47,7 @@ Creep.prototype.findResourceOfType = function(type: ResourceConstant): void {
         ) ||
         (
             s.structureType === STRUCTURE_LAB &&
-            s.labType !== "feeder" &&
+            s.labType === "reactor" &&
             s.mineralType === type &&
             s.mineralAmount > 0
         )
