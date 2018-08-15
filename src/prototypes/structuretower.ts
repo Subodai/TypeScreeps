@@ -136,7 +136,8 @@ StructureTower.prototype.repairRamparts = function(max?: number): boolean {
 StructureTower.prototype.findRampart = function(hp: number): StructureRampart | void {
     let targets = [];
     targets = this.room.find(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my
+        filter: (s) => !(this.room.getDeconList().indexOf(s.id) > -1) &&
+                        s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my
     });
     if (targets.length > 0) {
         const rampart = _.min(targets, (t) => t.hits);
@@ -185,7 +186,10 @@ StructureTower.prototype.repairWalls = function(max?: number): boolean {
 
 StructureTower.prototype.findWall = function(hp: number): StructureWall | void {
     let targets = [];
-    targets = this.room.find(FIND_STRUCTURES, { filter: (s) => s.structureType === STRUCTURE_WALL && s.hits <= hp });
+    targets = this.room.find(FIND_STRUCTURES, {
+        filter: (s) => !(this.room.getDeconList().indexOf(s.id) > -1) &&
+        s.structureType === STRUCTURE_WALL && s.hits <= hp
+    });
     if (targets.length > 0) {
         const wall = _.min(targets, (t) => t.hits);
         if (wall instanceof StructureWall) {
@@ -206,7 +210,8 @@ StructureTower.prototype.findWall = function(hp: number): StructureWall | void {
 
 StructureTower.prototype.repairContainers = function(): boolean {
     const target = this.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_CONTAINER && s.hits < s.hitsMax
+        filter: (s) => !(this.room.getDeconList().indexOf(s.id) > -1) &&
+                        s.structureType === STRUCTURE_CONTAINER && s.hits < s.hitsMax
     });
     if (target) {
         this.log("Found Container with hp <= max");
@@ -218,7 +223,8 @@ StructureTower.prototype.repairContainers = function(): boolean {
 
 StructureTower.prototype.repairRoads = function(): boolean {
     const target = this.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax
+        filter: (s) => !(this.room.getDeconList().indexOf(s.id) > -1) &&
+                        s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax
     });
     if (target) {
         this.log("Found Road with hp <= max");
