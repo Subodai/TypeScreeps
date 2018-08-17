@@ -53,7 +53,7 @@ StructureTower.prototype.run = function(): number | boolean {
     if ((global.towerRepair || this.room.controller!.level < 5) &&
         this.energy >= 600 &&
         this.room.storage &&
-        this.room.storage.store[RESOURCE_ENERGY] >= 200000  &&
+        this.room.storage.store[RESOURCE_ENERGY] >= 100000  &&
         (
             this.repairContainers() ||
             this.repairRamparts(rampartMax * (this.room.controller!.level / 8)) ||
