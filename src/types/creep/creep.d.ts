@@ -82,6 +82,7 @@ interface Creep {
     repairStructures(roads?: boolean, defences?: boolean, structures?: boolean): number;
     reserveRemoteRoom(): void;
     roadCheck(work?: boolean): void;
+    rotateAbout(position: RoomPosition): void;
     travelTo(destination: HasPos | RoomPosition, options?: TravelToOptions): number;
     travelTo(destination: RoomPosition | { pos: RoomPosition }, option?: TravelToOptions): number;
     upgradeHomeRoom(): ScreepsReturnCode;

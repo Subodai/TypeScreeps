@@ -698,3 +698,20 @@ Room.prototype.cancelEmptyLabs = function(): void {
         lab.emptyMe = false;
     }
 };
+
+Room.prototype.boost = function(role: Role, compound: ResourceConstant): void {
+    return;
+};
+
+Room.prototype.clearBoost = function(): void {
+    const lab = _.first(this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "booster"
+    })) as StructureLab;
+
+    lab.boostTarget = undefined;
+    lab.compoundIn = undefined;
+    lab.mineralIn = undefined;
+    lab.emptyMe = true;
+};

@@ -38,6 +38,11 @@ export class MineralExtractor {
         if (extractors.length === 0) {
             return false;
         }
+        if (room.terminal) {
+            if (_.sum(room.terminal.store) >= room.terminal.storeCapacity * 0.8) {
+                return false;
+            }
+        }
         if (room.memory.mineralsNeeded && room.memory.mineralsNeeded > 0) {
             return true;
         }

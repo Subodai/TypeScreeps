@@ -50,6 +50,7 @@ StructureLink.prototype.runReceiver = function(): number {
     });
     // Did we find one?
     if (storageLinks.length > 0) {
+        this.log("Found storage link");
         // grab the link
         const from = storageLinks[0] as StructureLink;
         // transfer

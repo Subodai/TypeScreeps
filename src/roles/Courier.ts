@@ -5,7 +5,7 @@ import { BodyBuilder } from "functions/tools";
  * Builders turn energy into structures
  */
 export class Courier {
-    private static minEnergyForSpawn: number = 50000;
+    private static minEnergyForSpawn: number = 100000;
     public static ticksBeforeRenew: number = 100;
     public static colour: string = "#4286f4";
     public static roleName: string = "courier";

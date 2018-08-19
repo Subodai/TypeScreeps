@@ -189,3 +189,36 @@ Creep.prototype.goToRoom = function(roomName: string): void {
         ensurePath: true
     });
 };
+
+Creep.prototype.rotateAbout = function(position: RoomPosition): void {
+    if (this.pos.getRangeTo(position) <= 1 && this.fatigue === 0) {
+        // get direction To object, and move dependent on that
+        const dir = this.pos.getDirectionTo(position);
+        switch (dir) {
+            case BOTTOM_RIGHT:
+                this.move(RIGHT);
+                break;
+            case BOTTOM:
+                this.move(RIGHT);
+                break;
+            case BOTTOM_LEFT:
+                this.move(BOTTOM);
+                break;
+            case LEFT:
+                this.move(BOTTOM);
+                break;
+            case TOP_LEFT:
+                this.move(LEFT);
+                break;
+            case TOP:
+                this.move(LEFT);
+                break;
+            case TOP_RIGHT:
+                this.move(TOP);
+                break;
+            case RIGHT:
+                this.move(TOP);
+                break;
+        }
+    }
+};

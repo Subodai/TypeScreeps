@@ -109,6 +109,7 @@ export class Runner {
         });
         let linkCost = 0;
         if (links.length > 0) {
+            room.log("found receivers");
             for (const i in links) {
                 // Grab the link
                 const link: StructureLink = links[i] as StructureLink;

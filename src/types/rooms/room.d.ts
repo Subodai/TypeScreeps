@@ -74,6 +74,10 @@ interface Room {
     runReactionLabs(): void;
     emptyLabs(): void;
     cancelEmptyLabs(): void;
+    boost(roleName: Role, compound: ResourceConstant): void;
+    clearBoost():void;
+    beginReaction(input1: ResourceConstant, input2: ResourceConstant): void;
+    clearReaction():void;
 }
 
 interface RoomMemory {

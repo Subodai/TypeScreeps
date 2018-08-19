@@ -118,19 +118,111 @@ Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
     if (Game.rooms[this.memory.roomName!]) {
         const controller: StructureController | undefined = Game.rooms[this.memory.roomName!].controller;
         if (controller) {
+            this.log("found controller");
             // if we're move than 3 spaces away, get close
             if (this.pos.getRangeTo(controller.pos) > 3) {
+                this.log("too far away");
                 this.travelTo(controller);
                 return ERR_NOT_IN_RANGE;
             } else {
-                // E26N8 Deadspot handling
-                // TODO turn this into something that has a list of deadzones in rooms
-                if (this.pos.roomName === "E26N8" && this.pos.x === 16 && this.pos.y === 6) {
-                    const left = new RoomPosition(15, 6, this.pos.roomName);
-                    if (left.hasCreep() === false) {
-                        this.moveTo(left);
+                this.log("in range");
+                if (global.chargeRoom) {
+                    this.log("global charge room set " + global.chargeRoom + " is in " + this.room.name);
+                    if (global.chargeRoom === this.room.name) {
+                        this.log("this is the charge room");
+                        const link = _.first(this.room.find(FIND_MY_STRUCTURES, {
+                            filter: (s) =>
+                                s.structureType === STRUCTURE_LINK &&
+                                s.linkType === "receiver"
+                        }));
+                        if (this.pos.getRangeTo(link) > 1) {
+                            this.log("moving to link");
+                            this.travelTo(link);
+                        } else {
+                            this.log("rotating");
+                            this.rotateAbout(link.pos);
+                            this.withdraw(link, RESOURCE_ENERGY);
+                        }
+                        // Find nearest spawner
+                        if (this.room.controller &&
+                            this.room.controller.level === this.memory.level &&
+                            this.ticksToLive &&
+                            this.ticksToLive < CREEP_LIFE_TIME / 5) {
+                            const spawn = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+                                filter: (s) => s.structureType === STRUCTURE_SPAWN
+                            }) as StructureSpawn;
+                            if (!spawn.spawning) {
+                                if (this.pos.getRangeTo(spawn) <= 1) {
+                                    spawn.renewCreep(this);
+                                }
+                                // const direction = this.pos.getDirectionTo(spawn);
+                                // if (direction === TOP ||
+                                //     direction === BOTTOM ||
+                                //     direction === LEFT ||
+                                //     direction === RIGHT) {
+
+                                // }
+                            }
+                        }
                     }
                 }
+                // // E26N8 Deadspot handling
+                // // TODO turn this into something that has a list of deadzones in rooms
+                // if (this.pos.roomName === "E26N8" && this.pos.x === 16 && this.pos.y === 6) {
+                //     const space = new RoomPosition(15, 6, this.pos.roomName);
+                //     if (space.hasCreep() === false) {
+                //         this.moveTo(space);
+                //     }
+                // }
+
+                // if (this.pos.roomName === "E11N6") {
+                //     if (this.pos.x === 26 && this.pos.y === 31) {
+                //         const space = new RoomPosition(26, 30, this.pos.roomName);
+                //         if (space.hasCreep() === false) {
+                //             this.moveTo(space);
+                //         }
+                //     }
+
+                //     if (this.pos.x === 27 && this.pos.y === 29) {
+                //         const space = new RoomPosition(26, 29, this.pos.roomName);
+                //         if (space.hasCreep() === false) {
+                //             this.moveTo(space);
+                //         }
+                //     }
+
+                //     if (this.pos.x === 28 && this.pos.y === 29) {
+                //         const space = new RoomPosition(27, 29, this.pos.roomName);
+                //         if (space.hasCreep() === false) {
+                //             this.moveTo(space);
+                //         }
+                //     }
+
+                //     if (this.pos.x === 28 && this.pos.y === 30) {
+                //         const space = new RoomPosition(28, 29, this.pos.roomName);
+                //         if (space.hasCreep() === false) {
+                //             this.moveTo(space);
+                //         }
+                //     }
+
+                //     if (this.pos.x === 28 && this.pos.y === 31) {
+                //         const space = new RoomPosition(28, 30, this.pos.roomName);
+                //         if (space.hasCreep() === false) {
+                //             this.moveTo(space);
+                //         }
+                //     }
+
+                //     if (this.pos.x === 27 && this.pos.y === 31) {
+                //         const right = new RoomPosition(28, 31, this.pos.roomName);
+                //         if (right.hasCreep() === false) {
+                //             this.moveTo(right);
+                //         } else {
+                //             const left = new RoomPosition(26, 31, this.pos.roomName);
+                //             if (left.hasCreep() === false) {
+                //                 this.moveTo(left);
+                //             }
+                //         }
+                //     }
+                // }
             }
             // we must be within 3 spaces
             return this.upgradeController(controller);
