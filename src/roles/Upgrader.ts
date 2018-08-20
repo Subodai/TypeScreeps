@@ -147,7 +147,7 @@ Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
                         if (this.room.controller &&
                             this.room.controller.level === this.memory.level &&
                             this.ticksToLive &&
-                            this.ticksToLive < CREEP_LIFE_TIME / 5) {
+                            this.ticksToLive < CREEP_LIFE_TIME / 3) {
                             const spawn = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                                 filter: (s) => s.structureType === STRUCTURE_SPAWN
                             }) as StructureSpawn;
