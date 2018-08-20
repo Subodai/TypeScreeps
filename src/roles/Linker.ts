@@ -3,7 +3,7 @@ import { BodyBuilder } from "functions/tools";
 
 export class Linker {
     public static ticksBeforeRenew: number = 100;
-    public static colour: string = "#22222";
+    public static colour: string = "#42f4c5";
     public static roleName: string = "linker";
     public static roster: number[]      = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
     public static rosterLinks: number[] = [ 0, 0, 0, 0, 1, 1, 1, 1, 1 ];
