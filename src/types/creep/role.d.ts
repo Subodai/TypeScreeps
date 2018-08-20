@@ -54,6 +54,7 @@ declare class MineralExtractor extends Role {}
 declare class Janitor extends Role {}
 declare class Destroyer extends Role {}
 declare class Scientist extends Role {}
+declare class Linker extends Role {}
 
 /**
  * Defines what a creep does during it's lifespan
@@ -71,7 +72,8 @@ type CreepRole = Role
     | MineralExtractor
     | Janitor
     | Destroyer
-    | Scientist;
+    | Scientist
+    | Linker;
 /**
  * !!!! NOTICE !!!! Remember to update ROLES, Counter, Runner and Room.ts
  */

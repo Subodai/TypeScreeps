@@ -1,5 +1,6 @@
 import { Builder } from "roles/Builder";
 import { Destroyer } from "roles/Destroyer";
+import { Linker } from "roles/Linker";
 import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { Scientist } from "roles/Scientist";
@@ -615,7 +616,7 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
     }
 
     // if we're a refiller prioritise links
-    if (this.role === Refiller.roleName &&
+    if (this.role === Linker.roleName &&
         this.room.controller &&
         this.room.controller.level >= 5 &&
         this.carry.energy > 0) {
@@ -623,6 +624,7 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         if (linkResult !== false) {
             return linkResult;
         }
+        return OK;
     }
 
     // only refill spawns and other things if room level below 4 after 4 we just fill storage

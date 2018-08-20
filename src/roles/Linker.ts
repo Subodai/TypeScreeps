@@ -1,12 +1,12 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
 
-export class Refiller {
+export class Linker {
     public static ticksBeforeRenew: number = 100;
-    public static colour: string = "#888888";
-    public static roleName: string = "refil";
-    public static roster: number[]      = [ 0, 0, 0, 0, 1, 1, 1, 1, 1 ];
-    public static rosterLinks: number[] = [ 0, 0, 0, 0, 1, 2, 2, 2, 1 ];
+    public static colour: string = "#22222";
+    public static roleName: string = "linker";
+    public static roster: number[]      = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+    public static rosterLinks: number[] = [ 0, 0, 0, 0, 1, 1, 1, 1, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         [],
@@ -24,6 +24,7 @@ export class Refiller {
      * @param room
      */
     public static enabled(room: Room): boolean {
+        if (!room.memory.links) { return false; }
         if (room.memory.emergency) {
             if (room.storage && room.storage.store[RESOURCE_ENERGY] < 10000) {
                 return false;

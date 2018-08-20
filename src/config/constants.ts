@@ -4,6 +4,7 @@ import { Courier } from "roles/Courier";
 import { Destroyer } from "roles/Destroyer";
 import { Harvester } from "roles/Harvester";
 import { Janitor } from "roles/Janitor";
+import { Linker } from "roles/Linker";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
 import { Refiller } from "roles/Refiller";
@@ -21,6 +22,7 @@ export const ROLES: string[] = [
     Harvester.roleName,
     Upgrader.roleName,
     Builder.roleName,
+    Linker.roleName,
 
     // mid priority roles
     Janitor.roleName,
@@ -43,6 +45,7 @@ export const ROLEMODELS: Role[] = [
     Harvester,
     Upgrader,
     Builder,
+    Linker,
     Janitor,
     Destroyer,
     Scientist,
