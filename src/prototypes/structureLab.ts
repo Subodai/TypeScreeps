@@ -12,11 +12,11 @@ StructureLab.prototype.log = function(msg: string): void {
 Object.defineProperty(StructureLab.prototype, "mineralIn", {
     configurable: true,
     enumerable: false,
-    get(): MineralConstant | null {
+    get(): MineralConstant | undefined {
         this.initMemory();
-        return Memory.structures[this.id].mineralIn || null;
+        return Memory.structures[this.id].mineralIn || undefined;
     },
-    set(v: MineralConstant | null): MineralConstant | null {
+    set(v: MineralConstant | undefined): MineralConstant | undefined {
         return _.set(Memory, "structures." + this.id + ".mineralIn", v);
     }
 });
@@ -24,11 +24,11 @@ Object.defineProperty(StructureLab.prototype, "mineralIn", {
 Object.defineProperty(StructureLab.prototype, "compoundIn", {
     configurable: true,
     enumerable: false,
-    get(): ResourceConstant | null {
+    get(): ResourceConstant | undefined {
         this.initMemory();
-        return Memory.structures[this.id].compoundIn || null;
+        return Memory.structures[this.id].compoundIn || undefined;
     },
-    set(v: ResourceConstant | null): ResourceConstant | null {
+    set(v: ResourceConstant | undefined): ResourceConstant | undefined {
         return _.set(Memory, "structures." + this.id + ".compoundIn", v);
     }
 });
@@ -36,11 +36,11 @@ Object.defineProperty(StructureLab.prototype, "compoundIn", {
 Object.defineProperty(StructureLab.prototype, "compoundOut", {
     configurable: true,
     enumerable: false,
-    get(): ResourceConstant | null {
+    get(): ResourceConstant | undefined {
         this.initMemory();
-        return Memory.structures[this.id].compoundOut || null;
+        return Memory.structures[this.id].compoundOut || undefined;
     },
-    set(v: ResourceConstant | null): ResourceConstant | null {
+    set(v: ResourceConstant | undefined): ResourceConstant | undefined {
         return _.set(Memory, "structures." + this.id + ".compoundOut", v);
     }
 });
@@ -48,11 +48,11 @@ Object.defineProperty(StructureLab.prototype, "compoundOut", {
 Object.defineProperty(StructureLab.prototype, "boostTarget", {
     configurable: true,
     enumerable: false,
-    get(): BoostTarget | null {
+    get(): BoostTarget | undefined {
         this.initMemory();
-        return Memory.structures[this.id].boostTarget || null;
+        return Memory.structures[this.id].boostTarget || undefined;
     },
-    set(v: BoostTarget | null): BoostTarget | null {
+    set(v: BoostTarget | undefined): BoostTarget | undefined {
         return _.set(Memory, "structures." + this.id + ".boostTarget", v);
     }
 });
@@ -60,10 +60,10 @@ Object.defineProperty(StructureLab.prototype, "boostTarget", {
 Object.defineProperty(StructureLab.prototype, "reaction", {
     configurable: true,
     enumerable: false,
-    get(): LabReaction | null {
+    get(): LabReaction | undefined {
         this.initMemory();
-        const response = Memory.structures[this.id].reaction || null;
-        if (response === null) {
+        const response = Memory.structures[this.id].reaction || undefined;
+        if (response === undefined) {
             return response;
         }
         const reaction: LabReaction = {
@@ -74,8 +74,8 @@ Object.defineProperty(StructureLab.prototype, "reaction", {
         };
         return reaction;
     },
-    set(v: LabReaction | null): LabReaction | null {
-        if (v === null) {
+    set(v: LabReaction | undefined): LabReaction | undefined {
+        if (v === undefined) {
             return _.set(Memory, "structures." + this.id + ".reaction", v);
         }
         const data = {
@@ -134,7 +134,7 @@ Object.defineProperty(StructureLab.prototype, "emptyMe", {
         this.initMemory();
         return Memory.structures[this.id].emptyMe || false;
     },
-    set(v: boolean): BoostTarget | null {
+    set(v: boolean): BoostTarget | undefined {
         return _.set(Memory, "structures." + this.id + ".emptyMe", v);
     }
 });

@@ -699,8 +699,18 @@ Room.prototype.cancelEmptyLabs = function(): void {
     }
 };
 
-Room.prototype.boost = function(role: Role, compound: ResourceConstant): void {
-    return;
+Room.prototype.boost = function(role: Role, compound: _ResourceConstantSansEnergy): void {
+    const lab = _.first(this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "booster"
+    })) as StructureLab;
+    lab.boostTarget = {
+        compound,
+        roleName: role.roleName
+    };
+    lab.compoundIn = compound;
+    lab.emptyMe = false;
 };
 
 Room.prototype.clearBoost = function(): void {
@@ -714,4 +724,72 @@ Room.prototype.clearBoost = function(): void {
     lab.compoundIn = undefined;
     lab.mineralIn = undefined;
     lab.emptyMe = true;
+};
+
+Room.prototype.beginReaction = function(
+    input1: _ResourceConstantSansEnergy,
+    input2: _ResourceConstantSansEnergy
+): void {
+    this.log("Setting up reaction of " + input1 + ":" + input2);
+    // TODO Cache this
+    const feeders = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "feeder"
+    }) as StructureLab[];
+    const feederLab1 = _.first(feeders);
+    const feederLab2 = _.last(feeders);
+
+    this.log("Feeder lab 1: " + feederLab1.id);
+    this.log("Feeder lab 2: " + feederLab2.id);
+
+    feederLab1.compoundIn = input1;
+    feederLab1.emptyMe = false;
+    feederLab2.compoundIn = input2;
+    feederLab2.emptyMe = false;
+    // TODO Cache this
+    const reactors = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "reactor"
+    }) as StructureLab[];
+    for (const reactor of reactors) {
+        const reaction: LabReaction = {
+            targetLab: reactor,
+            // tslint:disable-next-line:object-literal-sort-keys
+            sourceLab1: feederLab1,
+            sourceLab2: feederLab2
+        };
+        reactor.reaction = reaction;
+        reactor.emptyMe = false;
+        this.log("Reactor lab " + reactor.id + " Started");
+    }
+    // TODO Check for and request inputs?
+};
+
+Room.prototype.clearReaction = function(): void {
+    const feeders = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "feeder"
+    }) as StructureLab[];
+
+    for (const feeder of feeders) {
+        feeder.compoundIn = undefined;
+        feeder.mineralIn = undefined;
+        feeder.emptyMe = true;
+        this.log("Feeder lab " + feeder.id + " cleared");
+    }
+
+    const reactors = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "reactor"
+    }) as StructureLab[];
+
+    for (const reactor of reactors) {
+        reactor.reaction = undefined;
+        reactor.emptyMe = true;
+        this.log("Reactor Lab " + reactor.id + " cleared");
+    }
 };

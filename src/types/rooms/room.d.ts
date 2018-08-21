@@ -74,9 +74,9 @@ interface Room {
     runReactionLabs(): void;
     emptyLabs(): void;
     cancelEmptyLabs(): void;
-    boost(roleName: Role, compound: ResourceConstant): void;
+    boost(roleName: Role, compound: _ResourceConstantSansEnergy): void;
     clearBoost():void;
-    beginReaction(input1: ResourceConstant, input2: ResourceConstant): void;
+    beginReaction(input1: _ResourceConstantSansEnergy, input2: _ResourceConstantSansEnergy): void;
     clearReaction():void;
 }
 

@@ -624,7 +624,7 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
         if (linkResult !== false) {
             return linkResult;
         }
-        return OK;
+        return ERR_NOT_FOUND;
     }
 
     // only refill spawns and other things if room level below 4 after 4 we just fill storage

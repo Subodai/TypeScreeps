@@ -33,7 +33,7 @@ export class Scientist {
         const labs = room.find(FIND_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_LAB &&
             s.labType !== "reactor" &&
-            (s.compoundIn !== null || s.mineralIn !== null) &&
+            (s.compoundIn !== undefined || s.mineralIn !== undefined) &&
             (s.mineralAmount < s.mineralCapacity ||
             s.energy < s.energyCapacity) &&
             s.emptyMe === false

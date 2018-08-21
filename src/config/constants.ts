@@ -19,10 +19,10 @@ export const ROLES: string[] = [
     // "guard",
     Miner.roleName,
     Refiller.roleName,
+    Linker.roleName,
     Harvester.roleName,
     Upgrader.roleName,
     Builder.roleName,
-    Linker.roleName,
 
     // mid priority roles
     Janitor.roleName,
@@ -42,10 +42,10 @@ export const ROLES: string[] = [
 export const ROLEMODELS: Role[] = [
     Miner,
     Refiller,
+    Linker,
     Harvester,
     Upgrader,
     Builder,
-    Linker,
     Janitor,
     Destroyer,
     Scientist,
