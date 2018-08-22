@@ -239,6 +239,8 @@ class Empire implements Empire {
                         this.log("Has some in storage (probably energy)");
                         this.log("Charging terminal");
                         room.memory.prioritise = "terminal";
+                    } else {
+                        room.memory.prioritise = "none";
                     }
                 }
                 if (stored >= 1000) {
@@ -270,9 +272,11 @@ class Empire implements Empire {
                             break;
                     }
                 } else {
+                    room.memory.prioritise = "none";
                     this.log("Not quite enough to send yet");
                 }
             } else {
+                room.memory.prioritise = "none";
                 this.log("No terminal, or not charging");
             }
         }
