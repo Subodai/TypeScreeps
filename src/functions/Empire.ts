@@ -272,11 +272,15 @@ class Empire implements Empire {
                             break;
                     }
                 } else {
-                    room.memory.prioritise = "none";
+                    if (request.resource !== RESOURCE_ENERGY) {
+                        room.memory.prioritise = "none";
+                    }
                     this.log("Not quite enough to send yet");
                 }
             } else {
-                room.memory.prioritise = "none";
+                if (request.resource !== RESOURCE_ENERGY) {
+                    room.memory.prioritise = "none";
+                }
                 this.log("No terminal, or not charging");
             }
         }
