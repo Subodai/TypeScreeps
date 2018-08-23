@@ -16,7 +16,7 @@ export function CalcBodyCost(body: BodyPartConstant[]): number {
 }
 
 /**
- * Converts a 0 - 100 number to an RGB colour
+ * Converts a 0 - 100 number to an RGB colour from red to green
  * @param p number
  */
 export function percentToColour(p: number): string {

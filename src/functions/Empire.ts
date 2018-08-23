@@ -12,7 +12,7 @@ class Empire implements Empire {
      * Run our tasks
      */
     public run(): void {
-        // TODO run this off a list of methods, with a tick count for each etc, sleepers between
+        // TODO: run this off a list of methods, with a tick count for each etc, sleepers between
         const start = Game.cpu.getUsed();
         this.processRequestQueue();
         const end = Game.cpu.getUsed() - start;

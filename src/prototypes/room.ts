@@ -731,7 +731,7 @@ Room.prototype.beginReaction = function(
     input2: _ResourceConstantSansEnergy
 ): void {
     this.log("Setting up reaction of " + input1 + ":" + input2);
-    // TODO Cache this
+    // TODO: Cache this
     const feeders = this.find(FIND_MY_STRUCTURES, {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
@@ -747,7 +747,7 @@ Room.prototype.beginReaction = function(
     feederLab1.emptyMe = false;
     feederLab2.compoundIn = input2;
     feederLab2.emptyMe = false;
-    // TODO Cache this
+    // TODO: Cache this
     const reactors = this.find(FIND_MY_STRUCTURES, {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
@@ -764,7 +764,7 @@ Room.prototype.beginReaction = function(
         reactor.emptyMe = false;
         this.log("Reactor lab " + reactor.id + " Started");
     }
-    // TODO Check for and request inputs?
+    // TODO: Check for and request inputs?
 };
 
 Room.prototype.clearReaction = function(): void {

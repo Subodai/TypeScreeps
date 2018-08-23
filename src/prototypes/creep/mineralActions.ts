@@ -82,7 +82,7 @@ Creep.prototype.findLabMinerals = function(): void {
             s.structureType === STRUCTURE_LAB &&
             (
                 (s.labType === "reactor" && s.mineralAmount > s.mineralCapacity / 10) ||
-                (s.emptyMe === true && s.mineralAmount > 0) // TODO Can empty me be set by the lab itself?
+                (s.emptyMe === true && s.mineralAmount > 0) // TODO: Can empty me be set by the lab itself?
             )
     }) as StructureLab[];
     if (labs.length > 0) {

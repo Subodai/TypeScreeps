@@ -167,7 +167,7 @@ Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
                     }
                 }
                 // // E26N8 Deadspot handling
-                // // TODO turn this into something that has a list of deadzones in rooms
+                // // TODO: turn this into something that has a list of deadzones in rooms
                 // if (this.pos.roomName === "E26N8" && this.pos.x === 16 && this.pos.y === 6) {
                 //     const space = new RoomPosition(15, 6, this.pos.roomName);
                 //     if (space.hasCreep() === false) {

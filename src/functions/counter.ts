@@ -60,9 +60,9 @@ export class Counter {
                 list = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
                     i.role !== RemoteEnergyHauler.roleName &&
                     i.role !== Builder.roleName &&
-                    i.role !== "guard"); // TODO replace with hauler and guard rolenames
+                    i.role !== "guard"); // TODO: replace with hauler and guard rolenames
                 miners = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
-                    (i.role === Miner.roleName || i.role === "linkminer")); // TODO replace with linkMiner rolename?
+                    (i.role === Miner.roleName || i.role === "linkminer")); // TODO: replace with linkMiner rolename?
                 if (!Room.storage) {
                     Room.memory.links = false;
                 } else {
@@ -123,7 +123,7 @@ export class Counter {
             } else {
                 // non owned rooms can never be in emergency
                 delete Room.memory.emergency;
-                // TODO We should add a tick counter to remove this hostile flag
+                // TODO: We should add a tick counter to remove this hostile flag
                 //  based on the life time of the hostile creeps in it
                 if (hostiles > 0 && Room.memory.mode === "safe") {
                     Room.memory.mode = "hostile";

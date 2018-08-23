@@ -72,7 +72,7 @@ Creep.prototype.getNearbyEnergy = function(
         this.log("Creep has no memory, finding stuff to pickup");
         // If this is an emergency we should be going for the terminal, then storage
         if (emergency) {
-            // TODO EMPTY TERMINAL AND STORAGE HERE PLEASE
+            // TODO: EMPTY TERMINAL AND STORAGE HERE PLEASE
         }
         const thisCreep: Creep = this;
         const id = this.findNearbyEnergyTarget();
