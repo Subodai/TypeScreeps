@@ -86,13 +86,15 @@ Room.prototype.clearSites = function() {
 Room.prototype.checkDefenceMax = function(): void {
     // our room, max level with storage
     if (this.controller && this.controller.my && this.controller.level === 8 && this.storage) {
-        if (this.storage.store[RESOURCE_ENERGY] >= 700000) {
+        if (this.storage.store[RESOURCE_ENERGY] >= 700000 || this.memory.charging === false) {
+            this.log("Checking defence numbers");
             const walls: StructureWall[] = this.find(FIND_STRUCTURES, {
                 filter: (c: AnyStructure) => c.structureType === STRUCTURE_WALL
             }) as StructureWall[];
             const wallAvg = _.sum(walls, (c) => c.hits) / walls.length;
             const wallMax = this.memory.wallMax || global.wallMax || Memory.wallMax;
             if (wallAvg > wallMax) {
+                this.log("Increasing wallmax");
                 this.memory.wallMax = wallMax * 1.1;
             }
 
@@ -103,6 +105,7 @@ Room.prototype.checkDefenceMax = function(): void {
             const ramMax = this.memory.rampartMax || global.rampartMax || Memory.rampartMax;
             // Always reduce the rampart max down a little since they decay
             if (ramAvg > ramMax * 0.95) {
+                this.log("Increasing rampartmax");
                 this.memory.rampartMax = ramMax * 1.1;
             }
         }

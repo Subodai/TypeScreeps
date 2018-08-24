@@ -82,6 +82,8 @@ export class Janitor {
     private static getAllRepairs(room: Room): Structure[] {
         const rampartMax = room.memory.rampartMax || global.rampartMax || Memory.rampartMax || 1;
         const wallMax = room.memory.wallMax || global.wallMax || Memory.wallMax || 1;
+        room.log("WallMax: " + wallMax);
+        room.log("RampartMax: " + rampartMax);
         const items: Structure[] = room.find(FIND_STRUCTURES, {
             filter: (s: AnyStructure) =>
                 !(room.getDeconList().indexOf(s.id) > -1) &&
