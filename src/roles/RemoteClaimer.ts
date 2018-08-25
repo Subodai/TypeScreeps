@@ -190,6 +190,5 @@ Creep.prototype.claimRemoteRoom = function(): void {
             }
         }
         this.travelTo(this.room.controller, { ensurePath: true });
-        this.roadCheck();
     }
 };

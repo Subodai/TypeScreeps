@@ -61,14 +61,18 @@ class Empire implements Empire {
      * @param id
      */
     public completeRequest(id: number): void {
-        if (this.requestQueue === undefined || this.requestQueue === null ||
-        this.completedRequests === undefined || this.completedRequests === null) {
-            this.loadQueueFromCache();
-        }
-        const request: ResourceRequest = _.first(_.filter(this.requestQueue, (c: ResourceRequest) => c.id = id));
+        // if (this.requestQueue === undefined || this.requestQueue === null ||
+        // this.completedRequests === undefined || this.completedRequests === null) {
+        //     this.loadQueueFromCache();
+        // }
+        const request: ResourceRequest = _.first(_.filter(this.requestQueue, (c: ResourceRequest) => c.id === id));
         const complete = request as CompletedResourceRequest;
         this.completedRequests.push(complete);
+        this.logAlways("before");
+        this.logAlways(JSON.stringify(this.requestQueue));
         _.remove(this.requestQueue, (c: ResourceRequest) => c.id === id);
+        this.logAlways("after");
+        this.logAlways(JSON.stringify(this.requestQueue));
         this.saveQueueToCache();
     }
 
@@ -78,7 +82,7 @@ class Empire implements Empire {
      * @param room
      */
     public fulfilRequest(id: number, room: Room, amount: number): ScreepsReturnCode {
-        const request: ResourceRequest = _.first(_.filter(this.requestQueue, (c: ResourceRequest) => c.id = id));
+        const request: ResourceRequest = _.first(_.filter(this.requestQueue, (c: ResourceRequest) => c.id === id));
         if (request === null) {
             return ERR_INVALID_ARGS;
         }
@@ -115,7 +119,7 @@ class Empire implements Empire {
         if (response === OK) {
             request.amount -= amount;
             if (request.amount <= 0) {
-                this.completeRequest(request.id);
+                // this.completeRequest(request.id);
             }
         } else {
             return response;
@@ -328,6 +332,7 @@ class Empire implements Empire {
         this.checkAndInitCache();
         global.empire.requestQueue = this.requestQueue;
         global.empire.completedRequests = this.completedRequests;
+        this.saveQueueToMemory();
     }
 
     /**

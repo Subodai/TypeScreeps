@@ -98,10 +98,14 @@ export class Scientist {
                     creep.state = STATE._INIT;
                     return;
                 }
-                if (creep.fillLabs() === OK) {
-                    creep.log("Delivered some resources");
-                    delete creep.memory.mineralType;
+                for (const res in creep.carry) {
+                    if (res === RESOURCE_ENERGY) { continue; }
+                    if (creep.fillLabs(res as ResourceConstant) === ERR_NOT_IN_RANGE) {
+                        creep.log("Delivered some resources");
+                        break;
+                    }
                 }
+
                 break;
             // DELIVER state
             case STATE._DELIVER:
@@ -151,7 +155,7 @@ export class Scientist {
                 return;
             }
 
-            const resourceTargets = creep.room.find(FIND_STRUCTURES, {
+            let resourceTargets = creep.room.find(FIND_STRUCTURES, {
                 filter: (s) =>
                     s.structureType === STRUCTURE_LAB &&
                     (s.mineralIn !== null || s.compoundIn !== null) &&
@@ -159,15 +163,18 @@ export class Scientist {
                     s.labType !== "reactor" &&
                     s.emptyMe === false
             }) as StructureLab[];
+            creep.memory.mineralType = [];
             if (resourceTargets.length > 0) {
-                const target: StructureLab = _.min(resourceTargets, (l) => l.mineralAmount) as StructureLab;
-                if (target.compoundIn) {
-                    creep.memory.mineralType = target.compoundIn;
-                } else if (target.mineralIn) {
-                    creep.memory.mineralType = target.mineralIn;
-                } else {
-                    delete creep.memory.mineralType;
+                resourceTargets = _.sortBy(resourceTargets, (n) => n.mineralAmount);
+                for (const target of resourceTargets) {
+                    if (target.compoundIn) {
+                        creep.memory.mineralType.push(target.compoundIn);
+                    } else if (target.mineralIn) {
+                        creep.memory.mineralType.push(target.mineralIn);
+                    }
                 }
+            }
+            if (creep.memory.mineralType.length > 0) {
                 creep.state = STATE._GATHERM;
                 this.run(creep);
                 return;

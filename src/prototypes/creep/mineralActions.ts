@@ -7,7 +7,7 @@
  */
 Creep.prototype.getNearbyMinerals = function(
     storage: boolean = false,
-    type?: ResourceConstant): ScreepsReturnCode {
+    types?: ResourceConstant[]): ScreepsReturnCode {
     // First are we full?
     if (this.full()) {
         this.log("Creep full cannot get nearby minerals");
@@ -15,7 +15,7 @@ Creep.prototype.getNearbyMinerals = function(
         this.invalidateMineralTarget(true);
         return ERR_FULL;
     }
-    if (type) { this.findResourceOfType(type); }
+    if (types) { this.findResourceOfType(types); }
     if (!this.memory.mineralPickup && storage) { this.findStorageMinerals(); }
     // Start with ground minerals
     if (!this.memory.mineralPickup) { this.findGroundMinerals(); }
@@ -34,30 +34,32 @@ Creep.prototype.getNearbyMinerals = function(
 /**
  *
  */
-Creep.prototype.findResourceOfType = function(type: ResourceConstant): void {
-    this.log("looking for " + type);
-    const targets = this.room.find(FIND_STRUCTURES, {
-        filter: (s) =>
-        (
-            (
-                s.structureType === STRUCTURE_TERMINAL ||
-                s.structureType === STRUCTURE_STORAGE ||
-                s.structureType === STRUCTURE_CONTAINER
-            ) && s.store[type] !== undefined
-        ) ||
-        (
-            s.structureType === STRUCTURE_LAB &&
-            s.labType === "reactor" &&
-            s.mineralType === type &&
-            s.mineralAmount > 0
-        )
-    });
-    if (targets.length > 0) {
-        const target = _.first(targets);
-        this.memory.mineralPickup = target.id;
-        this.memory.mineralType = type;
-        return;
+Creep.prototype.findResourceOfType = function(types: ResourceConstant[]): void {
+    this.log("looking for " + JSON.stringify(types));
+    for (const type of types) {
+        const targets = this.room.find(FIND_STRUCTURES, {
+            filter: (s) =>
+                (
+                    (
+                        s.structureType === STRUCTURE_TERMINAL ||
+                        s.structureType === STRUCTURE_STORAGE ||
+                        s.structureType === STRUCTURE_CONTAINER
+                    ) && s.store[type] !== undefined
+                ) ||
+                (
+                    s.structureType === STRUCTURE_LAB &&
+                    s.labType === "reactor" &&
+                    s.mineralType === type &&
+                    s.mineralAmount > 0
+                )
+        });
+        if (targets.length > 0) {
+            const target = _.first(targets);
+            this.memory.mineralPickup = target.id;
+            return;
+        }
     }
+
     // no joy, clear any previous values
     delete this.memory.mineralPickup;
     // delete this.memory.mineralType;
@@ -235,18 +237,19 @@ Creep.prototype.moveToAndPickupMinerals = function(): ScreepsReturnCode {
         // Can we pick it up now?
         if (this.canPickup(target)) {
             if (this.memory.mineralType) {
-                const r = this.memory.mineralType;
-                // If there is more than 0 of this mineral, let's pick it up
-                if (target.store.hasOwnProperty(r) && r !== RESOURCE_ENERGY) {
-                    // Attempt to pick it up
-                    const pickupResult = this.withdraw(target, r as ResourceConstant);
-                    // check the result
-                    if (pickupResult === ERR_NOT_IN_RANGE) {
-                        // something probbaly went wrong
-                    } else if (pickupResult === OK) {
-                        this.say(global.sayWithdraw);
-                        // Invalidate and return full
-                        return this.invalidateMineralTarget(this.full());
+                for (const r of this.memory.mineralType) {
+                    // If there is more than 0 of this mineral, let's pick it up
+                    if (target.store.hasOwnProperty(r) && r !== RESOURCE_ENERGY) {
+                        // Attempt to pick it up
+                        const pickupResult = this.withdraw(target, r as ResourceConstant);
+                        // check the result
+                        if (pickupResult === ERR_NOT_IN_RANGE) {
+                            // something probbaly went wrong
+                        } else if (pickupResult === OK) {
+                            this.say(global.sayWithdraw);
+                            // Invalidate and return full
+                            return this.invalidateMineralTarget(this.full());
+                        }
                     }
                 }
             } else {
@@ -332,15 +335,18 @@ Creep.prototype.fillNukeGhodium = function(): ScreepsReturnCode | false {
 //     // }
 //     return OK;
 // };
-Creep.prototype.fillLabs = function(): ScreepsReturnCode | false {
+Creep.prototype.fillLabs = function(type: ResourceConstant): ScreepsReturnCode | false {
     this.log("Attempting to fill a Lab");
-    let target: StructureLab | StructureTerminal | StructureStorage | null;
-    target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+    let target: StructureLab | StructureTerminal | StructureStorage | null = null;
+    const labs: StructureLab[] = this.room.find(FIND_MY_STRUCTURES, {
         filter: (s) => s.structureType === STRUCTURE_LAB &&
-            (s.compoundIn === this.memory.mineralType || s.mineralIn === this.memory.mineralType)
+            (s.compoundIn === type || s.mineralIn === type)
             && s.mineralAmount < s.mineralCapacity
             && s.emptyMe === false
-    }) as StructureLab;
+    }) as StructureLab[];
+    if (labs.length > 0) {
+        target = _.min(labs, (l) => l.mineralAmount);
+    }
     this.log(JSON.stringify(target));
     if (!target) {
         // tslint:disable-next-line:max-line-length
@@ -369,12 +375,12 @@ Creep.prototype.fillLabs = function(): ScreepsReturnCode | false {
                                 return ERR_NOT_IN_RANGE;
                             } else {
                                 this.log("transferred to storage or terminal");
-                                return OK;
+                                return ERR_FULL;
                             }
                         }
                     }
                 }
-            return this.transfer(target, this.memory.mineralType!);
+            return this.transfer(target, type);
         } else {
             this.travelTo(target);
             return ERR_NOT_IN_RANGE;
