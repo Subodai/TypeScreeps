@@ -796,3 +796,7 @@ Room.prototype.clearReaction = function(): void {
         this.log("Reactor Lab " + reactor.id + " cleared");
     }
 };
+
+Room.prototype.request = function(resource: ResourceConstant, amount: number): void {
+    global.empire.addRequest(this, resource, amount);
+};

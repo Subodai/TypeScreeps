@@ -1,0 +1,3 @@
+interface SpawnMemory {
+    spawnType?: string;
+}

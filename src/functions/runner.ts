@@ -74,9 +74,10 @@ export class Runner {
 
     private static towers(room: Room): number {
         room.log("Running Towers");
-        const towers = room.find(FIND_MY_STRUCTURES, {
+        let towers = room.find(FIND_MY_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_TOWER && s.energy > 0
-        });
+        }) as StructureTower[];
+        towers = _.sortBy(towers, (t) => t.energy * -1);
         let towerCost = 0;
         if (towers.length > 0) {
             for (const i in towers) {

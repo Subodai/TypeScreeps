@@ -22,6 +22,12 @@ export class Spawner {
         const spawnedCreeps: {[k: string]: {[k: string]: boolean}} | null = {};
         for (const spawn in Game.spawns) {
             const Spawn: StructureSpawn = Game.spawns[spawn];
+            if (Spawn.memory.spawnType &&
+                Spawn.memory.spawnType === "renewer" &&
+                Spawn.room.memory.links === true &&
+                Spawn.room.memory.charging === false) {
+                    continue;
+            }
             if (Spawn.spawning) {
                 Spawn.log("Already Spawning");
                 continue;
