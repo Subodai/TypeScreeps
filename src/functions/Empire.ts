@@ -154,8 +154,10 @@ class Empire implements Empire {
             // todo sleep?
             return;
         }
+        // Order queue by id
+        this.requestQueue = _.sortByOrder(this.requestQueue, "id", "asc");
         const request = _.first(this.requestQueue);
-        this.log("Attempting to process request " + request.id);
+        this.logAlways("Attempting to process request " + request.id);
 
         const receiver: StructureTerminal | undefined = Game.rooms[request.room].terminal;
         if (receiver === undefined) {
