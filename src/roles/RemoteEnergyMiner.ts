@@ -162,11 +162,12 @@ Creep.prototype.chooseRemoteMinerRoom = function(): void {
     if (!this.memory.flagName) {
         this.log("No flag in memory");
         // check for flags
-        const flags = _.filter(Game.flags, (f: Flag) =>
+        let flags = _.filter(Game.flags, (f: Flag) =>
             f.color === global.flagColor.remote);
         if (flags.length === 0) {
             this.log("No Remote flags found, must be an issue");
         }
+        flags = _.sortByOrder(flags, (f) => Game.map.getRoomLinearDistance(this.room.name, f.pos.roomName), "asc");
         for (const i in flags) {
             const flag: Flag = flags[i];
             this.log("Considering " + flag.name);

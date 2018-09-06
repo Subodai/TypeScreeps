@@ -69,6 +69,9 @@ export class Linker {
                 break;
             // DELIVER state
             case STATE._DELIVER:
+                if (!creep.room.memory.links) {
+                    creep.deSpawn();
+                }
                 creep.log("Delivering energy");
                 if (creep.empty()) {
                     creep.state = STATE._INIT;
