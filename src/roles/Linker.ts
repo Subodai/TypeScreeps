@@ -12,11 +12,11 @@ export class Linker {
         [],
         [],
         [],
-        BodyBuilder({ CARRY: 5, MOVE: 5 }),
-        BodyBuilder({ CARRY: 10, MOVE: 10 }),
-        BodyBuilder({ CARRY: 10, MOVE: 10 }),
-        BodyBuilder({ CARRY: 20, MOVE: 20 }),
-        BodyBuilder({ CARRY: 20, MOVE: 20 })
+        BodyBuilder({ CARRY: 5, MOVE: 1 }),
+        BodyBuilder({ CARRY: 10, MOVE: 1 }),
+        BodyBuilder({ CARRY: 10, MOVE: 1 }),
+        BodyBuilder({ CARRY: 20, MOVE: 1 }),
+        BodyBuilder({ CARRY: 20, MOVE: 1 })
     ];
 
     /**
