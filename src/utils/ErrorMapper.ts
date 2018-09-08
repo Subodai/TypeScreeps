@@ -79,6 +79,7 @@ export class ErrorMapper {
             console.log(`<span style='color:red'>${message}<br>${_.escape(e.stack)}</span>`);
           } else {
             console.log(`<span style='color:red'>${_.escape(this.sourceMappedStackTrace(e))}</span>`);
+            Game.notify(`<span style='color:red'>${_.escape(this.sourceMappedStackTrace(e))}</span>`, 30);
           }
         } else {
           // can't handle it
