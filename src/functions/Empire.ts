@@ -250,7 +250,7 @@ class Empire implements Empire {
                     }
                 }
                 if (stored >= 1000) {
-                    const send = _.min([toSend, amount, space, 1000]);
+                    const send = _.max([_.min([toSend, amount, space]), 1000]);
                     const price = Game.market.calcTransactionCost(send, room.name, request.room);
                     this.log("Attempting to send " + send + " at a cost of " + price + " Total: " + (price + send));
                     const result = this.fulfilRequest(request.id, room, send);
