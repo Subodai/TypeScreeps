@@ -97,7 +97,6 @@ export class Refiller {
 
             // Just stick to gathering energy
             creep.state = STATE._GATHER;
-            this.run(creep);
         }
     }
 }
