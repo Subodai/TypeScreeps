@@ -29,7 +29,7 @@ export class Screepsplus {
      * Collect Stats
      */
     private static CollectStats(): void {
-        if (Game.time % 20 === 0) {
+        if (Game.time + 10 % 20 === 0) { // Wonder if putting this on the off-tick from other stuff will help?
             this.SummarizeEconomy();
         }
         this.SummarizeRooms();
