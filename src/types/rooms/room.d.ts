@@ -79,6 +79,7 @@ interface Room {
     beginReaction(input1: _ResourceConstantSansEnergy, input2: _ResourceConstantSansEnergy): void;
     clearReaction():void;
     request(resource: ResourceConstant, amount: number): void;
+    feedReaction(): void;
 }
 
 interface RoomMemory {

@@ -75,7 +75,7 @@ Creep.prototype.getNearbyEnergy = function(
             // TODO: EMPTY TERMINAL AND STORAGE HERE PLEASE
         }
         const thisCreep: Creep = this;
-        const id = this.findNearbyEnergyTarget();
+        this.findNearbyEnergyTarget();
 
         if (!this.memory.energyPickup) {
             if (this.memory.role === Builder.roleName || this.memory.level <= 2) {
@@ -158,8 +158,10 @@ Creep.prototype.getNearbyEnergy = function(
                 this.log("Target not in range");
                 pickupSuccess = false;
             }
-        } else if (target instanceof StructureLink) { // Link
-            this.log("Target is a link");
+        } else if (target instanceof StructureLink ||
+                   target instanceof StructureLab
+        ) { // Link or lab
+            this.log("Target is a link or a lab");
             // Check the container still has the energy
             if (target.energy === 0) {
                 this.log("Target no longer has enough energy, clearing memory");
@@ -275,6 +277,7 @@ Creep.prototype.fillLabsEnergy = function(): ScreepsReturnCode | false {
     target = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
         filter: (s) => s.structureType === STRUCTURE_LAB &&
             s.energy < s.energyCapacity &&
+            s.labType === "booster" &&
             s.my
     }) as StructureLab;
     this.log(JSON.stringify(target));
@@ -719,10 +722,27 @@ Creep.prototype.findNearbyEnergyTarget = function(): void {
     if (target === null) { target = this.findTombstoneEnergy(); }
     if (target === null) { target = this.findDroppedEnergy();   }
     if (target === null) { target = this.findContainerEnergy(); }
+    if (target === null) { target = this.findLabEnergy(); }
     if (target !== null) {
         this.memory.energyPickup = target.id;
     }
 };
+
+Creep.prototype.findLabEnergy = function(): StructureLab | null {
+    this.log("Checking for labs with excess energy");
+    const labs: StructureLab[] = this.room.find(FIND_MY_STRUCTURES, {
+        filter: (l) => l.structureType === STRUCTURE_LAB &&
+        l.labType !== "booster" &&
+        l.energy > 0 &&
+        l.my
+    }) as StructureLab[];
+
+    if (labs.length > 0) {
+        return _.max(labs, (l: StructureLab) => l.energy);
+    }
+
+    return null;
+}
 
 /**
  * Find Tombestone energy

@@ -26,5 +26,6 @@ interface Empire {
     loadQueueFromCache(): void;
     saveQueueToCache(): void;
     saveQueueToMemory(): void;
+    getRequestQueue(): ResourceRequest[];
     run(): void;
 }

@@ -5,6 +5,7 @@ import { visualiseDamage } from "functions/tools";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
+import { Empire } from "functions/Empire";
 
 Debug.Load("Prototype: Room");
 Room.prototype.log = function(msg: string): void {
@@ -664,7 +665,7 @@ Room.prototype.runReactionLabs = function(): void {
         }
         if (lab2.mineralAmount < 5 || lab1.mineralAmount < 5) {
             this.log("Not enough source minerals");
-            continue;
+            break;
         }
         const result = lab.runReaction(lab1, lab2);
         if (result === OK) {
@@ -682,6 +683,8 @@ Room.prototype.runReactionLabs = function(): void {
         }
         this.log("Lab reaction result " + result.toString());
     }
+    this.log("Feeding reaction");
+    this.feedReaction();
 };
 
 Room.prototype.emptyLabs = function(): void {
@@ -794,6 +797,63 @@ Room.prototype.clearReaction = function(): void {
         reactor.reaction = undefined;
         reactor.emptyMe = true;
         this.log("Reactor Lab " + reactor.id + " cleared");
+    }
+};
+
+Room.prototype.feedReaction = function(): void {
+    const feeders = this.find(FIND_MY_STRUCTURES, {
+        filter: (s) =>
+            s.structureType === STRUCTURE_LAB &&
+            s.labType === "feeder"
+    }) as StructureLab[];
+
+    let inputs: _ResourceConstantSansEnergy[] = [];
+    // for each room's feeder
+    for (const feeder of feeders) {
+        if (feeder.compoundIn !== undefined) {
+            inputs.push(feeder.compoundIn);
+        }
+    }
+    // grab the terminal for this room
+    const terminal = this.terminal;
+    const storage = this.storage;
+    // if there's no terminal, something's wrong.. just stop
+    if (!terminal || !storage) {
+        return;
+    }
+    const myEmpire = new Empire();
+    const requestQueue: ResourceRequest[] = myEmpire.getRequestQueue();
+    // now for each input
+    for (const res of inputs) {
+        this.log("Checking for " + res + " in terminal and storage");
+        const tAmount: number = terminal.store[res] !== undefined ? terminal.store[res] as number : 0;
+        const sAmount: number = storage.store[res] !== undefined ? storage.store[res] as number : 0;
+        const amount = sAmount + tAmount;
+        this.log("Found " + amount);
+
+        // Less than 20k?
+        if (amount < 20000) {
+            let found = false;
+            this.log("Checking for existing request");
+            for (const request of requestQueue) {
+                if (request.resource === res && request.room === this.name) {
+                    this.log("Found existing request, stopping");
+                    found = true;
+                    break;
+                }
+            }
+            // not found, put in a request
+            if (!found) {
+                // Check for empire minerals to make sure we have at least 10000 of this... somewhere?
+                const empireAmount: number = Memory.stats.empireMinerals[res] !== undefined ? Memory.stats.empireMinerals[res] : 0;
+                this.log("Empire has [" + empireAmount + "] of [" + res + "]");
+                // Is there more than 10k elsewhere in our empire
+                if (empireAmount - amount >= 20000) {
+                    this.log("Putting request in for 5000 " + res);
+                    myEmpire.addRequest(this, res, 5000);
+                }
+            }
+        }
     }
 };
 

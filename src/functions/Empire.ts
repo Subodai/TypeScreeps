@@ -8,6 +8,12 @@ class Empire implements Empire {
     public requestQueue!: ResourceRequest[];
     public completedRequests!: CompletedResourceRequest[];
 
+    public getRequestQueue(): ResourceRequest[] {
+        if (this.requestQueue === undefined || this.requestQueue === null) {
+            this.loadQueueFromCache();
+        }
+        return this.requestQueue;
+    }
     /**
      * Run our tasks
      */

@@ -2,6 +2,7 @@ import { Builder } from "roles/Builder";
 import { Miner } from "roles/Miner";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { Debug } from "./debug";
+import { Empire } from "./Empire";
 
 export class Counter {
     private static runEvery: number = 1;
@@ -27,6 +28,8 @@ export class Counter {
     }
 
     private static runCount(): void {
+        const myEmpire = new Empire();
+        const requestQueue: ResourceRequest[] = myEmpire.getRequestQueue();
         // Loop through all rooms
         for (const room in Game.rooms) {
             const Room: Room = Game.rooms[room];
@@ -81,6 +84,24 @@ export class Counter {
 
                     if (Room.storage.store[RESOURCE_ENERGY] <= 100000 && Room.memory.links === true) {
                         Room.memory.links = false;
+                    }
+
+                    if (Room.storage.store[RESOURCE_ENERGY] < 50000) {
+                        let found = false;
+                        for (const request of requestQueue) {
+                            if (request.resource === RESOURCE_ENERGY && request.room === Room.name) {
+                                Room.log("Found existing request, stopping");
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            const empireAmount: number = Memory.stats.empireMinerals[RESOURCE_ENERGY] !== undefined ? Memory.stats.empireMinerals[RESOURCE_ENERGY] : 0;
+                            if (empireAmount - Room.storage.store[RESOURCE_ENERGY] > 4000000) {
+                                Room.log("adding emergency energy request");
+                                myEmpire.addRequest(Room, RESOURCE_ENERGY, 100000);
+                            }
+                        }
                     }
                 }
 
