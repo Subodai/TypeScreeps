@@ -24,8 +24,8 @@ import Profiler from "screeps-profiler";
 const empire = new Empire();
 global.empire = empire;
 
-const science = new Science();
-global.science = science;
+// const science = new Science();
+// global.science = science;
 /* Prototype loader */
 loadPrototypes();
 init();
