@@ -15,6 +15,7 @@ declare const _RETURN    = "return";
 declare const _CHARGE    = "charge";
 declare const _GATHERM   = "gatherm";
 declare const _DELIVERM  = "deliverm";
+declare const _ATTACK    = "attack";
 
 /**
  * State types
@@ -33,6 +34,7 @@ type _RETURN    = "return";
 type _CHARGE    = "charge";
 type _GATHERM   = "gatherm";
 type _DELIVERM  = "deliverm";
+type _ATTACK    = "attack";
 
 /**
  * CreepStates
@@ -52,4 +54,5 @@ type CreepState =
     | _CHARGE
     | _GATHERM
     | _DELIVERM
+    | _ATTACK
     ;

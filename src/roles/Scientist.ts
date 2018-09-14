@@ -147,7 +147,10 @@ export class Scientist {
             creep.log("at home ready to gather");
             // Check for things that need energy
             const energyTargets = creep.room.find(FIND_STRUCTURES, {
-                filter: (s) => s.structureType === STRUCTURE_LAB && s.energy < s.energyCapacity && s.my
+                filter: (s) => s.structureType === STRUCTURE_LAB &&
+                s.energy < s.energyCapacity &&
+                s.my &&
+                s.labType === "booster"
             });
             if (energyTargets.length > 0) {
                 creep.state = STATE._GATHER;

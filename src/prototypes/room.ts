@@ -454,7 +454,7 @@ Room.prototype.sourceSetup = function(): void {
     // get the sources in this room
     const sources: Source[] = this.find(FIND_SOURCES);
     // get the miners in this room
-    const creeps: Creep[] = _.filter(Game.creeps, (c: Creep) =>
+    const creeps: Creep[] = _.filter(Game.creeps, (c: Creep) => c.role !== undefined &&
         ((c.role === Miner.roleName && c.memory.roomName === this.name) ||
             (c.role === RemoteEnergyMiner.roleName && c.memory.remoteRoom === this.name)) &&
         !c.memory.dying);
@@ -683,8 +683,10 @@ Room.prototype.runReactionLabs = function(): void {
         }
         this.log("Lab reaction result " + result.toString());
     }
-    this.log("Feeding reaction");
-    this.feedReaction();
+    if (Game.time % 20 === 0) {
+        this.log("Feeding reaction");
+        this.feedReaction();
+    }
 };
 
 Room.prototype.emptyLabs = function(): void {

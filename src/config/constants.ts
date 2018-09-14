@@ -14,9 +14,10 @@ import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
 import { RemoteReserver } from "roles/RemoteReserver";
 import { Scientist } from "roles/Scientist";
 import { Upgrader } from "roles/Upgrader";
+import { Hassler } from "roles/Hassler";
 
 export const ROLES: string[] = [
-    // "guard",
+    Hassler.roleName,
     Miner.roleName,
     Refiller.roleName,
     Linker.roleName,
@@ -40,6 +41,7 @@ export const ROLES: string[] = [
 ];
 
 export const ROLEMODELS: Role[] = [
+    Hassler,
     Miner,
     Refiller,
     Linker,

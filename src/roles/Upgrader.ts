@@ -126,9 +126,9 @@ Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
                 return ERR_NOT_IN_RANGE;
             } else {
                 this.log("in range");
-                if (global.chargeRoom) {
+                if (global.chargeRoom || this.room.memory.links === true) {
                     this.log("global charge room set " + global.chargeRoom + " is in " + this.room.name);
-                    if (global.chargeRoom === this.room.name) {
+                    if (global.chargeRoom === this.room.name || this.room.memory.links === true) {
                         this.log("this is the charge room");
                         const link = _.first(this.room.find(FIND_MY_STRUCTURES, {
                             filter: (s) =>

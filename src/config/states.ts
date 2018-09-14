@@ -12,3 +12,4 @@ export const _RETURN: CreepState = "return";
 export const _CHARGE: CreepState = "charge";
 export const _GATHERM: CreepState = "gatherm";
 export const _DELIVERM: CreepState = "deliverm";
+export const _ATTACK: CreepState = "attack";

@@ -125,7 +125,7 @@ export class Runner {
 
     private static role(role: string): boolean {
         // Grab the creeps
-        const creeps = _.filter(Game.creeps, (c: Creep) => c.role === role);
+        const creeps = _.filter(Game.creeps, (c: Creep) => c.role !== undefined && c.role === role);
         let handler: Role;
         for (handler of ROLEMODELS) {
             if (role === handler.roleName) {

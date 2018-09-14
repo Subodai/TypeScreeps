@@ -10,6 +10,15 @@ Object.defineProperty(Creep.prototype, "role", {
     configurable: true,
     enumerable: true,
     get(): string {
+        if (!Memory.creeps[this.name]) {
+            Memory.creeps[this.name] = {
+                role: "Unknown",
+                state: "init",
+                level: 0, boosted:
+                false
+            };
+            console.log(this.name + " No memory");
+        }
         if (!Memory.creeps[this.name].role) {
             Memory.creeps[this.name].role = "Unknown";
         }

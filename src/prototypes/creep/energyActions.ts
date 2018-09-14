@@ -434,13 +434,6 @@ Creep.prototype.fillTowers = function(): ScreepsReturnCode | false {
             filter: (i: AnyStructure) => i.structureType === STRUCTURE_TOWER && i.energy < i.energyCapacity
         }) as StructureTower;
     }
-
-    // If towers are full, can we dump it into a lab?
-    if (!tower) {
-        tower = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-            filter: (i: AnyStructure) => i.structureType === STRUCTURE_LAB && i.energy < i.energyCapacity
-        }) as StructureTower;
-    }
     // So did we find one?
     if (tower) {
         this.log("found a tower");
@@ -720,9 +713,9 @@ Creep.prototype.deliverEnergy = function(): ScreepsReturnCode {
 Creep.prototype.findNearbyEnergyTarget = function(): void {
     let target = null;
     if (target === null) { target = this.findTombstoneEnergy(); }
+    if (target === null) { target = this.findLabEnergy(); }
     if (target === null) { target = this.findDroppedEnergy();   }
     if (target === null) { target = this.findContainerEnergy(); }
-    if (target === null) { target = this.findLabEnergy(); }
     if (target !== null) {
         this.memory.energyPickup = target.id;
     }

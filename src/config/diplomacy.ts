@@ -35,7 +35,6 @@ export const ALLIES = [
     "Publiccert",
     "poppahorse",
     "Regnare",
-    "Source Keeper",
     "Subodai",
     "Tantalas",
     "Tijnoz",
@@ -49,7 +48,10 @@ export const ALLIES = [
     "xsinx",
     "Yilmas",
     "Zpike",
-    "Zyzyzyryxy"
+    "Zyzyzyryxy",
+
+    "Source Keeper",
+    "Power Bank",
 ];
 
 export const PRIME = [];
