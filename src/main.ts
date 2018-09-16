@@ -21,8 +21,6 @@ import { ErrorMapper } from "./utils/ErrorMapper";
 import { Screepsplus } from "./utils/Screepsplus/Screepsplus";
 
 import Profiler from "screeps-profiler";
-const empire = new Empire();
-global.empire = empire;
 
 // const science = new Science();
 // global.science = science;
@@ -42,7 +40,6 @@ export const loop = ErrorMapper.wrapLoop(  () => {
         }
         global.feedEnabled = Memory.feedEnabled;
 
-
         // if (Game.time % 10 === 0) {
         //     if (global.feedEnabled) {
         //         Counter.runRoomFeed();
@@ -58,6 +55,8 @@ export const loop = ErrorMapper.wrapLoop(  () => {
         Counter.run(); // @todo make the counter count the things we need to run other things
         Spawner.run(); // @todo make this put items into the spawn queue
         Runner.run();  // @todo make this aware of the things the counter has counted so it won't run unnecessary items
+        const empire = new Empire();
+        global.empire = empire;
         if (Game.time % 20 === 0) {
             empire.run();
         }

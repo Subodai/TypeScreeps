@@ -1,11 +1,11 @@
 import { ROLEMODELS, ROLES } from "config/constants";
 import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
+import { Empire } from "functions/Empire";
 import { visualiseDamage } from "functions/tools";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
 import { RemoteEnergyMiner } from "roles/RemoteEnergyMiner";
-import { Empire } from "functions/Empire";
 
 Debug.Load("Prototype: Room");
 Room.prototype.log = function(msg: string): void {
@@ -683,7 +683,7 @@ Room.prototype.runReactionLabs = function(): void {
         }
         this.log("Lab reaction result " + result.toString());
     }
-    if (Game.time % 20 === 0) {
+    if (Game.time % 100 === 0) {
         this.log("Feeding reaction");
         this.feedReaction();
     }
@@ -809,7 +809,7 @@ Room.prototype.feedReaction = function(): void {
             s.labType === "feeder"
     }) as StructureLab[];
 
-    let inputs: _ResourceConstantSansEnergy[] = [];
+    const inputs: _ResourceConstantSansEnergy[] = [];
     // for each room's feeder
     for (const feeder of feeders) {
         if (feeder.compoundIn !== undefined) {
@@ -847,7 +847,8 @@ Room.prototype.feedReaction = function(): void {
             // not found, put in a request
             if (!found) {
                 // Check for empire minerals to make sure we have at least 10000 of this... somewhere?
-                const empireAmount: number = Memory.stats.empireMinerals[res] !== undefined ? Memory.stats.empireMinerals[res] : 0;
+                const empireAmount: number = Memory.stats.empireMinerals[res] !== undefined
+                ? Memory.stats.empireMinerals[res] : 0;
                 this.log("Empire has [" + empireAmount + "] of [" + res + "]");
                 // Is there more than 10k elsewhere in our empire
                 if (empireAmount - amount >= 20000) {
@@ -860,5 +861,6 @@ Room.prototype.feedReaction = function(): void {
 };
 
 Room.prototype.request = function(resource: ResourceConstant, amount: number): void {
-    global.empire.addRequest(this, resource, amount);
+    const myEmpire = new Empire();
+    myEmpire.addRequest(this, resource, amount);
 };

@@ -8,7 +8,7 @@ export class RemoteEnergyMiner {
     public static ticksBeforeRenew: number = 200;
     public static colour: string = "#ff66ff";
     public static roleName: string = "rEMiner";
-    public static roster: number[] = [ 0, 0, 0, 4, 4, 4, 4, 4, 4 ];
+    public static roster: number[] = [ 0, 0, 0, 4, 4, 4, 4, 4, 6 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
         [],

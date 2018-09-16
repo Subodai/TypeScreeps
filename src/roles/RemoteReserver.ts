@@ -29,9 +29,7 @@ export class RemoteReserver {
         if (!room.controller || !room.controller.my) {
             return false;
         }
-        if (room.memory.emergency) {
-            return false;
-        }
+
         // get all reserve flags
         const flags = _.filter(Game.flags, (f: Flag) =>
             f.color === global.flagColor.reserve &&
@@ -133,11 +131,12 @@ Creep.prototype.chooseReserveRoom = function(): void {
     if (!this.memory.flagName &&  !this.memory.reserveRoom) {
         this.log("No flag in memory or reserve in memory");
         // @todo perhaps add distance to the filter
-        const flags = _.filter(Game.flags, (f: Flag) =>
+        let flags = _.filter(Game.flags, (f: Flag) =>
             f.color === global.flagColor.reserve);
         if (flags.length === 0) {
             this.log("No flags found, must be an issue");
         }
+        flags = _.sortByOrder(flags, (f) => Game.map.getRoomLinearDistance(this.room.name, f.pos.roomName), "asc");
         for (const i in flags) {
             const flag: Flag = flags[i];
             this.log("Considering " + flag.name);
