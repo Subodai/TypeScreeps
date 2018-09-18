@@ -15,8 +15,8 @@ export class Hassler {
         BodyBuilder({ TOUGH:2, ATTACK: 3, MOVE: 5 }),
         BodyBuilder({ TOUGH: 2, ATTACK: 3, MOVE: 5 }),
         BodyBuilder({ TOUGH: 2, ATTACK: 3, MOVE: 5 }),
-        BodyBuilder({ TOUGH: 5, ATTACK: 20, MOVE: 25 }),
-        BodyBuilder({ TOUGH: 5, ATTACK: 20, MOVE: 25 })
+        BodyBuilder({ TOUGH: 5, ATTACK: 19, MOVE: 25, HEAL: 1 }),
+        BodyBuilder({ TOUGH: 5, ATTACK: 19, MOVE: 25, HEAL: 1 })
     ];
     // is role enabled
     public static enabled(room: Room): boolean {
@@ -26,6 +26,10 @@ export class Hassler {
 
     public static run(creep: Creep): void {
         creep.deathCheck(this.ticksBeforeRenew);
+
+        if (!creep.canDo(TOUGH)) {
+            creep.log("Damaged seeking repair");
+        }
         if (!creep.canDo(ATTACK)) {
             creep.log("Damaged seeking repair");
             return;
@@ -85,7 +89,7 @@ export class Hassler {
         if (!target) {
             const targetFlag = Game.flags['target'];
 
-            if (targetFlag) {
+            if (targetFlag && targetFlag.pos.roomName === creep.room.name) {
                 const targets = creep.room.lookForAt(LOOK_STRUCTURES, targetFlag.pos) as AnyStructure[];
                 if (targets.length > 0) {
                     target = targets[0];
@@ -118,7 +122,9 @@ export class Hassler {
         if (target) {
             creep.memory.idle = 0;
             if (!creep.pos.inRangeTo(target, 1)) {
-                creep.travelTo(target);
+                creep.travelTo(target, {
+                    ensurePath: true
+                });
                 creep.say(global.sayMove);
             }
 
@@ -144,7 +150,9 @@ export class Hassler {
                 } else {
                     // If we're more than 1 tile away attempt to move there
                     if (!creep.pos.inRangeTo(flag, 1)) {
-                        creep.travelTo(flag);
+                        creep.travelTo(flag, {
+                            ensurePath: true
+                        });
                     }
                 }
             }

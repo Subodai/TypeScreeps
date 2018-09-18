@@ -42,7 +42,8 @@ class Empire implements Empire {
              // tslint:disable-next-line:object-literal-sort-keys
              resource,
              amount,
-             requestedAmount : amount
+             requestedAmount : amount,
+             time: Game.time
         };
 
         this.requestQueue.push(request);
@@ -164,6 +165,11 @@ class Empire implements Empire {
         this.requestQueue = _.sortByOrder(this.requestQueue, "id", "asc");
         const request = _.first(this.requestQueue);
         this.logAlways("Attempting to process request " + request.id);
+        if (request.time + 500 >= Game.time) {
+            this.logAlways("Request over 500 ticks old, clearing");
+            this.completeRequest(request.id);
+            return;
+        }
 
         const receiver: StructureTerminal | undefined = Game.rooms[request.room].terminal;
         if (receiver === undefined) {

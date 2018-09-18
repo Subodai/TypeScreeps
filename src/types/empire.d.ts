@@ -4,6 +4,7 @@ interface ResourceRequest {
     resource: ResourceConstant;
     amount: number;
     requestedAmount: number;
+    time: number;
 }
 
 interface ReactionRequest {
