@@ -164,9 +164,10 @@ class Empire implements Empire {
         // Order queue by id
         this.requestQueue = _.sortByOrder(this.requestQueue, "id", "asc");
         const request = _.first(this.requestQueue);
+        // tslint:disable-next-line:max-line-length
         this.logAlways("Processing " + request.id + " from " + request.room + " for " + request.amount + " of " + request.resource);
-        if (request.time + 500 <= Game.time) {
-            this.logAlways("Request over 500 ticks old, clearing");
+        if (request.time + 400 <= Game.time) {
+            this.logAlways("Request over 400 ticks old, clearing");
             this.completeRequest(request.id);
             return;
         }
