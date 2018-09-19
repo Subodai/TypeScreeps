@@ -75,11 +75,11 @@ class Empire implements Empire {
         const request: ResourceRequest = _.first(_.filter(this.requestQueue, (c: ResourceRequest) => c.id === id));
         const complete = request as CompletedResourceRequest;
         this.completedRequests.push(complete);
-        this.logAlways("before");
-        this.logAlways(JSON.stringify(this.requestQueue));
+        this.log("before");
+        this.log(JSON.stringify(this.requestQueue));
         _.remove(this.requestQueue, (c: ResourceRequest) => c.id === id);
-        this.logAlways("after");
-        this.logAlways(JSON.stringify(this.requestQueue));
+        this.log("after");
+        this.log(JSON.stringify(this.requestQueue));
         this.saveQueueToCache();
     }
 
@@ -167,9 +167,13 @@ class Empire implements Empire {
         // tslint:disable-next-line:max-line-length
         this.logAlways("Processing " + request.id + " from " + request.room + " for " + request.amount + " of " + request.resource);
         if (request.time + 400 <= Game.time) {
-            this.logAlways("Request over 400 ticks old, clearing");
-            this.completeRequest(request.id);
-            return;
+            if (global.chargeRoom && request.room === global.chargeRoom && request.resource === RESOURCE_ENERGY) {
+
+            } else {
+                this.logAlways("Request over 400 ticks old, clearing");
+                this.completeRequest(request.id);
+                return;
+            }
         }
 
         const receiver: StructureTerminal | undefined = Game.rooms[request.room].terminal;
@@ -346,6 +350,10 @@ class Empire implements Empire {
     public saveQueueToCache(): void {
         this.checkAndInitCache();
         global.empire.requestQueue = this.requestQueue;
+        // Reset after 500 completed requests, otherwise memory will get daft
+        if (this.completedRequests.length === 500) {
+            this.completedRequests = [];
+        }
         global.empire.completedRequests = this.completedRequests;
         this.saveQueueToMemory();
     }

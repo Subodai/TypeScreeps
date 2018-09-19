@@ -62,6 +62,13 @@ export class Screepsplus {
             Memory.stats.queue = Memory.queue;
             Memory.stats.queue.length = Memory.queue.creeps.length;
         }
+        if (Memory.empire) {
+            if (!Memory.stats.empire) {
+                Memory.stats.empire = {};
+            }
+            Memory.stats.empire.requests = Memory.empire.requestQueue.length;
+            Memory.stats.empire.completed = Memory.empire.completedRequests.length;
+        }
     }
 
     /**

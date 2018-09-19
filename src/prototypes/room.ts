@@ -803,6 +803,8 @@ Room.prototype.clearReaction = function(): void {
 };
 
 Room.prototype.feedReaction = function(): void {
+    // If we're trying to charge a room, don't feed this one
+    if (global.chargeRoom) { return; }
     const feeders = this.find(FIND_MY_STRUCTURES, {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
