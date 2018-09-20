@@ -151,7 +151,7 @@ Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
                             const spawn = this.pos.findClosestByRange(FIND_MY_STRUCTURES, {
                                 filter: (s) => s.structureType === STRUCTURE_SPAWN
                             }) as StructureSpawn;
-                            if (!spawn.spawning) {
+                            if (!spawn.spawning && spawn.memory.spawnType && spawn.memory.spawnType === "renewer") {
                                 if (this.pos.getRangeTo(spawn) <= 1) {
                                     spawn.renewCreep(this);
                                 }
