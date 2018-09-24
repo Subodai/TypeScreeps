@@ -168,7 +168,7 @@ class Empire implements Empire {
         this.logAlways("Processing " + request.id + " from " + request.room + " for " + request.amount + " of " + request.resource);
         if (request.time + 400 <= Game.time) {
             if (global.chargeRoom && request.room === global.chargeRoom && request.resource === RESOURCE_ENERGY) {
-
+                // Comment
             } else {
                 this.logAlways("Request over 400 ticks old, clearing");
                 this.completeRequest(request.id);
@@ -351,7 +351,7 @@ class Empire implements Empire {
         this.checkAndInitCache();
         global.empire.requestQueue = this.requestQueue;
         // Reset after 500 completed requests, otherwise memory will get daft
-        if (this.completedRequests.length === 500) {
+        if (this.completedRequests.length >= 200) {
             this.completedRequests = [];
         }
         global.empire.completedRequests = this.completedRequests;

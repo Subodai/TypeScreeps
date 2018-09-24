@@ -6,7 +6,7 @@ import { Empire } from "./Empire";
 
 export class Counter {
     private static runEvery: number = 1;
-    private static runSetupEvery: number = 5;
+    private static runSetupEvery: number = 10;
     private static runHaulerSetupEvery: number = 200;
     // private static notify: boolean = false;
 
@@ -96,6 +96,7 @@ export class Counter {
                             }
                         }
                         if (!found) {
+                            // tslint:disable-next-line:max-line-length
                             const empireAmount: number = Memory.stats.empireMinerals[RESOURCE_ENERGY] !== undefined ? Memory.stats.empireMinerals[RESOURCE_ENERGY] : 0;
                             if (empireAmount - Room.storage.store[RESOURCE_ENERGY] > 4000000) {
                                 Room.log("adding emergency energy request");
