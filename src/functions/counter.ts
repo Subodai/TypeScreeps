@@ -108,14 +108,26 @@ export class Counter {
 
                 // If we're not in emergency mode
                 if (!Room.memory.emergency) {
-                    if (list.length <= minCreeps || miners.length < minMiners) {
+                    let energy = false;
+                    if (Room.storage) {
+                        if (Room.storage.store[RESOURCE_ENERGY] < 10000) {
+                            energy = true;
+                        }
+                    }
+                    if (list.length <= minCreeps || miners.length < minMiners || energy) {
                         // activate emergency mode
                         Room.memory.emergency = true;
                         Room.log("Emergency Activated");
                     }
                 } else {
+                    let energy = true;
+                    if (Room.storage) {
+                        if (Room.storage.store[RESOURCE_ENERGY] < 10000) {
+                            energy = false;
+                        }
+                    }
                     // Are we above the desired levels?
-                    if (list.length >= desiredCreeps && miners.length >= minMiners) {
+                    if (list.length >= desiredCreeps && miners.length >= minMiners && energy) {
                         // Deactivate emergency mode
                         delete Room.memory.emergency;
                         Room.log("Emergency Deactivated");
