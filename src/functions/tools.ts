@@ -220,6 +220,13 @@ global.cancelDrain = (): string => {
     return "Drain Stopped";
 };
 
+global.cancelReactions = (): string => {
+    for (const room in Game.rooms) {
+        Game.rooms[room].clearReaction();
+    }
+    return "Reactions Cancelled";
+};
+
 global.pause = (lineNo: number = 0): void => {
     if (Game.cpu.bucket < global.cpuDesired && Game.cpu.getUsed() > Game.cpu.limit - 2) {
         Debug.Log("Stopping At " + lineNo + " To relax CPU use");
