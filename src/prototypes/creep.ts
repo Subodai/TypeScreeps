@@ -95,8 +95,9 @@ Creep.prototype.findSpaceAtSource = function(source: Source): boolean {
 };
 
 Creep.prototype.checkEmptyAtPos = function(pos: RoomPosition): boolean {
-    const terrain: Terrain = Game.map.getTerrainAt(pos);
-    if (terrain === "wall") {
+    const roomTerrain: RoomTerrain = Game.map.getRoomTerrain(pos.roomName);
+    const terrain: TerrainMask = roomTerrain.get(pos.x, pos.y);
+    if (terrain === TERRAIN_MASK_WALL) {
         this.log("Wall found at " + JSON.stringify(pos));
         return false;
     }

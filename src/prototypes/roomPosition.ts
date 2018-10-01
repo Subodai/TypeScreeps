@@ -62,8 +62,9 @@ RoomPosition.prototype.isStandable = function(creep?: Creep, ignore?: boolean): 
 };
 
 RoomPosition.prototype.hasWall = function(): boolean {
-    const terrain: Terrain = Game.map.getTerrainAt(this);
-    if (terrain === "wall") {
+    const roomTerrain: RoomTerrain = Game.map.getRoomTerrain(this.roomName);
+    const terrain: TerrainMask = roomTerrain.get(this.x, this.y);
+    if (terrain === TERRAIN_MASK_WALL) {
         // log wall found
         return true;
     }
