@@ -128,9 +128,12 @@ export class Destroyer {
             creep.state = STATE._INIT;
             // this.run(creep);
         }
-        if (creep.deliverEnergy() === OK) {
-            creep.log("Delivered some energy");
-            creep.state = STATE._INIT;
-        }
+        creep.drop(RESOURCE_ENERGY);
+        creep.state = STATE._INIT;
+        this.run(creep);
+        // if (creep.deliverEnergy() === OK) {
+        //     creep.log("Delivered some energy");
+        //     creep.state = STATE._INIT;
+        // }
     }
 }
