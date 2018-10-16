@@ -53,15 +53,20 @@ StructureTower.prototype.run = function(): number | boolean {
     if ((global.towerRepair || this.room.controller!.level < 5) &&
         this.energy >= 600 &&
         this.room.storage &&
-        this.room.storage.store[RESOURCE_ENERGY] >= 100000  &&
-        (
-            this.repairContainers() ||
-            this.repairRamparts(rampartMax * (this.room.controller!.level / 8)) ||
-            this.repairWalls(wallMax * (this.room.controller!.level / 8))
-        )
+        this.room.storage.store[RESOURCE_ENERGY] >= 100000
     ) {
+        if ( this.repairContainers() ) {
+            return this.countCPU(start);
+        }
+        if ( this.repairRamparts(rampartMax * (this.room.controller!.level / 8)) ) {
+            return this.countCPU(start);
+        }
+        if ( this.repairWalls(wallMax * (this.room.controller!.level / 8)) ) {
+            return this.countCPU(start);
+        }
         return false;
     }
+
     return false;
 };
 

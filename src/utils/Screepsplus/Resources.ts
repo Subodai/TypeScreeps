@@ -31,7 +31,7 @@ export class Resources {
             const room = Game.rooms[name];
             // if this is a remote room
             if (!room.controller || !room.controller.my) {
-                retval[name + "_remote"] = this.SummarizeRemoteRoom(room);
+                // retval[name + "_remote"] = this.SummarizeRemoteRoom(room);
             } else {
                 retval[name] = this.SummarizeMyRoom(room);
                 this.AddStorageMinerals(room, minerals);
