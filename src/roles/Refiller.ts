@@ -5,11 +5,11 @@ export class Refiller {
     public static ticksBeforeRenew: number = 100;
     public static colour: string = "#888888";
     public static roleName: string = "refil";
-    public static roster: number[]      = [ 0, 0, 0, 0, 1, 1, 1, 1, 1 ];
+    public static roster: number[]      = [ 0, 2, 0, 0, 1, 1, 1, 1, 1 ];
     public static rosterLinks: number[] = [ 0, 0, 0, 0, 2, 2, 2, 2, 1 ];
     public static bodyStructure: BodyPartConstant[][] = [
         [],
-        [],
+        BodyBuilder({ CARRY: 2, MOVE: 2 }),
         [],
         [],
         BodyBuilder({ CARRY: 5, MOVE: 5 }),
