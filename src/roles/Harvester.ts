@@ -126,9 +126,12 @@ export class Harvester {
             creep.state = STATE._INIT;
             // this.run(creep);
         }
-        if (creep.deliverEnergy() === OK && _.sum(creep.carry) === 0) {
-            creep.log("Delivered some energy");
-            creep.state = STATE._INIT;
+        if (creep.atHome()) {
+            if (creep.deliverEnergy() === OK && _.sum(creep.carry) === 0) {
+                creep.log("Delivered some energy");
+                creep.state = STATE._INIT;
+            }
         }
+
     }
 }

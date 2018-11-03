@@ -1,6 +1,6 @@
+import { ALLIES } from "config/diplomacy";
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
-import { ALLIES } from "config/diplomacy";
 
 export class Hassler {
     public static ticksBeforeRenew: number = 100;

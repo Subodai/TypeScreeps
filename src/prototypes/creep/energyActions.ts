@@ -735,7 +735,7 @@ Creep.prototype.findLabEnergy = function(): StructureLab | null {
     }
 
     return null;
-}
+};
 
 /**
  * Find Tombestone energy
