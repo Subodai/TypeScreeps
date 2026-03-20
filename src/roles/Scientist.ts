@@ -1,5 +1,6 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
+import { sortByAsc } from "utils/utils";
 
 export class Scientist {
     public static ticksBeforeRenew: number = 100;
@@ -168,7 +169,7 @@ export class Scientist {
             }) as StructureLab[];
             creep.memory.mineralType = [];
             if (resourceTargets.length > 0) {
-                resourceTargets = _.sortBy(resourceTargets, (n) => n.mineralAmount);
+                resourceTargets = sortByAsc(resourceTargets, (n) => n.mineralAmount);
                 for (const target of resourceTargets) {
                     if (target.compoundIn) {
                         creep.memory.mineralType.push(target.compoundIn);

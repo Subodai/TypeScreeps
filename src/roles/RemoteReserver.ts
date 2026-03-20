@@ -1,5 +1,6 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
+import { sortByAsc } from "utils/utils";
 
 /**
  * Remote room reserver
@@ -31,7 +32,7 @@ export class RemoteReserver {
         }
 
         // get all reserve flags
-        const flags = _.filter(Game.flags, (f: Flag) =>
+        const flags = Object.values(Game.flags).filter((f: Flag) =>
             f.color === global.flagColor.reserve &&
             Game.map.getRoomLinearDistance(room.name, f.pos.roomName) <= 2
         );
@@ -42,7 +43,7 @@ export class RemoteReserver {
         for (const i in flags) {
             // grab the flag
             const flag = flags[i];
-            const creeps = _.filter(Game.creeps, (c: Creep) =>
+            const creeps = Object.values(Game.creeps).filter((c: Creep) =>
                 c.memory.role === this.roleName &&
                 c.memory.reserveRoom === flag.pos.roomName &&
                 c.memory.flagName === flag.name &&
@@ -131,12 +132,12 @@ Creep.prototype.chooseReserveRoom = function(): void {
     if (!this.memory.flagName &&  !this.memory.reserveRoom) {
         this.log("No flag in memory or reserve in memory");
         // @todo perhaps add distance to the filter
-        let flags = _.filter(Game.flags, (f: Flag) =>
+        let flags = Object.values(Game.flags).filter((f: Flag) =>
             f.color === global.flagColor.reserve);
         if (flags.length === 0) {
             this.log("No flags found, must be an issue");
         }
-        flags = _.sortByOrder(flags, (f) => Game.map.getRoomLinearDistance(this.room.name, f.pos.roomName), "asc");
+        flags = sortByAsc(flags, (f) => Game.map.getRoomLinearDistance(this.room.name, f.pos.roomName));
         for (const i in flags) {
             const flag: Flag = flags[i];
             this.log("Considering " + flag.name);
@@ -152,7 +153,7 @@ Creep.prototype.chooseReserveRoom = function(): void {
                 break;
             }
             // check for other creeps that are assigned to this flag
-            const creeps = _.filter(Game.creeps, (c: Creep) =>
+            const creeps = Object.values(Game.creeps).filter((c: Creep) =>
                 c.role === RemoteReserver.roleName &&
                 c.memory.reserveRoom === flag.pos.roomName &&
                 c.memory.flagName === flag.name &&

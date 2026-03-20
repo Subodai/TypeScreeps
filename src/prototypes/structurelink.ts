@@ -34,7 +34,9 @@ Object.defineProperty(StructureLink.prototype, "linkType", {
         return Memory.structures[this.id].linkType;
     },
     set(v: any): any {
-        return _.set(Memory, "structures." + this.id + ".linkType", v);
+        this.initMemory();
+        Memory.structures[this.id].linkType = v;
+        return v;
     }
 });
 

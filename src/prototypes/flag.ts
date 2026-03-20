@@ -25,7 +25,8 @@ export function loadFlagPrototypes(): void {
                 delete Memory.flags[this.name].assignedCreep;
                 return null;
             }
-            _.set(Memory, "flags." + this.name + ".assignedCreep", v.id);
+            if (!Memory.flags[this.name]) { Memory.flags[this.name] = {}; }
+            Memory.flags[this.name].assignedCreep = v.id;
             return Game.getObjectById(v.id) as Creep;
         }
     });

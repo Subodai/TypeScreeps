@@ -31,7 +31,7 @@ class RoomIntel {
             }
         }
 
-        info[this.INTEL_UPDATED] = Game.time - _.random(0, 10);
+        info[this.INTEL_UPDATED] = Game.time - (Math.floor(Math.random() * 11));
 
         return info;
     }

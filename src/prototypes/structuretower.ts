@@ -1,5 +1,6 @@
 import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
+import { minBy } from "utils/utils";
 
 Debug.Load("Prototype: StructureTower");
 
@@ -145,7 +146,7 @@ StructureTower.prototype.findRampart = function(hp: number): StructureRampart | 
                         s.structureType === STRUCTURE_RAMPART && s.hits <= hp && s.my
     });
     if (targets.length > 0) {
-        const rampart = _.min(targets, (t) => t.hits);
+        const rampart = minBy(targets, (t) => t.hits);
         if (rampart instanceof StructureRampart) {
             return rampart;
         }
@@ -196,7 +197,7 @@ StructureTower.prototype.findWall = function(hp: number): StructureWall | void {
         s.structureType === STRUCTURE_WALL && s.hits <= hp
     });
     if (targets.length > 0) {
-        const wall = _.min(targets, (t) => t.hits);
+        const wall = minBy(targets, (t) => t.hits);
         if (wall instanceof StructureWall) {
             return wall;
         }

@@ -5,6 +5,7 @@ import { Refiller } from "roles/Refiller";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { Scientist } from "roles/Scientist";
 import { Upgrader } from "roles/Upgrader";
+import { maxBy, minBy, sumValues } from "utils/utils";
 
 /**
  * Find and collect nearby energy
@@ -16,7 +17,7 @@ Creep.prototype.getNearbyEnergy = function(
     useStorage: boolean = false,
     emergency: boolean = false): ScreepsReturnCode {
     // First, are we full?
-    if (_.sum(this.carry) === this.carryCapacity) {
+    if (sumValues(this.carry as unknown as Record<string, number>) === this.carryCapacity) {
         this.log("Creep Full Cannot Get Nearby Energy");
         // Clear our pickup target
         delete this.memory.energyPickup;
@@ -38,7 +39,7 @@ Creep.prototype.getNearbyEnergy = function(
                 // Temporary creep object
                 const thisCreep: Creep = this;
                 // get the nearest one
-                const link: Structure = _.min(links, (l) => thisCreep.pos.getRangeTo(l));
+                const link: Structure = minBy(links, (l) => thisCreep.pos.getRangeTo(l)) as Structure;
                 // Set it to memory
                 this.memory.energyPickup = link.id;
             } else {
@@ -248,10 +249,10 @@ Creep.prototype.getNearbyEnergy = function(
 Creep.prototype.fillContainers = function(): ScreepsReturnCode | false {
     this.log("Dumping to container");
     let target: StructureContainer;
-    if (this.room.storage && _.sum(this.room.storage.store) >= this.room.storage.storeCapacity) {
+    if (this.room.storage && sumValues(this.room.storage.store as unknown as Record<string, number>) >= this.room.storage.storeCapacity) {
         this.log("Room storage is full");
         target = this.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (s) => s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) < s.storeCapacity
+            filter: (s) => s.structureType === STRUCTURE_CONTAINER && sumValues((s as StructureContainer).store as unknown as Record<string, number>) < s.storeCapacity
         }) as StructureContainer;
         this.log(JSON.stringify(target));
         if (target) {
@@ -288,19 +289,19 @@ Creep.prototype.fillLabsEnergy = function(): ScreepsReturnCode | false {
             this.memory.idle = idle;
             if (this.memory.idle >= 10) {
                 this.log("Idling, going to boost lab to get out the way");
-                const lab = _.first(this.room.find(FIND_MY_STRUCTURES, {
+                const lab = this.room.find(FIND_MY_STRUCTURES, {
                     filter: (s) => s.structureType === STRUCTURE_LAB && s.boostTarget !== null
-                })) as StructureLab;
+                })[0] as StructureLab;
                 if (this.pos.getRangeTo(lab) > 1) {
                     this.travelTo(lab);
                 }
                 return false;
             }
             // tslint:disable-next-line:max-line-length
-            target = this.room.storage && _.sum(this.room.storage.store) < this.room.storage.storeCapacity ? this.room.storage : null;
+            target = this.room.storage && sumValues(this.room.storage.store as unknown as Record<string, number>) < this.room.storage.storeCapacity ? this.room.storage : null;
             if (!target) {
                 // tslint:disable-next-line:max-line-length
-                target = this.room.terminal && _.sum(this.room.terminal.store) < this.room.terminal.storeCapacity ? this.room.terminal : null;
+                target = this.room.terminal && sumValues(this.room.terminal.store as unknown as Record<string, number>) < this.room.terminal.storeCapacity ? this.room.terminal : null;
             }
             this.log("dumping to storage");
         } else {
@@ -456,7 +457,7 @@ Creep.prototype.fillRoomStorageOrTerminal = function(): ScreepsReturnCode | fals
     const target = this.pickStorageOrTerminal();
     if (target) {
         this.log("found storage or terminal");
-        if (_.sum(target.store) >= target.storeCapacity) {
+        if (sumValues(target.store as unknown as Record<string, number>) >= target.storeCapacity) {
             this.log("storage or terminal full!");
             return false;
         }
@@ -495,7 +496,7 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
         if (this.room.memory.prioritise) {
             if (this.room.memory.prioritise === "terminal") {
                 this.log("Terminal priority");
-                if (_.sum(terminal.store) < terminal.storeCapacity) {
+                if (sumValues(terminal.store as unknown as Record<string, number>) < terminal.storeCapacity) {
                     this.log("Terminal has space");
                     target = terminal;
                 } else {
@@ -504,7 +505,7 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
                 }
             } else if (this.room.memory.prioritise === "storage") {
                 this.log("Storage priority");
-                if (_.sum(storage.store) < storage.storeCapacity) {
+                if (sumValues(storage.store as unknown as Record<string, number>) < storage.storeCapacity) {
                     this.log("Storage has space");
                     target = storage;
                 } else {
@@ -516,7 +517,7 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
                 if (this.carry.energy > 0) {
                     this.log("Carrying energy choosing storage");
                     target = storage;
-                    if (!target || _.sum(storage.store) === storage.storeCapacity) {
+                    if (!target || sumValues(storage.store as unknown as Record<string, number>) === storage.storeCapacity) {
                         this.log("Storage is full");
                         // try storage
                         target = terminal;
@@ -524,7 +525,7 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
                 } else {
                     this.log("Carry minerals, choosing terminal");
                     target = terminal;
-                    if (!target || _.sum(terminal.store) >= terminal.storeCapacity) {
+                    if (!target || sumValues(terminal.store as unknown as Record<string, number>) >= terminal.storeCapacity) {
                         this.log("Terminal full, choosing storage");
                         // try storage
                         target = storage;
@@ -537,8 +538,8 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
                 // Lets just assume these exist and get the percentage filled
                 // We need to know the relative filled of each of these, \
                 // so [filled / (capacity/100)] should give us the percentage?
-                const terminalP = (_.sum(terminal.store) / (terminal.storeCapacity / 100));
-                const storageP = (_.sum(storage.store) / (storage.storeCapacity / 100));
+                const terminalP = (sumValues(terminal.store as unknown as Record<string, number>) / (terminal.storeCapacity / 100));
+                const storageP = (sumValues(storage.store as unknown as Record<string, number>) / (storage.storeCapacity / 100));
                 // If the fill percentage is less or equal
                 if (terminalP <= storageP) {
                     target = terminal;
@@ -551,7 +552,7 @@ Creep.prototype.pickStorageOrTerminal = function(): StructureStorage |  Structur
                 // Prioritise the terminal for non-energy
                 target = terminal;
                 // If we don't have one
-                if (!target || _.sum(terminal.store) === terminal.storeCapacity) {
+                if (!target || sumValues(terminal.store as unknown as Record<string, number>) === terminal.storeCapacity) {
                     // try storage
                     target = storage;
                 }
@@ -731,7 +732,7 @@ Creep.prototype.findLabEnergy = function(): StructureLab | null {
     }) as StructureLab[];
 
     if (labs.length > 0) {
-        return _.max(labs, (l: StructureLab) => l.energy);
+        return maxBy(labs, (l: StructureLab) => l.energy) || null;
     }
 
     return null;
@@ -749,7 +750,7 @@ Creep.prototype.findTombstoneEnergy = function(): Tombstone | null {
     // If we found a tombstone with energy
     if (tombstones.length > 0) {
         // return the one with the most energy
-        return _.max(tombstones, (t: Tombstone) => t.store.energy);
+        return maxBy(tombstones, (t: Tombstone) => t.store.energy) || null;
     }
     // nothing here, return null
     return null;
@@ -763,12 +764,12 @@ Creep.prototype.findDroppedEnergy = function(): Resource | null {
     const _creep: Creep = this;
     const resources: Resource[] = this.room.find(FIND_DROPPED_RESOURCES, {
         filter: (i) => i.resourceType === RESOURCE_ENERGY &&
-        i.amount > (this.carryCapacity - _.sum(this.carry)) / 4
+        i.amount > (this.carryCapacity - sumValues(this.carry as unknown as Record<string, number>)) / 4
     });
     // if we found some resources
     if (resources.length > 0) {
         // return the one that is most efficient
-        return _.max(resources, (r) => r.amount / _creep.pos.getRangeTo(r));
+        return maxBy(resources, (r) => r.amount / _creep.pos.getRangeTo(r)) || null;
     }
     return null;
 };
@@ -781,12 +782,12 @@ Creep.prototype.findContainerEnergy = function(): Structure | null {
     const _creep: Creep = this;
     const containers: Structure[] = this.room.find(FIND_STRUCTURES, {
         filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
-        i.store[RESOURCE_ENERGY] > (this.carryCapacity - _.sum(this.carry)) / 4
+        i.store[RESOURCE_ENERGY] > (this.carryCapacity - sumValues(this.carry as unknown as Record<string, number>)) / 4
     });
     // did we find a suitable container
     if (containers.length > 0) {
-        return _.max(containers, (c: StructureContainer) =>
-            c.store[RESOURCE_ENERGY] / _creep.pos.getRangeTo(c));
+        return maxBy(containers, (c: StructureContainer) =>
+            c.store[RESOURCE_ENERGY] / _creep.pos.getRangeTo(c)) || null;
     }
     return null;
 };

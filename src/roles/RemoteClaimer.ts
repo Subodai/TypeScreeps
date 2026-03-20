@@ -1,5 +1,6 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
+import { sortByAsc } from "utils/utils";
 import { Upgrader } from "./Upgrader";
 
 /**
@@ -28,7 +29,7 @@ export class RemoteClaimer {
             return false;
         }
         // get claim flags
-        let flags = _.filter(Game.flags, (f: Flag) =>
+        let flags = Object.values(Game.flags).filter((f: Flag) =>
             f.color === global.flagColor.claim &&
             f.assignedCreep === null &&
             Game.map.getRoomLinearDistance(room.name, f.pos.roomName) <= 5
@@ -37,12 +38,12 @@ export class RemoteClaimer {
         if (flags.length === 0) {
             return false;
         }
-        flags = _.sortByOrder(flags, (f) => Game.map.getRoomLinearDistance(room.name, f.pos.roomName), "asc");
+        flags = sortByAsc(flags, (f) => Game.map.getRoomLinearDistance(room.name, f.pos.roomName));
         // loop through flags
         for (const i in flags) {
             // get the flag
             const flag = flags[i];
-            const creeps = _.filter(Game.creeps, (c: Creep) =>
+            const creeps = Object.values(Game.creeps).filter((c: Creep) =>
                 c.memory.role === this.roleName &&
                 c.memory.flagName === flag.name &&
                 c.memory.remoteRoom === flag.pos.roomName &&
@@ -135,13 +136,13 @@ Creep.prototype.chooseClaimRoom = function(): void {
     if (!this.memory.flagName && !this.memory.claimRoom) {
         this.log("No flag in memory or claim room in memory");
         // @todo perhaps add distance to the filter
-        let flags = _.filter(Game.flags, (f: Flag) =>
+        let flags = Object.values(Game.flags).filter((f: Flag) =>
             f.color === global.flagColor.claim &&
             f.assignedCreep === null);
         if (flags.length === 0) {
             this.log("No flags found, must be an issue");
         }
-        flags = _.sortByOrder(flags, (f) => Game.map.getRoomLinearDistance(this.room.name, f.pos.roomName), "asc");
+        flags = sortByAsc(flags, (f) => Game.map.getRoomLinearDistance(this.room.name, f.pos.roomName));
         for (const i in flags) {
             const flag: Flag = flags[i];
             this.log("Considering " + flag.name);
@@ -151,7 +152,7 @@ Creep.prototype.chooseClaimRoom = function(): void {
                 continue;
             }
             // check for other creeps that are assigned to this flag
-            const creeps = _.filter(Game.creeps, (c: Creep) =>
+            const creeps = Object.values(Game.creeps).filter((c: Creep) =>
                 c.role === RemoteClaimer.roleName &&
                 c.memory.reserveRoom === flag.pos.roomName &&
                 c.memory.flagName === flag.name &&

@@ -1,5 +1,6 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
+import { sumValues } from "utils/utils";
 
 /**
  * Upgrader
@@ -70,7 +71,7 @@ export class Upgrader {
             // GATHER state
             case STATE._GATHER:
                 creep.log("In gather state");
-                if (_.sum(creep.carry) === creep.carryCapacity || creep.getNearbyEnergy(true) === ERR_FULL) {
+                if (sumValues(creep.carry as unknown as Record<string, number>) === creep.carryCapacity || creep.getNearbyEnergy(true) === ERR_FULL) {
                     creep.log("Got some energy");
                     creep.clearTargets();
                     creep.state = STATE._UPGRADE;
@@ -130,11 +131,11 @@ Creep.prototype.upgradeHomeRoom = function(): ScreepsReturnCode {
                     this.log("global charge room set " + global.chargeRoom + " is in " + this.room.name);
                     if (global.chargeRoom === this.room.name || this.room.memory.links === true) {
                         this.log("this is the charge room");
-                        const link = _.first(this.room.find(FIND_MY_STRUCTURES, {
+                        const link = this.room.find(FIND_MY_STRUCTURES, {
                             filter: (s) =>
                                 s.structureType === STRUCTURE_LINK &&
                                 s.linkType === "receiver"
-                        }));
+                        })[0];
                         if (this.pos.getRangeTo(link) > 1) {
                             this.log("moving to link");
                             this.travelTo(link);

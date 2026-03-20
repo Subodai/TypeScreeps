@@ -27,7 +27,7 @@ export class RemoteEnergyHauler {
         if (room.memory.charging === false) {
             return false;
         }
-        const flags = _.filter(Game.flags, (f: Flag) =>
+        const flags = Object.values(Game.flags).filter((f: Flag) =>
             f.color === global.flagColor.haul &&
             Game.map.getRoomLinearDistance(room.name, f.pos.roomName) <= 2
         );
@@ -147,7 +147,7 @@ Creep.prototype.chooseRemoteRoom = function(): void {
         return;
     }
     this.log("Finding a remote room");
-    const flags = _.filter(Game.flags, (f: Flag) => f.color === global.flagColor.haul && Game.rooms[f.pos.roomName]);
+    const flags = Object.values(Game.flags).filter((f: Flag) => f.color === global.flagColor.haul && Game.rooms[f.pos.roomName]);
     if (flags.length === 0) {
         this.memory.remoteRoom = Memory.settings.remoteRoom;
     }

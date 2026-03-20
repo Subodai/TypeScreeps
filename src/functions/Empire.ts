@@ -1,4 +1,5 @@
 import { Debug } from "./debug";
+import { maxBy, removeFrom, sortByAsc, sumValues } from "utils/utils";
 
 class Empire implements Empire {
 
@@ -59,7 +60,7 @@ class Empire implements Empire {
         if (this.requestQueue === undefined || this.requestQueue === null) {
             this.loadQueueFromCache();
         }
-        _.remove(this.requestQueue, (c: ResourceRequest) => c.id === id);
+        this.requestQueue = removeFrom(this.requestQueue, (c: ResourceRequest) => c.id === id);
         this.saveQueueToCache();
     }
 
@@ -72,12 +73,12 @@ class Empire implements Empire {
         // this.completedRequests === undefined || this.completedRequests === null) {
         //     this.loadQueueFromCache();
         // }
-        const request: ResourceRequest = _.first(_.filter(this.requestQueue, (c: ResourceRequest) => c.id === id));
+        const request = this.requestQueue.find((c: ResourceRequest) => c.id === id)!;
         const complete = request as CompletedResourceRequest;
         this.completedRequests.push(complete);
         this.log("before");
         this.log(JSON.stringify(this.requestQueue));
-        _.remove(this.requestQueue, (c: ResourceRequest) => c.id === id);
+        this.requestQueue = removeFrom(this.requestQueue, (c: ResourceRequest) => c.id === id);
         this.log("after");
         this.log(JSON.stringify(this.requestQueue));
         this.saveQueueToCache();
@@ -89,8 +90,8 @@ class Empire implements Empire {
      * @param room
      */
     public fulfilRequest(id: number, room: Room, amount: number): ScreepsReturnCode {
-        const request: ResourceRequest = _.first(_.filter(this.requestQueue, (c: ResourceRequest) => c.id === id));
-        if (request === null) {
+        const request = this.requestQueue.find((c: ResourceRequest) => c.id === id);
+        if (request === null || request === undefined) {
             return ERR_INVALID_ARGS;
         }
         const from = room.terminal;
@@ -162,8 +163,8 @@ class Empire implements Empire {
             return;
         }
         // Order queue by id
-        this.requestQueue = _.sortByOrder(this.requestQueue, "id", "asc");
-        const request = _.first(this.requestQueue);
+        this.requestQueue = sortByAsc(this.requestQueue, (r) => r.id);
+        const request = this.requestQueue[0];
         // tslint:disable-next-line:max-line-length
         this.logAlways("Processing " + request.id + " from " + request.room + " for " + request.amount + " of " + request.resource);
         if (request.time + 400 <= Game.time) {
@@ -191,7 +192,7 @@ class Empire implements Empire {
     }
 
     private sendCouriersTo(request: ResourceRequest): void {
-        const myRooms = _.filter(Game.rooms, (r: Room) =>
+        const myRooms = Object.values(Game.rooms).filter((r: Room) =>
             r.controller && r.controller.my &&
             Game.map.getRoomLinearDistance(r.name, request.room) <= 3 &&
             r.name !== request.room
@@ -204,13 +205,13 @@ class Empire implements Empire {
 
     private sendResourcesViaTerminalsTo(request: ResourceRequest, receiver: StructureTerminal): void {
         let amount = request.amount;
-        let space = receiver.storeCapacity - _.sum(receiver.store);
+        let space = receiver.storeCapacity - sumValues(receiver.store as unknown as Record<string, number>);
         if (space === 0) {
             this.logAlways("No Space at destination holding transfers");
             this.clearAllTerminalCharges();
             return;
         }
-        const myRooms = _.filter(Game.rooms, (r: Room) =>
+        const myRooms = Object.values(Game.rooms).filter((r: Room) =>
             r.controller && r.controller.my &&
             r.name !== request.room
         );
@@ -236,7 +237,7 @@ class Empire implements Empire {
             }
 
             if (room.terminal && room.storage) {
-                const totalEnergy = _.sum([room.terminal.store.energy, room.storage.store.energy]);
+                const totalEnergy = (room.terminal.store.energy ?? 0) + (room.storage.store.energy ?? 0);
                 if (totalEnergy <= 200000) {
                     this.log("Room below min energy level, " + totalEnergy + "  skipping");
                     room.memory.prioritise = "none";
@@ -267,7 +268,7 @@ class Empire implements Empire {
                     }
                 }
                 if (stored >= 1000) {
-                    const send = _.max([_.min([toSend, amount, space]), 1000]);
+                    const send = Math.max(Math.min(toSend, amount, space), 1000);
                     const price = Game.market.calcTransactionCost(send, room.name, request.room);
                     this.log("Attempting to send " + send + " at a cost of " + price + " Total: " + (price + send));
                     const result = this.fulfilRequest(request.id, room, send);
@@ -331,8 +332,8 @@ class Empire implements Empire {
         if (this.requestQueue.length === 0) {
             return 1;
         }
-        const request = _.max(this.requestQueue, (c: ResourceRequest) => c.id);
-        return request.id + 1;
+        const request = maxBy(this.requestQueue, (c: ResourceRequest) => c.id);
+        return request ? request.id + 1 : 1;
     }
 
     /**

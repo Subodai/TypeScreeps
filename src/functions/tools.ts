@@ -1,3 +1,4 @@
+import { minBy } from "utils/utils";
 import { Debug } from "./debug";
 
 Debug.Load("Tools: Global Functions");
@@ -108,7 +109,7 @@ global.InitRespawn = (MeanIt = false): void => {
         Debug.Log("--Flags cleared--");
 
         Debug.Log("--Removing construction sites--");
-        const mySites: ConstructionSite[] = _.filter(Game.constructionSites, (site: ConstructionSite) => site.my);
+        const mySites: ConstructionSite[] = Object.values(Game.constructionSites).filter((site: ConstructionSite) => site.my);
         for (const site in mySites) {
             mySites[site].remove();
         }
@@ -253,9 +254,9 @@ global.setupFeedRoom = (): string => {
         }
     }
     if (!Memory.feedRoom) {
-        const myRooms = _.filter(Game.rooms, (r) => r.controller && r.controller.my);
+        const myRooms = Object.values(Game.rooms).filter((r) => r.controller && r.controller.my);
         Debug.Log(JSON.stringify(myRooms));
-        const room = _.min(myRooms, (r) => {
+        const room = minBy(myRooms, (r) => {
             if (!r || !r.storage || !r.terminal) {
                 return 10000000;
             } else {

@@ -1,5 +1,6 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
+import { sumValues } from "utils/utils";
 /**
  * Mineral Extractor
  */
@@ -39,7 +40,7 @@ export class MineralExtractor {
             return false;
         }
         if (room.terminal) {
-            if (_.sum(room.terminal.store) >= room.terminal.storeCapacity * 0.8) {
+            if (sumValues(room.terminal.store as unknown as Record<string, number>) >= room.terminal.storeCapacity * 0.8) {
                 return false;
             }
         }
@@ -119,7 +120,7 @@ Creep.prototype.pickMineral = function(): boolean {
         this.deSpawn();
         return false;
     }
-    const mineral: Mineral = _.first(minerals);
+    const mineral: Mineral = minerals[0];
     this.memory.assignedMineral = mineral.id;
     // didn't work
     return true;

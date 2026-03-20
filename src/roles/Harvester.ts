@@ -1,5 +1,6 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
+import { sumValues } from "utils/utils";
 
 /**
  * Harvesters collect energy in a room and bring it back to the base
@@ -127,7 +128,7 @@ export class Harvester {
             // this.run(creep);
         }
         if (creep.atHome()) {
-            if (creep.deliverEnergy() === OK && _.sum(creep.carry) === 0) {
+            if (creep.deliverEnergy() === OK && sumValues(creep.carry as unknown as Record<string, number>) === 0) {
                 creep.log("Delivered some energy");
                 creep.state = STATE._INIT;
             }
