@@ -1,0 +1,42 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "no-console": "off",
+    "comma-dangle": ["error", "never"],
+    "@typescript-eslint/no-namespace": ["error", { "allowDeclarations": true }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/naming-convention": [
+      "warn",
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": { "regex": "^I[A-Z]", "match": false }
+      },
+      {
+        "selector": "variable",
+        "leadingUnderscore": "allow",
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"]
+      }
+    ]
+  },
+  "env": {
+    "es2020": true
+  },
+  "ignorePatterns": [
+    "dist/",
+    "node_modules/",
+    "src/utils/Traveler.ts"
+  ]
+}

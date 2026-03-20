@@ -1,3 +1,5 @@
+import { maxBy, minBy } from "utils/utils";
+
 /**
  * Economy Class
  */
@@ -95,17 +97,15 @@ export class Economy {
         if (orders.length > 0) {
             switch (mode) {
                 case "max":
-                    high = _.max(orders, (b: Order) => b.price).price;
+                    high = maxBy(orders, (b: Order) => b.price)?.price ?? 0;
                     break;
                 case "min":
-                    high = _.min(orders, (b: Order) => b.price).price;
+                    high = minBy(orders, (b: Order) => b.price)?.price ?? 0;
                 default:
                     break;
             }
         }
-        const avg = _.reduce(orders, (memo, num) => {
-            return memo + num.price;
-        }, 0) / orders.length || 0;
+        const avg = orders.reduce((memo, num) => memo + num.price, 0) / orders.length || 0;
         return [ high, avg ];
     }
 }

@@ -1,3 +1,4 @@
+import { sumValues } from "utils/utils";
 /**
  * Basic Creep Actions
  */
@@ -36,14 +37,14 @@ Creep.prototype.canPickup = function(target: RoomObject, range: number = 1): boo
  * Is Creep Full?
  */
 Creep.prototype.full = function() {
-    return _.sum(this.carry) >= this.carryCapacity;
+    return sumValues(this.carry as unknown as Record<string, number>) >= this.carryCapacity;
 };
 
 /**
  * Is Creep empty?
  */
 Creep.prototype.empty = function() {
-    return _.sum(this.carry) === 0;
+    return sumValues(this.carry as unknown as Record<string, number>) === 0;
 };
 
 Creep.prototype.moveEfficiency = () => {

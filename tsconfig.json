@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "module": "es2015",
-    "target": "es2017",
+    "module": "es2020",
+    "target": "es2020",
     "outDir": "dist",
     "baseUrl": "src/",
     "sourceMap": true,
@@ -9,7 +9,9 @@
     "experimentalDecorators": true,
     "noImplicitReturns": true,
     "allowSyntheticDefaultImports": true,
-    "allowUnreachableCode": false
+    "allowUnreachableCode": false,
+    "skipLibCheck": true,
+    "moduleResolution": "node"
   },
   "exclude": [
     "node_modules"
