@@ -26,6 +26,28 @@ interface Source {
 
 /// <reference types="typed-screeps" />
 
+// Extend Memory with custom properties and index signature for Screeps custom memory
+interface Memory {
+    [key: string]: any;
+    feedEnabled?: boolean;
+    feedRoom?: string;
+    feedTarget?: string;
+    remoteRoom?: string;
+    myRoom?: string;
+    war?: boolean;
+    wallMax?: number;
+    rampartMax?: number;
+    settings?: { [key: string]: any };
+    scienceQueue?: any[];
+    scienceReactions?: any[];
+}
+
+// screeps-profiler has no type declarations
+declare module "screeps-profiler" {
+    const profiler: any;
+    export default profiler;
+}
+
 // TODO: ADD & This to the creeps one
 // interface StoreDefinition {
 //     [k: string]: number;

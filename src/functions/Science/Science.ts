@@ -118,7 +118,7 @@ class Science implements ScienceInterface {
             requests.push(obj);
         }
         global.scienceQueue = requests;
-        _.set(Memory, "scienceQueue", requests);
+        Memory.scienceQueue = requests;
     }
 
     private saveReactions(): void {
@@ -135,7 +135,7 @@ class Science implements ScienceInterface {
             reactions.push(obj);
         }
         global.scienceReactions = reactions;
-        _.set(Memory, "scienceReactions", reactions);
+        Memory.scienceReactions = reactions;
     }
 
     public addRequest(room: Room, resource: ResourceConstant, amount: number): void {

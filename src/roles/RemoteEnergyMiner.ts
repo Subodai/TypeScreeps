@@ -1,5 +1,6 @@
 import * as STATE from "config/states";
 import { BodyBuilder } from "functions/tools";
+import { sortByAsc } from "utils/utils";
 
 /**
  * Remote energy miner
@@ -33,7 +34,7 @@ export class RemoteEnergyMiner {
             return false;
         }
         // get all reserve flags
-        const flags = _.filter(Game.flags, (f: Flag) =>
+        const flags = Object.values(Game.flags).filter((f: Flag) =>
             f.color === global.flagColor.remote &&
             Game.map.getRoomLinearDistance(room.name, f.pos.roomName) <= 2
         );
@@ -62,7 +63,7 @@ export class RemoteEnergyMiner {
                     }
                 }
             }
-            const creeps = _.filter(Game.creeps, (c: Creep) =>
+            const creeps = Object.values(Game.creeps).filter((c: Creep) =>
                 c.memory.role === this.roleName &&
                 c.memory.remoteRoom === flag.pos.roomName &&
                !c.memory.dying);
@@ -162,12 +163,12 @@ Creep.prototype.chooseRemoteMinerRoom = function(): void {
     if (!this.memory.flagName) {
         this.log("No flag in memory");
         // check for flags
-        let flags = _.filter(Game.flags, (f: Flag) =>
+        let flags = Object.values(Game.flags).filter((f: Flag) =>
             f.color === global.flagColor.remote);
         if (flags.length === 0) {
             this.log("No Remote flags found, must be an issue");
         }
-        flags = _.sortByOrder(flags, (f) => Game.map.getRoomLinearDistance(this.room.name, f.pos.roomName), "asc");
+        flags = sortByAsc(flags, (f) => Game.map.getRoomLinearDistance(this.room.name, f.pos.roomName));
         for (const i in flags) {
             const flag: Flag = flags[i];
             this.log("Considering " + flag.name);
@@ -184,7 +185,7 @@ Creep.prototype.chooseRemoteMinerRoom = function(): void {
                 this.log("we're aware of the room");
                 if (room.memory.minersNeeded && room.memory.minersNeeded > 0) {
                     this.log("it's aware it needs miners");
-                    const creeps = _.filter(Game.creeps, (c: Creep) =>
+                    const creeps = Object.values(Game.creeps).filter((c: Creep) =>
                         c.role === RemoteEnergyMiner.roleName &&
                         c.memory.remoteRoom === flag.pos.roomName &&
                        !c.memory.dying);

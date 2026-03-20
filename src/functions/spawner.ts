@@ -81,10 +81,10 @@ export class Spawner {
         // Get the appropriate level of creep for this room (when upgrading rooms we have less)
         while (Room.energyCapacityAvailable < CalcBodyCost(bodyStructure[level])) { level--; }
         // Make sure it's minimum level 1
-        level = _.max([level, 1]);
+        level = Math.max(level, 1);
         Spawn.log("Able to spawn level " + level + " Creep");
         // Get the list of these creeps
-        const list = _.filter(Game.creeps, (c) => c.role === Role.roleName &&
+        const list = Object.values(Game.creeps).filter((c) => c.role === Role.roleName &&
                                                   c.memory.roomName === Room.name &&
                                                   c.memory.level === level &&
                                                  !c.memory.dying);

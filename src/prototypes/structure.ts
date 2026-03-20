@@ -19,7 +19,8 @@ export function loadStructurePrototypes(): void {
             return Memory.structures[this.id];
         },
         set(v: any): any {
-            return _.set(Memory, "structures." + this.id, v);
+            Memory.structures[this.id] = v;
+            return v;
         }
     });
 
@@ -36,12 +37,13 @@ export function loadStructurePrototypes(): void {
             return this.memory.targetted || 0;
         },
         set(v: number): number {
-            return _.set(Memory, "structures." + this.id + ".targetted", v);
+            Memory.structures[this.id].targetted = v;
+            return v;
         }
     });
 }
 
 import "./structureLab";
-import "./structureLink";
-import "./structureSpawn";
-import "./structureTower";
+import "./structurelink";
+import "./structurespawn";
+import "./structuretower";

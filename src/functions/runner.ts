@@ -77,7 +77,7 @@ export class Runner {
         let towers = room.find(FIND_MY_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_TOWER && s.energy > 0
         }) as StructureTower[];
-        towers = _.sortBy(towers, (t) => t.energy * -1);
+        towers = towers.slice().sort((a, b) => b.energy - a.energy);
         let towerCost = 0;
         if (towers.length > 0) {
             for (const i in towers) {
@@ -125,7 +125,7 @@ export class Runner {
 
     private static role(role: string): boolean {
         // Grab the creeps
-        const creeps = _.filter(Game.creeps, (c: Creep) => c.role !== undefined && c.role === role);
+        const creeps = Object.values(Game.creeps).filter((c: Creep) => c.role !== undefined && c.role === role);
         let handler: Role;
         for (handler of ROLEMODELS) {
             if (role === handler.roleName) {

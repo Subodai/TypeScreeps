@@ -1,3 +1,5 @@
+import { countBy, maxBy, minBy, sumBy, sumValues } from "utils/utils";
+
 /**
  * Resources class for gathering details for stats
  */
@@ -50,10 +52,12 @@ export class Resources {
         }
         const sources = room.find(FIND_SOURCES);
         const numSources = sources === null ? 0 : sources.length;
-        const sourceEnergy = _.sum(sources, (s: Source) => s.energy);
-        const creeps = _.filter(Game.creeps, (c: Creep) => c.pos.roomName === room.name && c.my);
+        const sourceEnergy = sumBy(sources, (s: Source) => s.energy);
+        const creeps = Object.values(Game.creeps).filter((c: Creep) => c.pos.roomName === room.name && c.my);
         const numCreeps = creeps ? creeps.length : 0;
-        const creepEnergy = _.sum(Game.creeps, (c: Creep) => c.pos.roomName === room.name ? c.carry.energy : 0);
+        const creepEnergy = Object.values(Game.creeps).reduce(
+            (sum: number, c: Creep) => sum + (c.pos.roomName === room.name ? (c.carry as any)[RESOURCE_ENERGY] : 0), 0
+        );
         const enemyCreeps = room.find(FIND_HOSTILE_CREEPS);
         const numEnemies = enemyCreeps ? enemyCreeps.length : 0;
         const constSites = room.find(FIND_CONSTRUCTION_SITES);
@@ -63,14 +67,14 @@ export class Resources {
         const numConstructionSites = constSites.length;
         const numMyConstructionSites = myConstSites.length;
         const groundResources = room.find(FIND_DROPPED_RESOURCES);
-        const reducedResources = _.reduce(groundResources, (acc: { [k: string]: number }, res) => {
-            acc[res.resourceType] = _.get(acc, [res.resourceType], 0) + res.amount; return acc;
+        const reducedResources = groundResources.reduce((acc: { [k: string]: number }, res) => {
+            acc[res.resourceType] = (acc[res.resourceType] ?? 0) + res.amount;
+            return acc;
         }, {});
-        const creepCounts = _.countBy(creeps, (c: Creep) => c.role);
+        const creepCounts = countBy(creeps, (c: Creep) => (c as any).role as string);
 
         const retval = {
             room_name: room.name,
-            // tslint:disable-next-line:object-literal-sort-keys
             num_sources : numSources,
             source_energy: sourceEnergy,
             num_creeps: numCreeps,
@@ -105,22 +109,22 @@ export class Resources {
         const controllerSafemodeCooldown    = room.controller.safeModeCooldown;
         const hasStorage                    = room.storage != null;
         const storageEnergy                 = room.storage ? room.storage.store[RESOURCE_ENERGY] : 0;
-        const storageMinerals               = room.storage ? _.sum(room.storage.store) - storageEnergy : 0;
+        const storageMinerals               = room.storage ? sumValues(room.storage.store as unknown as Record<string, number>) - storageEnergy : 0;
         const energyAvail                   = room.energyAvailable;
         const energyCap                     = room.energyCapacityAvailable;
         const containers: StructureContainer[] = room.find(FIND_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_CONTAINER
         }) as StructureContainer[];
         const numContainers                 = containers == null ? 0 : containers.length;
-        const containerEnergy               = _.sum(containers, (c: StructureContainer) => c.store[RESOURCE_ENERGY]);
+        const containerEnergy               = sumBy(containers, (c: StructureContainer) => c.store[RESOURCE_ENERGY]);
         const sources: Source[]             = room.find(FIND_SOURCES);
         const numSources                    = sources == null ? 0 : sources.length;
-        const sourceEnergy                  = _.sum(sources, (s: Source) => s.energy);
+        const sourceEnergy                  = sumBy(sources, (s: Source) => s.energy);
         const links: StructureLink[] = room.find(FIND_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_LINK && s.my
         }) as StructureLink[];
         const numLinks                      = links == null ? 0 : links.length;
-        const linkEnergy                    = _.sum(links, (l: StructureLink) => l.energy);
+        const linkEnergy                    = sumBy(links, (l: StructureLink) => l.energy);
         const minerals                      = room.find(FIND_MINERALS);
         const mineral                       = minerals && minerals.length > 0 ? minerals[0] : null;
         const mineralType                   = mineral ? mineral.mineralType : "";
@@ -129,19 +133,21 @@ export class Resources {
             filter: (s) => s.structureType === STRUCTURE_EXTRACTOR
         });
         const numExtractors                 = extractors.length;
-        const creeps: Creep[]               = _.filter(Game.creeps, (c: Creep) => c.pos.roomName === room.name && c.my);
+        const creeps: Creep[]               = Object.values(Game.creeps).filter((c: Creep) => c.pos.roomName === room.name && c.my);
         const numCreeps                     = creeps ? creeps.length : 0;
         const enemyCreeps: Creep[]          = room.find(FIND_HOSTILE_CREEPS);
-        const creepEnergy = _.sum(Game.creeps, (c: Creep) => c.pos.roomName === room.name ? c.carry.energy : 0);
+        const creepEnergy = Object.values(Game.creeps).reduce(
+            (sum: number, c: Creep) => sum + (c.pos.roomName === room.name ? (c.carry as any)[RESOURCE_ENERGY] : 0), 0
+        );
         const numEnemies                    = enemyCreeps ? enemyCreeps.length : 0;
         const spawns: StructureSpawn[]      = room.find(FIND_MY_SPAWNS);
         const numSpawns                     = spawns ? spawns.length : 0;
-        const spawnsSpawning                = _.sum(spawns, (s: StructureSpawn) => s.spawning ? 1 : 0);
+        const spawnsSpawning                = sumBy(spawns, (s: StructureSpawn) => s.spawning ? 1 : 0);
         const towers: StructureTower[] = room.find(FIND_STRUCTURES, {
             filter: (s) => s.structureType === STRUCTURE_TOWER && s.my
         }) as StructureTower[];
         const numTowers                     = towers ? towers.length : 0;
-        const towerEnergy                   = _.sum(towers, (t: StructureTower) => t.energy);
+        const towerEnergy                   = sumBy(towers, (t: StructureTower) => t.energy);
         const constSites                    = room.find(FIND_CONSTRUCTION_SITES);
         const myConstSites = room.find(FIND_CONSTRUCTION_SITES, {
             filter: (cs) => cs.my
@@ -151,12 +157,13 @@ export class Resources {
         const numSourceContainers           = this.CountSourceContainers(room);
         const hasTerminal                   = room.terminal != null;
         const terminalEnergy                = room.terminal ? room.terminal.store[RESOURCE_ENERGY] : 0;
-        const terminalMinerals              = room.terminal ? _.sum(room.terminal.store) - terminalEnergy : 0;
+        const terminalMinerals              = room.terminal ? sumValues(room.terminal.store as unknown as Record<string, number>) - terminalEnergy : 0;
         const groundResources               = room.find(FIND_DROPPED_RESOURCES);
-        const reducedResources              = _.reduce(groundResources, (acc: {[k: string]: number}, res) => {
-            acc[res.resourceType] = _.get(acc, [res.resourceType], 0) + res.amount; return acc;
+        const reducedResources              = groundResources.reduce((acc: {[k: string]: number}, res) => {
+            acc[res.resourceType] = (acc[res.resourceType] ?? 0) + res.amount;
+            return acc;
         }, {});
-        const creepCounts = _.countBy(creeps, (c: Creep) => c.role);
+        const creepCounts = countBy(creeps, (c: Creep) => (c as any).role as string);
 
         const structures: AnyStructure[] = room.find(FIND_STRUCTURES);
         const structureTypes = structures.map((s) => s.structureType);
@@ -167,8 +174,8 @@ export class Resources {
             });
             structureInfo[s] = {
                 count: ss.length,
-                max_hits: _.max(ss, "hits").hits,
-                min_hits: _.min(ss, "hits").hits
+                max_hits: maxBy(ss, (st) => st.hits)?.hits ?? 0,
+                min_hits: minBy(ss, (st) => st.hits)?.hits ?? 0
             };
         }
 
@@ -177,7 +184,6 @@ export class Resources {
 
         const retval = {
             room_name: room.name,
-            // tslint:disable-next-line:object-literal-sort-keys
             controller_level : controllerLevel,
             controller_progress: controllerProgress,
             controller_needed: controllerNeeded,
@@ -236,7 +242,7 @@ export class Resources {
             if (minerals[i] === undefined) {
                 minerals[i] = 0;
             }
-            minerals[i] += room.storage.store[i];
+            minerals[i] += room.storage.store[i as ResourceConstant] ?? 0;
         }
     }
 
@@ -252,7 +258,7 @@ export class Resources {
             if (minerals[i] === undefined) {
                 minerals[i] = 0;
             }
-            minerals[i] += room.terminal.store[i];
+            minerals[i] += room.terminal.store[i as ResourceConstant] ?? 0;
         }
     }
 

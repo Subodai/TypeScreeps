@@ -3,6 +3,7 @@ import { Miner } from "roles/Miner";
 import { RemoteEnergyHauler } from "roles/RemoteEnergyHauler";
 import { Debug } from "./debug";
 import { Empire } from "./Empire";
+import { maxBy, minBy, sumValues } from "utils/utils";
 
 export class Counter {
     private static runEvery: number = 1;
@@ -60,17 +61,17 @@ export class Counter {
                 if (!Room.memory.charging && global.chargeRoom && global.chargeRoom === Room.name) {
                     minMiners = 0;
                 }
-                list = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
+                list = Object.values(Game.creeps).filter((i: Creep) => i.pos.roomName === room && !i.memory.dying &&
                     i.role !== RemoteEnergyHauler.roleName &&
                     i.role !== Builder.roleName &&
                     i.role !== "guard"); // TODO: replace with hauler and guard rolenames
-                miners = _.filter(Game.creeps, (i: Creep) => i.pos.roomName === room && !i.memory.dying &&
+                miners = Object.values(Game.creeps).filter((i: Creep) => i.pos.roomName === room && !i.memory.dying &&
                     (i.role === Miner.roleName || i.role === "linkminer")); // TODO: replace with linkMiner rolename?
                 if (!Room.storage) {
                     Room.memory.links = false;
                 } else {
                     if (Room.storage.store[RESOURCE_ENERGY] >= global.chargeLimit && Room.memory.charging === true ||
-                        _.sum(Room.storage.store) >= Room.storage.storeCapacity) {
+                        sumValues(Room.storage.store as unknown as Record<string, number>) >= Room.storage.storeCapacity) {
                         Room.memory.charging = false;
                     }
 
@@ -184,13 +185,13 @@ export class Counter {
     public static runRoomFeed(): void {
         Debug.Log("Feeding: ");
         const terminal = Game.rooms[Memory.feedRoom].terminal;
-        if (_.sum(terminal!.store) >= terminal!.storeCapacity) {
+        if (sumValues(terminal!.store as unknown as Record<string, number>) >= terminal!.storeCapacity) {
             Debug.Log("Feed Room Terminal Full Turning off feed");
             this.clearRoomFeed();
             Memory.feedEnabled = false;
             return;
         }
-        Debug.Log("Feed Room at " + _.sum(terminal!.store) + " Continuing feed");
+        Debug.Log("Feed Room at " + sumValues(terminal!.store as unknown as Record<string, number>) + " Continuing feed");
         for (const room in Game.rooms) {
             if (Game.rooms[room].terminal && Game.rooms[room].memory.charging === true) {
                 Game.rooms[room].feedEnergy();
@@ -236,7 +237,7 @@ export class Counter {
                     }
                 }
             }
-            const remoteRoom = _.max(remoteRooms, (c) => Game.rooms[c].collectableEnergy());
+            const remoteRoom = maxBy(remoteRooms, (c) => Game.rooms[c].collectableEnergy());
             Memory.remoteRoom = remoteRoom;
         } else {
             Debug.Log(Memory.remoteRoom + ":" + target.collectableEnergy());
@@ -275,8 +276,8 @@ export class Counter {
         if (myRooms.length === 0) {
             return;
         }
-        myRooms = _.filter(myRooms, (c) => Game.rooms[c].storage);
-        const myRoom = _.min(myRooms, (c) => Game.rooms[c].storage!.store[RESOURCE_ENERGY]);
+        myRooms = myRooms.filter((c) => Game.rooms[c].storage);
+        const myRoom = minBy(myRooms, (c) => Game.rooms[c].storage!.store[RESOURCE_ENERGY]);
         Memory.myRoom = myRoom;
         const After = Game.cpu.getUsed() - Before;
         Debug.Log("Hauler Target setup used " + After + " CPU");

@@ -1,5 +1,5 @@
-// tslint:disable:no-conditional-assignment
-import {SourceMapConsumer} from "source-map";
+import { SourceMapConsumer } from "source-map";
+import { escapeHtml } from "utils/utils";
 
 export class ErrorMapper {
   // Cache consumer
@@ -76,10 +76,10 @@ export class ErrorMapper {
         if (e instanceof Error) {
           if ("sim" in Game.rooms) {
             const message = `Source maps don't work in the simulator - displaying original error`;
-            console.log(`<span style='color:red'>${message}<br>${_.escape(e.stack)}</span>`);
+            console.log(`<span style='color:red'>${message}<br>${escapeHtml(e.stack ?? "")}</span>`);
           } else {
-            console.log(`<span style='color:red'>${_.escape(this.sourceMappedStackTrace(e))}</span>`);
-            Game.notify(`<span style='color:red'>${_.escape(this.sourceMappedStackTrace(e))}</span>`, 30);
+            console.log(`<span style='color:red'>${escapeHtml(this.sourceMappedStackTrace(e))}</span>`);
+            Game.notify(`<span style='color:red'>${escapeHtml(this.sourceMappedStackTrace(e))}</span>`, 30);
           }
         } else {
           // can't handle it

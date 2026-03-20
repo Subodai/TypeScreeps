@@ -1,6 +1,7 @@
 import * as STATE from "config/states";
 import { Debug } from "functions/debug";
 import { visualiseDamage } from "functions/tools";
+import { minBy, sumValues } from "utils/utils";
 import "roles/Builder";
 import "roles/Miner";
 import "roles/Upgrader";
@@ -175,7 +176,7 @@ Creep.prototype.roadCheck = function(work: boolean = false): void {
     if (!site) {
         this.log("No construction site, looking for flags");
         // Check for flag
-        const flags = _.filter(Game.flags, (f) => f.pos === this.pos);
+        const flags = Object.values(Game.flags).filter((f) => f.pos === this.pos);
         // let flags = this.room.lookForAt(LOOK_FLAGS, this.pos);
         if (flags.length > 0) {
             this.log("Found a flag");
@@ -187,7 +188,7 @@ Creep.prototype.roadCheck = function(work: boolean = false): void {
     // No site, no flag, and we're seeding remote roads
     if (!site && !flag && global.seedRemoteRoads === true) {
         // How many construction flags do we have?
-        const roadFlags = _.filter(Game.flags, (f) =>
+        const roadFlags = Object.values(Game.flags).filter((f) =>
         f.color === global.flagColor.buildsite && f.secondaryColor === COLOR_WHITE);
         // If we have 100 or more road flags, don't make any more!
         if (roadFlags.length >= 100) {
@@ -315,7 +316,7 @@ Creep.prototype.findWall = function(hp: number): void {
     });
     if (targets.length > 0) {
         visualiseDamage(targets, this.room);
-        const wall = _.min(targets, (t) => t.hits);
+        const wall = minBy(targets, (t) => t.hits);
         if (wall instanceof StructureWall) {
             this.memory.repairTarget = wall.id;
             this.memory.targetMaxHP = hp;
@@ -333,7 +334,7 @@ Creep.prototype.findRampart = function(hp: number): void {
     });
     if (targets.length > 0) {
         visualiseDamage(targets, this.room);
-        const rampart = _.min(targets, (t) => t.hits);
+        const rampart = minBy(targets, (t) => t.hits);
         if (rampart instanceof StructureRampart) {
             this.memory.repairTarget = rampart.id;
             this.memory.targetMaxHP = hp;
@@ -386,7 +387,7 @@ Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolea
         if (targets.length > 0) {
             visualiseDamage(targets, this.room);
             this.log("Found a 1 hp item, setting target");
-            this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
+            this.memory.repairTarget = minBy(targets, (t) => t.hits)?.id;
             this.memory.targetMaxHP = 10;
         }
     }
@@ -405,8 +406,8 @@ Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolea
         if (targets.length > 0) {
             visualiseDamage(targets, this.room);
             this.log("Found a container item, setting target");
-            this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
-            this.memory.targetMaxHP = _.min(targets, (t) => t.hits).hitsMax;
+            this.memory.repairTarget = minBy(targets, (t) => t.hits)?.id;
+            this.memory.targetMaxHP = minBy(targets, (t) => t.hits)?.hitsMax;
         }
     }
 
@@ -421,7 +422,7 @@ Creep.prototype.chooseHighPriorityDefenceTarget = function(d: boolean, s: boolea
         });
         if (targets.length > 0) {
             visualiseDamage(targets, this.room);
-            this.memory.repairTarget = _.min(targets, (t) => t.hits).id;
+            this.memory.repairTarget = minBy(targets, (t) => t.hits)?.id;
             this.memory.targetMaxHP = 20000;
         }
     }
@@ -522,7 +523,7 @@ Creep.prototype.deconstructRoomTargets = function(): ScreepsReturnCode {
             return ERR_NOT_FOUND;
         }
     }
-    if (_.sum(this.carry) >= this.carryCapacity) {
+    if (sumValues(this.carry as unknown as Record<string, number>) >= this.carryCapacity) {
         return ERR_FULL;
     }
 
@@ -552,7 +553,7 @@ Creep.prototype.deconstructRoomTargets = function(): ScreepsReturnCode {
  * Grab the first item from the list
  */
 Creep.prototype.chooseDeconstructionTarget = function(): void {
-    const item = _.first(this.room.getDeconItems());
+    const item = this.room.getDeconItems()[0];
     if (!item) {
         delete this.memory.deconstructionTarget;
         return;

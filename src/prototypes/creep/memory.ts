@@ -25,7 +25,8 @@ Object.defineProperty(Creep.prototype, "role", {
         return Memory.creeps[this.name].role;
     },
     set(v: string): string {
-        return _.set(Memory, "creeps." + this.name + ".role", v);
+        Memory.creeps[this.name].role = v;
+        return v;
     }
 });
 
@@ -42,7 +43,8 @@ Object.defineProperty(Creep.prototype, "state", {
         return Memory.creeps[this.name].state;
     },
     set(v: CreepState): CreepState {
-        return _.set(Memory, "creeps." + this.name + ".state", v);
+        Memory.creeps[this.name].state = v;
+        return v;
     }
 });
 
@@ -65,7 +67,8 @@ Object.defineProperty(Creep.prototype, "threat", {
         return Memory.rooms[this.room.name].enemies![this.id].threat;
     },
     set(v: number) {
-        return _.set(Memory, "rooms." + this.room.name + ".enemies." + this.id + ".threat", v);
+        Memory.rooms[this.room.name].enemies![this.id].threat = v;
+        return v;
     }
 });
 
@@ -79,6 +82,7 @@ Object.defineProperty(Creep.prototype, "boosted", {
         return Memory.creeps[this.name].boosted ? Memory.creeps[this.name].boosted : false;
     },
     set(v: boolean): boolean {
-        return _.set(Memory, "creeps." + this.name + ".boosted", v);
+        Memory.creeps[this.name].boosted = v;
+        return v;
     }
 });

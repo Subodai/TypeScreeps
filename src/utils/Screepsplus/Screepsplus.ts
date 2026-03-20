@@ -39,7 +39,7 @@ export class Screepsplus {
      * Sets up initial memory
      */
     private static SetupMemory(): void {
-        if (_.isUndefined(Memory.stats)) {
+        if (Memory.stats === undefined) {
             Memory.stats = {
                 tick: Game.time
             };
@@ -103,7 +103,7 @@ export class Screepsplus {
             // Traveler.structureMatrixCache = {};
             // Traveler.creepMatrixCache = {};
             const heapStats = Game.cpu.getHeapStatistics();
-            if (_.isUndefined(heapStats)) {
+            if (heapStats === undefined) {
                 return "";
             }
             const heapPercent = Math.round(

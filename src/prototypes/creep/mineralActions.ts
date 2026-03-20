@@ -1,6 +1,7 @@
 /**
  * Creep Actions related to minerals
  */
+import { maxBy, minBy, sumValues } from "utils/utils";
 
 /**
  * Get Nearby minerals to pickup
@@ -54,7 +55,7 @@ Creep.prototype.findResourceOfType = function(types: ResourceConstant[]): void {
                 )
         });
         if (targets.length > 0) {
-            const target = _.first(targets);
+            const target = targets[0];
             this.memory.mineralPickup = target.id;
             return;
         }
@@ -88,7 +89,7 @@ Creep.prototype.findLabMinerals = function(): void {
             )
     }) as StructureLab[];
     if (labs.length > 0) {
-        const target: StructureLab = _.max(labs, (l) => l.mineralAmount);
+        const target: StructureLab = maxBy(labs, (l) => l.mineralAmount) as StructureLab;
         this.memory.mineralPickup = target.id;
     }
 };
@@ -105,8 +106,8 @@ Creep.prototype.findStorageMinerals = function(): void {
     // Does this room have a storage? (no harm in checking)
     if (storage) {
         // Is there something other than energy in the storage? (and space in the terminal)
-        if (_.sum(storage.store) - storage.store[RESOURCE_ENERGY] > 0 &&
-            _.sum(terminal.store) < terminal.storeCapacity) {
+        if (sumValues(storage.store as unknown as Record<string, number>) - storage.store[RESOURCE_ENERGY] > 0 &&
+            sumValues(terminal.store as unknown as Record<string, number>) < terminal.storeCapacity) {
             // Set the target to be the storage
             this.memory.mineralPickup = storage.id;
         }
@@ -129,7 +130,7 @@ Creep.prototype.findGroundMinerals = function(): void {
     if (resources.length > 0) {
         this.log("Found some minerals picking the closest");
         // get the closest resource
-        resource = _.min(resources, (r) => thisCreep.pos.getRangeTo(r));
+        resource = minBy(resources, (r) => thisCreep.pos.getRangeTo(r)) || false;
         // Did we find some resources?
         if (resource) {
             // We did, let's store their id
@@ -147,12 +148,12 @@ Creep.prototype.findTombstoneMinerals = function(): void {
     this.log("Creep searching for mineral tombstones");
     // get tombstones
     const tombstones: Tombstone[] = this.room.find(FIND_TOMBSTONES, {
-        filter: (t: Tombstone) => (_.sum(t.store) - t.store[RESOURCE_ENERGY]) > 0
+        filter: (t: Tombstone) => (sumValues(t.store as unknown as Record<string, number>) - t.store[RESOURCE_ENERGY]) > 0
     });
     if (tombstones.length > 0) {
         this.log("Found some mineral tombstones");
-        tombstone = _.max(tombstones, (t: Tombstone) =>
-            (_.sum(t.store) - t.store[RESOURCE_ENERGY]) / thisCreep.pos.getRangeTo(t));
+        tombstone = maxBy(tombstones, (t: Tombstone) =>
+            (sumValues(t.store as unknown as Record<string, number>) - t.store[RESOURCE_ENERGY]) / thisCreep.pos.getRangeTo(t)) || false;
         if (tombstone) {
             this.memory.mineralPickup = tombstone.id;
         }
@@ -169,13 +170,13 @@ Creep.prototype.findContainerMinerals = function(): void {
     // Check for containers with anything other than energy in them
     const containers = this.room.find(FIND_STRUCTURES, {
         filter: (i) => i.structureType === STRUCTURE_CONTAINER &&
-            (_.sum(i.store) - i.store[RESOURCE_ENERGY]) > 0
+            (sumValues(i.store as unknown as Record<string, number>) - i.store[RESOURCE_ENERGY]) > 0
     });
     // Any containers?
     if (containers.length > 0) {
         this.log("Found some mineral containers, picking the most cost effective");
-        container = _.max(containers, (c: StructureContainer) =>
-            (_.sum(c.store) - c.store[RESOURCE_ENERGY]) / thisCreep.pos.getRangeTo(c));
+        container = maxBy(containers, (c: StructureContainer) =>
+            (sumValues(c.store as unknown as Record<string, number>) - c.store[RESOURCE_ENERGY]) / thisCreep.pos.getRangeTo(c)) || false;
         // Did we find a container
         if (container) {
             // We did it, store the id
@@ -226,7 +227,7 @@ Creep.prototype.moveToAndPickupMinerals = function(): ScreepsReturnCode {
     ) {
         this.log("Target is Container, Storage, Terminal or Tombstone");
         // Check there is still res in the container
-        if (_.sum(target.store) - target.store[RESOURCE_ENERGY] === 0) {
+        if (sumValues(target.store as unknown as Record<string, number>) - target.store[RESOURCE_ENERGY] === 0) {
             return this.invalidateMineralTarget();
         }
         // Can we pick it up yet?
@@ -345,15 +346,15 @@ Creep.prototype.fillLabs = function(type: ResourceConstant): ScreepsReturnCode |
             && s.emptyMe === false
     }) as StructureLab[];
     if (labs.length > 0) {
-        target = _.min(labs, (l) => l.mineralAmount);
+        target = minBy(labs, (l) => l.mineralAmount) ?? null;
     }
     this.log(JSON.stringify(target));
     if (!target) {
         // tslint:disable-next-line:max-line-length
-        target = this.room.terminal && _.sum(this.room.terminal.store) < this.room.terminal.storeCapacity ? this.room.terminal : null;
+        target = this.room.terminal && sumValues(this.room.terminal.store as unknown as Record<string, number>) < this.room.terminal.storeCapacity ? this.room.terminal : null;
         if (!target) {
             // tslint:disable-next-line:max-line-length
-            target = this.room.storage && _.sum(this.room.storage.store) < this.room.storage.storeCapacity ? this.room.storage : null;
+            target = this.room.storage && sumValues(this.room.storage.store as unknown as Record<string, number>) < this.room.storage.storeCapacity ? this.room.storage : null;
         }
         this.log("dumping to storage");
     }

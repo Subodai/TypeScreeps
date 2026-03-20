@@ -17,7 +17,9 @@ Object.defineProperty(StructureLab.prototype, "mineralIn", {
         return Memory.structures[this.id].mineralIn || undefined;
     },
     set(v: MineralConstant | undefined): MineralConstant | undefined {
-        return _.set(Memory, "structures." + this.id + ".mineralIn", v);
+        this.initMemory();
+        Memory.structures[this.id].mineralIn = v;
+        return v;
     }
 });
 
@@ -29,7 +31,9 @@ Object.defineProperty(StructureLab.prototype, "compoundIn", {
         return Memory.structures[this.id].compoundIn || undefined;
     },
     set(v: ResourceConstant | undefined): ResourceConstant | undefined {
-        return _.set(Memory, "structures." + this.id + ".compoundIn", v);
+        this.initMemory();
+        Memory.structures[this.id].compoundIn = v;
+        return v;
     }
 });
 
@@ -41,7 +45,9 @@ Object.defineProperty(StructureLab.prototype, "compoundOut", {
         return Memory.structures[this.id].compoundOut || undefined;
     },
     set(v: ResourceConstant | undefined): ResourceConstant | undefined {
-        return _.set(Memory, "structures." + this.id + ".compoundOut", v);
+        this.initMemory();
+        Memory.structures[this.id].compoundOut = v;
+        return v;
     }
 });
 
@@ -53,7 +59,9 @@ Object.defineProperty(StructureLab.prototype, "boostTarget", {
         return Memory.structures[this.id].boostTarget || undefined;
     },
     set(v: BoostTarget | undefined): BoostTarget | undefined {
-        return _.set(Memory, "structures." + this.id + ".boostTarget", v);
+        this.initMemory();
+        Memory.structures[this.id].boostTarget = v;
+        return v;
     }
 });
 
@@ -68,23 +76,24 @@ Object.defineProperty(StructureLab.prototype, "reaction", {
         }
         const reaction: LabReaction = {
             sourceLab1: Game.getObjectById(response.sourceLab1) as StructureLab,
-            // tslint:disable-next-line:object-literal-sort-keys
             sourceLab2: Game.getObjectById(response.sourceLab2) as StructureLab,
             targetLab: this
         };
         return reaction;
     },
     set(v: LabReaction | undefined): LabReaction | undefined {
+        this.initMemory();
         if (v === undefined) {
-            return _.set(Memory, "structures." + this.id + ".reaction", v);
+            Memory.structures[this.id].reaction = v;
+            return v;
         }
         const data = {
             sourceLab1: v.sourceLab1.id,
-            // tslint:disable-next-line:object-literal-sort-keys
             sourceLab2: v.sourceLab2.id,
             targetLab: v.targetLab.id
         };
-        return _.set(Memory, "structures." + this.id + ".reaction", data);
+        Memory.structures[this.id].reaction = data;
+        return v;
     }
 });
 
@@ -123,7 +132,9 @@ Object.defineProperty(StructureLab.prototype, "labType", {
         return Memory.structures[this.id].labType;
     },
     set(v: any): any {
-        return _.set(Memory, "structures." + this.id + ".labType", v);
+        this.initMemory();
+        Memory.structures[this.id].labType = v;
+        return v;
     }
 });
 
@@ -134,7 +145,9 @@ Object.defineProperty(StructureLab.prototype, "emptyMe", {
         this.initMemory();
         return Memory.structures[this.id].emptyMe || false;
     },
-    set(v: boolean): BoostTarget | undefined {
-        return _.set(Memory, "structures." + this.id + ".emptyMe", v);
+    set(v: boolean): boolean {
+        this.initMemory();
+        Memory.structures[this.id].emptyMe = v;
+        return v;
     }
 });

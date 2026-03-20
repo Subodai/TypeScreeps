@@ -46,7 +46,7 @@ function clearMemory(): void {
 function convertCreeps(): void {
     Memory._creeps = Memory.creeps;
     console.log("Converting old creeps");
-    const creeps = _.filter(Game.creeps);
+    const creeps = Object.values(Game.creeps);
     for (const creep of creeps) {
         switch (creep.memory.role) {
             case "builder":

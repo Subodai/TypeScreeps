@@ -2,6 +2,7 @@ import { ROLEMODELS, ROLES } from "config/constants";
 import { ALLIES } from "config/diplomacy";
 import { Debug } from "functions/debug";
 import { Empire } from "functions/Empire";
+import { sortByAsc, sortByDesc, sumBy } from "utils/utils";
 import { visualiseDamage } from "functions/tools";
 import { Miner } from "roles/Miner";
 import { MineralExtractor } from "roles/MineralExtractor";
@@ -28,7 +29,8 @@ Object.defineProperty(Room.prototype, "enemies", {
         return Memory.rooms[this.name].enemies;
     },
     set(v: {}): {} {
-        return _.set(Memory, "rooms." + this.name + ".enemies", v);
+        Memory.rooms[this.name].enemies = v;
+        return v;
     }
 });
 
@@ -45,7 +47,8 @@ Object.defineProperty(Room.prototype, "targets", {
         return Memory.rooms[this.name].targets;
     },
     set(v: string[]): string[] {
-        return _.set(Memory, "rooms." + this.name + ".targets", v);
+        Memory.rooms[this.name].targets = v;
+        return v;
     }
 });
 
@@ -92,7 +95,7 @@ Room.prototype.checkDefenceMax = function(): void {
             const walls: StructureWall[] = this.find(FIND_STRUCTURES, {
                 filter: (c: AnyStructure) => c.structureType === STRUCTURE_WALL
             }) as StructureWall[];
-            const wallAvg = _.sum(walls, (c) => c.hits) / walls.length;
+            const wallAvg = walls.reduce((s, c) => s + c.hits, 0) / walls.length;
             const wallMax = this.memory.wallMax || global.wallMax || Memory.wallMax;
             if (wallAvg > wallMax) {
                 this.log("Increasing wallmax");
@@ -102,7 +105,7 @@ Room.prototype.checkDefenceMax = function(): void {
             const ramparts: StructureRampart[] = this.find(FIND_STRUCTURES, {
                 filter: (c: AnyStructure) => c.structureType === STRUCTURE_RAMPART
             }) as StructureRampart[];
-            const ramAvg = _.sum(ramparts, (c) => c.hits) / ramparts.length;
+            const ramAvg = ramparts.reduce((s, c) => s + c.hits, 0) / ramparts.length;
             const ramMax = this.memory.rampartMax || global.rampartMax || Memory.rampartMax;
             // Always reduce the rampart max down a little since they decay
             if (ramAvg > ramMax * 0.95) {
@@ -128,10 +131,10 @@ Room.prototype.collectableEnergy = function(): number {
         filter: (r: Resource) => r.resourceType === RESOURCE_ENERGY
     });
     if (containers.length > 0) {
-        energy += _.sum(containers, (c: StructureContainer) => c.store[RESOURCE_ENERGY]);
+        energy += sumBy(containers, (c: StructureContainer) => c.store[RESOURCE_ENERGY]);
     }
     if (resources.length > 0) {
-        energy += _.sum(resources, (r: Resource) => r.amount);
+        energy += sumBy(resources, (r: Resource) => r.amount);
     }
     this.memory.energy = energy;
     this.memory.lastEnergyCheck = Game.time;
@@ -178,7 +181,7 @@ Room.prototype.countEnemies = function(): string[] {
             threat += creep.getActiveBodyparts(TOUGH);
             creep.threat = threat;
         }
-        targets = _.pluck(_.sortByOrder(hostiles, "threat", "desc"), "id");
+        targets = sortByDesc(hostiles, h => (h as any).threat).map(h => h.id);
     } else {
         this.memory.enemies = {};
     }
@@ -197,9 +200,9 @@ Room.prototype.attackEnemiesWithTowers = function(): void {
         // if no target, do nothing
         if (!target) { return; }
         // Sort towers by range to target
-        towers = _.sortByOrder(towers, (tower: StructureTower) => {
+        towers = sortByAsc(towers, (tower: StructureTower) => {
             return tower.pos.getRangeTo(target);
-        }, "asc");
+        });
 
         let hp = target.hits;
         for (const tower of towers) {
@@ -245,7 +248,7 @@ Room.prototype.stopDrain = function(): void {
 
 Room.prototype.processBuildFlags = function(): number {
     // If we have 100 (or more?) buildsites, ignore this entirely
-    if (_.filter(Game.constructionSites, (site) => site.my).length >= 100) { return OK; }
+    if (Object.values(Game.constructionSites).filter((site) => site.my).length >= 100) { return OK; }
     this.log("Checking for buildsites");
     // Get the buildsites in this room
     const sitecount = this.find(FIND_CONSTRUCTION_SITES);
@@ -255,7 +258,7 @@ Room.prototype.processBuildFlags = function(): number {
         return OK;
     }
     // Get the buildsite flags in this room
-    const flags = _.filter(Game.flags, (flag) => flag.color === global.flagColor.buildsite &&
+    const flags = Object.values(Game.flags).filter((flag) => flag.color === global.flagColor.buildsite &&
         flag.pos.roomName === this.name);
     // If there's no flags, no point carrying on
     if (flags.length === 0) {
@@ -321,7 +324,7 @@ Room.prototype.processDeconFlags = function(): void {
     // Initialise the memory
     if (!this.memory.deconTargets) { this.memory.deconTargets = []; }
     // Filter the room for flags with decon colours
-    const flags: Flag[] = _.filter(Game.flags, (flag) =>
+    const flags: Flag[] = Object.values(Game.flags).filter((flag) =>
         flag.pos.roomName === this.name &&
         flag.color === COLOR_RED && flag.secondaryColor === COLOR_ORANGE
     );
@@ -354,7 +357,7 @@ Room.prototype.getDeconList = function(): string[] {
  * Gets the list of decon ids and converts into game objects
  */
 Room.prototype.getDeconItems = function(): Structure[] {
-    const structures = _.filter(this.getDeconList(), (id) => {
+    const structures = this.getDeconList().filter((id) => {
         const obj = Game.getObjectById(id);
         if (obj) { return true; }
         return false;
@@ -362,7 +365,7 @@ Room.prototype.getDeconItems = function(): Structure[] {
     this.memory.deconTargets = structures;
     if (structures.length === 0) { return []; }
     // Return the mapped items
-    return _.map(structures, (id) => Game.getObjectById(id)) as Structure[];
+    return structures.map((id) => Game.getObjectById(id)) as Structure[];
 };
 
 /**
@@ -454,7 +457,7 @@ Room.prototype.sourceSetup = function(): void {
     // get the sources in this room
     const sources: Source[] = this.find(FIND_SOURCES);
     // get the miners in this room
-    const creeps: Creep[] = _.filter(Game.creeps, (c: Creep) => c.role !== undefined &&
+    const creeps: Creep[] = Object.values(Game.creeps).filter((c: Creep) => c.role !== undefined &&
         ((c.role === Miner.roleName && c.memory.roomName === this.name) ||
             (c.role === RemoteEnergyMiner.roleName && c.memory.remoteRoom === this.name)) &&
         !c.memory.dying);
@@ -502,11 +505,11 @@ Room.prototype.mineralSetup = function(): void {
         this.memory.mineralsNeeded = 0;
         return;
     }
-    const creeps = _.filter(Game.creeps, (c: Creep) =>
+    const creeps = Object.values(Game.creeps).filter((c: Creep) =>
         c.role === MineralExtractor.roleName && c.memory.roomName === this.name &&
         // @todo Remote Mineral Extractor role name?
         !c.memory.dying);
-    const mineral: Mineral = _.first(minerals);
+    const mineral: Mineral = minerals[0];
     const spaces: number = mineral.pos.numSpacesAround(undefined, true);
     this.log("Found " + spaces + " available spaces");
     // get the mineral extracters in this room
@@ -536,7 +539,7 @@ Room.prototype.roleSetup = function(): void {
  * Returns list of creeps of a certain role
  */
 Room.prototype.activeCreepsInRole = function(Role: CreepRole): Creep[] {
-    const list: Creep[] = _.filter(Game.creeps, (c: Creep) =>
+    const list: Creep[] = Object.values(Game.creeps).filter((c: Creep) =>
         c.memory.role === Role.roleName &&
         c.memory.roomName === this.name &&
         !c.memory.dying);
@@ -576,12 +579,12 @@ Room.prototype.cancelTerminalOverride = function(): void {
 };
 
 Room.prototype.runBoostLab = function(): void {
-    const boostLab = _.first(this.find(FIND_MY_STRUCTURES, {
+    const boostLab = this.find(FIND_MY_STRUCTURES, {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
             s.labType === "booster" &&
             s.mineralAmount > 0
-    })) as StructureLab;
+    })[0] as StructureLab;
     if (!boostLab) {
         return;
     }
@@ -708,11 +711,11 @@ Room.prototype.cancelEmptyLabs = function(): void {
 };
 
 Room.prototype.boost = function(role: Role, compound: _ResourceConstantSansEnergy): void {
-    const lab = _.first(this.find(FIND_MY_STRUCTURES, {
+    const lab = this.find(FIND_MY_STRUCTURES, {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
             s.labType === "booster"
-    })) as StructureLab;
+    })[0] as StructureLab;
     lab.boostTarget = {
         compound,
         roleName: role.roleName
@@ -722,11 +725,11 @@ Room.prototype.boost = function(role: Role, compound: _ResourceConstantSansEnerg
 };
 
 Room.prototype.clearBoost = function(): void {
-    const lab = _.first(this.find(FIND_MY_STRUCTURES, {
+    const lab = this.find(FIND_MY_STRUCTURES, {
         filter: (s) =>
             s.structureType === STRUCTURE_LAB &&
             s.labType === "booster"
-    })) as StructureLab;
+    })[0] as StructureLab;
 
     lab.boostTarget = undefined;
     lab.compoundIn = undefined;
@@ -745,8 +748,8 @@ Room.prototype.beginReaction = function(
             s.structureType === STRUCTURE_LAB &&
             s.labType === "feeder"
     }) as StructureLab[];
-    const feederLab1 = _.first(feeders);
-    const feederLab2 = _.last(feeders);
+    const feederLab1 = feeders[0];
+    const feederLab2 = feeders[feeders.length - 1];
 
     this.log("Feeder lab 1: " + feederLab1.id);
     this.log("Feeder lab 2: " + feederLab2.id);
