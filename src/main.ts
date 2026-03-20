@@ -7,7 +7,7 @@ import { Counter } from "functions/counter";
 import { Debug, debugEnablers } from "functions/debug";
 import { Empire } from "functions/Empire";
 import { Runner } from "functions/runner";
-import { Science } from "functions/science/Science";
+import { Science } from "functions/Science/Science";
 import { Spawner } from "functions/spawner";
 import "functions/tools";
 

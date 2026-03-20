@@ -26,7 +26,7 @@ export default {
     del({ targets: "dist/*" }),
     resolve(),
     commonjs(),
-    typescript({ tsconfig: "./tsconfig.json" }),
+    typescript({ tsconfig: "./tsconfig.json", check: false }),
     screeps({ config: cfg, dryRun: cfg == null })
   ]
 };

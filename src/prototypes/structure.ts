@@ -44,6 +44,6 @@ export function loadStructurePrototypes(): void {
 }
 
 import "./structureLab";
-import "./structureLink";
-import "./structureSpawn";
-import "./structureTower";
+import "./structurelink";
+import "./structurespawn";
+import "./structuretower";
